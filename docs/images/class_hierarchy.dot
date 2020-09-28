@@ -1,0 +1,39 @@
+digraph classes {
+    graph [rankdir=RL];
+    node [shape=rect, style=filled, fontname=Sans, fontsize=10];
+    edge [];
+
+    /* Abstract classes */
+    node [color="#9ec6e0", fontcolor="#000000"]
+
+    MosFile;
+
+    /* Concrete classes */
+    node [color="#2980b9", fontcolor="#ffffff"];
+
+    EADeleteItem->ElementAction;
+    EADeleteStory->ElementAction;
+    EAInsertItem->ElementAction;
+    EAInsertStory->ElementAction;
+    EAMoveItem->ElementAction;
+    EAMoveStory->ElementAction;
+    EAReplaceItem->ElementAction;
+    EAReplaceStory->ElementAction;
+    EASwapItem->ElementAction;
+    EASwapStory->ElementAction;
+    ElementAction->MosFile;
+    ItemDelete->MosFile;
+    ItemInsert->MosFile;
+    ItemMoveMultiple->MosFile;
+    ItemReplace->MosFile;
+    MetaDataReplace->MosFile;
+    RunningOrder->MosFile;
+    RunningOrderEnd->MosFile;
+    RunningOrderReplace->MosFile;
+    StoryAppend->MosFile;
+    StoryDelete->MosFile;
+    StoryInsert->MosFile;
+    StoryMove->MosFile;
+    StoryReplace->MosFile;
+    StorySend->MosFile;
+}

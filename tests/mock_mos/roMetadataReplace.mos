@@ -1,0 +1,8 @@
+<mos>
+  <mosID>MOS ID</mosID>
+  <messageID>1013</messageID>
+  <roMetadataReplace>
+    <roID>RO ID</roID>
+    <roSlug>RO SLUG NEW</roSlug>
+  </roMetadataReplace>
+</mos>

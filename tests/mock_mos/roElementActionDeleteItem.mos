@@ -1,0 +1,13 @@
+<mos>
+  <mosID>MOS ID</mosID>
+  <messageID>1006</messageID>
+  <roElementAction operation="DELETE">
+    <roID>RO ID</roID>
+    <element_target>
+      <storyID>STORY1</storyID>
+    </element_target>
+    <element_source>
+      <itemID>ITEM1</itemID>
+    </element_source>
+  </roElementAction>
+</mos>

@@ -1,0 +1,56 @@
+<mos>
+  <mosID>MOS ID</mosID>
+  <messageID>1000</messageID>
+  <roCreate>
+    <roID>RO ID</roID>
+    <roSlug>RO SLUG</roSlug>
+    <story>
+      <storyID>STORY1</storyID>
+      <storySlug>STORY 1</storySlug>
+      <item>
+        <itemID>ITEM1</itemID>
+        <itemSlug>ITEM 1</itemSlug>
+      </item>
+      <item>
+        <itemID>ITEM2</itemID>
+        <itemSlug>ITEM 2</itemSlug>
+      </item>
+      <item>
+        <itemID>ITEM3</itemID>
+        <itemSlug>ITEM 3</itemSlug>
+      </item>
+    </story>
+    <story>
+      <storyID>STORY2</storyID>
+      <storySlug>STORY 2</storySlug>
+      <item>
+        <itemID>ITEM21</itemID>
+        <itemSlug>ITEM 21</itemSlug>
+      </item>
+      <item>
+        <itemID>ITEM22</itemID>
+        <itemSlug>ITEM 22</itemSlug>
+      </item>
+      <item>
+        <itemID>ITEM23</itemID>
+        <itemSlug>ITEM 23</itemSlug>
+      </item>
+    </story>
+    <story>
+      <storyID>STORY3</storyID>
+      <storySlug>STORY 3</storySlug>
+      <item>
+        <itemID>ITEM31</itemID>
+        <itemSlug>ITEM 31</itemSlug>
+      </item>
+      <item>
+        <itemID>ITEM32</itemID>
+        <itemSlug>ITEM 32</itemSlug>
+      </item>
+      <item>
+        <itemID>ITEM33</itemID>
+        <itemSlug>ITEM 33</itemSlug>
+      </item>
+    </story>
+  </roCreate>
+</mos>

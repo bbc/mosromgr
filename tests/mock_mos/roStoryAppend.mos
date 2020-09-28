@@ -1,0 +1,25 @@
+<mos>
+  <mosID>MOS ID</mosID>
+  <messageID>1014</messageID>
+  <roStoryAppend>
+    <roID>RO ID</roID>
+    <story>
+      <storyID>STORYNEW1</storyID>
+      <storySlug>STORY NEW 1</storySlug>
+      <storyNum></storyNum>
+      <item>
+        <itemID>ITEMNEW1</itemID>
+        <itemSlug>ITEM NEW 1</itemSlug>
+      </item>
+    </story>
+    <story>
+      <storyID>STORYNEW2</storyID>
+      <storySlug>STORY NEW 2</storySlug>
+      <storyNum></storyNum>
+      <item>
+        <itemID>ITEMNEW21</itemID>
+        <itemSlug>ITEM NEW 21</itemSlug>
+      </item>
+    </story>
+  </roStoryAppend>
+</mos>

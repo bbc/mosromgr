@@ -1,0 +1,14 @@
+<mos>
+  <mosID>MOS ID</mosID>
+  <messageID>1012</messageID>
+  <roElementAction operation="MOVE">
+    <roID>RO ID</roID>
+    <element_target>
+      <storyID>STORY1</storyID>
+      <itemID>ITEM1</itemID>
+    </element_target>
+    <element_source>
+        <itemID>ITEM3</itemID>
+    </element_source>
+  </roElementAction>
+</mos>

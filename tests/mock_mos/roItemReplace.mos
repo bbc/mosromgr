@@ -1,0 +1,13 @@
+<mos>
+  <mosID>MOS ID</mosID>
+  <messageID>1022</messageID>
+  <roItemReplace>
+    <roID>RO ID</roID>
+    <storyID>STORY2</storyID>
+    <itemID>ITEM21</itemID>
+    <item>
+      <itemID>ITEM21</itemID>
+      <itemSlug>NEW ITEM 21</itemSlug>
+    </item>
+  </roItemReplace>
+</mos>

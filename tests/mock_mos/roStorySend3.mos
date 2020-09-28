@@ -1,0 +1,16 @@
+<mos>
+  <mosID>NEWSLABS.SLICER.BBC.MOS</mosID>
+  <messageID>1001</messageID>
+  <roStorySend>
+    <roID>RO ID</roID>
+    <storyID>NOTSTORY1</storyID>
+    <storySlug>STORY 1</storySlug>
+    <storyBody>
+      <p>(BONG+PRES)</p>
+      <storyItem>
+        <itemID>ITEM1</itemID>
+        <itemSlug>ITEM 1</itemSlug>
+      </storyItem>
+    </storyBody>
+  </roStorySend>
+</mos>

@@ -1,0 +1,58 @@
+from pathlib import Path
+
+HERE = Path(__file__).parent.absolute()
+MOCK_MOS = HERE / 'mock_mos'
+
+ROCREATE = MOCK_MOS / 'roCreate.mos'
+ROCREATE2 = MOCK_MOS / 'roCreate2.mos'
+ROSTORYSEND1 = MOCK_MOS / 'roStorySend1.mos'
+ROSTORYSEND2 = MOCK_MOS / 'roStorySend2.mos'
+ROELEMENTACTIONREPSTORY = MOCK_MOS / 'roElementActionReplaceStory.mos'
+ROELEMENTACTIONREPITEM = MOCK_MOS / 'roElementActionReplaceItem.mos'
+ROELEMENTACTIONDELSTORY = MOCK_MOS / 'roElementActionDeleteStory.mos'
+ROELEMENTACTIONDELITEM = MOCK_MOS / 'roElementActionDeleteItem.mos'
+ROELEMENTACTIONINSERTSTORY = MOCK_MOS / 'roElementActionInsertStory.mos'
+ROELEMENTACTIONINSERTITEM = MOCK_MOS / 'roElementActionInsertItem.mos'
+ROELEMENTACTIONSWAPSTORY = MOCK_MOS / 'roElementActionSwapStory.mos'
+ROELEMENTACTIONSWAPITEM = MOCK_MOS / 'roElementActionSwapItem.mos'
+ROELEMENTACTIONMOVESTORY = MOCK_MOS / 'roElementActionMoveStory.mos'
+ROELEMENTACTIONMOVEITEM = MOCK_MOS / 'roElementActionMoveItem.mos'
+ROAPPENDSTORY = MOCK_MOS / 'roStoryAppend.mos'
+ROREPSTORY = MOCK_MOS / 'roStoryReplace.mos'
+ROREPITEM = MOCK_MOS / 'roItemReplace.mos'
+RODELSTORY = MOCK_MOS / 'roStoryDelete.mos'
+RODELITEM = MOCK_MOS / 'roItemDelete.mos'
+ROINSERTSTORY = MOCK_MOS / 'roStoryInsert.mos'
+ROINSERTITEM = MOCK_MOS / 'roItemInsert.mos'
+ROMOVESTORY = MOCK_MOS / 'roStoryMove.mos'
+ROMOVEMULTIPLEITEM = MOCK_MOS / 'roItemMoveMultiple.mos'
+ROMETADATAREPLACE = MOCK_MOS / 'roMetadataReplace.mos'
+ROREPLACE = MOCK_MOS / 'roReplace.mos'
+RODELETE = MOCK_MOS / 'roDelete.mos'
+
+RO_ALL = [
+    ROCREATE,
+    ROSTORYSEND1,
+    ROSTORYSEND2,
+    ROELEMENTACTIONREPSTORY,
+    ROELEMENTACTIONREPITEM,
+    ROELEMENTACTIONDELSTORY,
+    ROELEMENTACTIONDELITEM,
+    ROELEMENTACTIONINSERTSTORY,
+    ROELEMENTACTIONINSERTITEM,
+    ROELEMENTACTIONSWAPSTORY,
+    ROELEMENTACTIONSWAPITEM,
+    ROELEMENTACTIONMOVESTORY,
+    ROELEMENTACTIONMOVEITEM,
+    ROMETADATAREPLACE,
+    RODELETE,
+]
+
+# roCreate with best bits
+ROCREATE3 = MOCK_MOS / 'roCreate3.mos'
+
+# Various invalid MOS files
+ROSTORYSEND3 = MOCK_MOS / 'roStorySend3.mos'
+ROSTORYSEND4 = MOCK_MOS / 'roStorySend4.mos'
+ROINVALID = MOCK_MOS / 'roInvalidMos.mos'
+RODELETE2 = MOCK_MOS / 'roDelete2.mos'

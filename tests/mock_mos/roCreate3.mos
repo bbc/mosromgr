@@ -1,0 +1,62 @@
+<mos>
+  <mosID>MOS ID</mosID>
+  <messageID>1000</messageID>
+  <roCreate>
+    <roID>RO ID</roID>
+    <roSlug>RO SLUG</roSlug>
+    <story>
+      <storyID>STORY1</storyID>
+      <storySlug>STORY 1</storySlug>
+      <item>
+        <itemID>ITEM1</itemID>
+        <itemSlug>Note</itemSlug>
+        <objID></objID>
+        <mosID>OPENMEDIA_MOS.W1.BBC.MOS</mosID>
+        <mosExternalMetadata>
+          <mosScope>PLAYLIST</mosScope>
+          <mosSchema>http://NCSA4.com/mos/supported_schemas/NCSAXML2.08</mosSchema>
+          <mosPayload>
+            <studioCommand type="note">
+              <text>BB1</text>
+            </studioCommand>
+          </mosPayload>
+        </mosExternalMetadata>
+      </item>
+    </story>
+    <story>
+      <storyID>STORY2</storyID>
+      <storySlug>STORY 2</storySlug>
+      <item>
+        <itemID>ITEM21</itemID>
+        <itemSlug>Note</itemSlug>
+        <objID></objID>
+        <mosID>OPENMEDIA_MOS.W1.BBC.MOS</mosID>
+        <mosExternalMetadata>
+          <mosScope>PLAYLIST</mosScope>
+          <mosSchema>http://NCSA4.com/mos/supported_schemas/NCSAXML2.08</mosSchema>
+          <mosPayload>
+            <studioCommand type="note">
+              <text>BB2</text>
+            </studioCommand>
+          </mosPayload>
+        </mosExternalMetadata>
+      </item>
+    </story>
+    <story>
+      <storyID>STORY3</storyID>
+      <storySlug>STORY 3</storySlug>
+      <item>
+        <itemID>ITEM31</itemID>
+        <itemSlug>ITEM 31</itemSlug>
+      </item>
+      <item>
+        <itemID>ITEM32</itemID>
+        <itemSlug>ITEM 32</itemSlug>
+      </item>
+      <item>
+        <itemID>ITEM33</itemID>
+        <itemSlug>ITEM 33</itemSlug>
+      </item>
+    </story>
+  </roCreate>
+</mos>

@@ -1,0 +1,7 @@
+<mos>
+  <mosID>MOS ID</mosID>
+  <messageID>1014</messageID>
+  <roDelete>
+    <roID>DIFFERENT RO ID</roID>
+  </roDelete>
+</mos>
