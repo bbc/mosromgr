@@ -77,13 +77,13 @@ with open('final.mos.xml', 'w') as f:
 
 - Python 3.6+
 - boto3
-- xmltodict (optional, except in tests)
 
 Test dependencies:
 
 - pytest
 - coverage
 - mock
+- xmltodict
 
 Docs:
 
