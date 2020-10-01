@@ -8,10 +8,10 @@ __author_email__ = 'bbcnewslabs@bbc.co.uk'
 __url__ = 'https://bbcnewslabs.co.uk/'
 __platforms__ = 'ALL'
 
-__requires__ = ['xmltodict', 'boto3']
+__requires__ = ['boto3']
 
 __extra_requires__ = {
-    'test': ['pytest', 'coverage', 'mock', 'flake8'],
+    'test': ['pytest', 'coverage', 'mock', 'xmltodict'],
     'doc': ['sphinx'],
 }
 
