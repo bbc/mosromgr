@@ -10,7 +10,7 @@ specifying as much detail as possible so your bug is reproducible.
 
 Please suggest features at
 [github.com/bbc/mosromgr/issues](https://github.com/bbc/mosromgr/issues)
-specifying the
+specifying the intended usage of your new feature.
 
 ## Contributing code
 
