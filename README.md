@@ -95,7 +95,7 @@ graphviz yourself to build the docs graphs.
 
 ### Local
 
-1. Create a virtualenv, e.g:
+1. Create a virtualenv, e.g using [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/):
 
     ```bash
     mkvirtualenv -p /usr/bin/python3 mosromgr
