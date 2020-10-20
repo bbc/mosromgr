@@ -62,7 +62,6 @@ class MosFile:
 
     @property
     def notes(self):
-        return []
         """
         This method assumes all notes contain an element called *studioCommand*
         with type *note*. It also assumes that this element always appears at
