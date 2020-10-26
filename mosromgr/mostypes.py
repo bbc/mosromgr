@@ -28,6 +28,8 @@ class MosFile:
         XML string of MOS file contents
     """
     def __init__(self, mos_file_path=None, mos_file_contents=None):
+        self._notes = None
+
         if mos_file_path is not None:
             self.xml = ET.parse(mos_file_path)
             self.mos = self.xml.getroot()
@@ -62,24 +64,21 @@ class MosFile:
 
     @property
     def notes(self):
-        """
-        This method assumes all notes contain an element called *studioCommand*
-        with type *note*. It also assumes that this element always appears at
-        the same position within a story element. From quick testing these
-        assumptions seem safe.
+        # This property assumes all notes contain an element called *studioCommand*
+        # with type *note*. It also assumes that this element always appears at
+        # the same position within a story element. From quick testing these
+        # assumptions seem safe.
 
-        This adds about 26 nano seconds to execution over returning [] and
-        overriding that behavior for specific cases.
-        """
-        notes = []
-        for story in self.xml.findall(".//studioCommand[@type='note']/../../../.."):
-            for item in story.findall(".//studioCommand[@type='note']/../../.."):
-                notes.append({
-                    'item_id': item.find('itemID').text,
-                    'story_slug': story.find('storySlug').text,
-                    'text': item.find(".//studioCommand[@type='note']/text").text
-                })
-        return notes
+        if self._notes is None:
+            self._notes = []
+            for story in self.xml.findall(".//studioCommand[@type='note']/../../../.."):
+                for item in story.findall(".//studioCommand[@type='note']/../../.."):
+                    self._notes.append({
+                        'item_id': item.find('itemID').text,
+                        'story_slug': story.find('storySlug').text,
+                        'text': item.find(".//studioCommand[@type='note']/text").text,
+                    })
+        return self._notes
 
     def to_dict(self):
         "Convert XML to dictionary using ``xmltodict`` library. Useful for testing."

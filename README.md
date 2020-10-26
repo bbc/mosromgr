@@ -156,6 +156,7 @@ also hosts the [issue tracker](https://github.com/bbc/mosromgr/issues) and
 - [Ben Nuttall](https://github.com/bennuttall)
 - [Owen Tourlamain](https://github.com/OwenTourlamain)
 - [Rob French](https://github.com/FrencR)
+- [Lucy MacGlashan](https://github.com/lannem)
 
 ## Licence
 
