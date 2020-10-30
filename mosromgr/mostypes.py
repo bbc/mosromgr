@@ -31,10 +31,9 @@ class MosFile:
         self._notes = None
 
         if mos_file_path is not None:
-            self.xml = ET.parse(mos_file_path)
-            self.mos = self.xml.getroot()
+            xml = ET.parse(mos_file_path)
+            self.mos = xml.getroot()
         elif mos_file_contents is not None:
-            self.xml = mos_file_contents
             self.mos = ET.fromstring(mos_file_contents)
         else:
             raise TypeError('Must specify mos_file_path or mos_file_contents')
@@ -72,7 +71,7 @@ class MosFile:
 
         if self._notes is None:
             self._notes = []
-            for story in self.xml.findall(".//studioCommand[@type='note']/../../../.."):
+            for story in self.mos.findall(".//studioCommand[@type='note']/../../../.."):
                 for item in story.findall(".//studioCommand[@type='note']/../../.."):
                     self._notes.append({
                         'item_id': item.find('itemID').text,
