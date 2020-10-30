@@ -34,6 +34,7 @@ class MosFile:
             self.xml = ET.parse(mos_file_path)
             self.mos = self.xml.getroot()
         elif mos_file_contents is not None:
+            self.xml = mos_file_contents
             self.mos = ET.fromstring(mos_file_contents)
         else:
             raise TypeError('Must specify mos_file_path or mos_file_contents')
