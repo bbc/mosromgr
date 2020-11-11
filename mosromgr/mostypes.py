@@ -63,11 +63,6 @@ class MosFile:
         return self.mos.find(tag).find('roID').text
 
     @property
-    def ro_slug(self):
-        tag = class_tag_map[self.__class__.__name__]
-        return self.mos.find(tag).find('roSlug').text
-
-    @property
     def notes(self):
         # This property assumes all notes contain an element called *studioCommand*
         # with type *note*. It also assumes that this element always appears at
@@ -124,6 +119,10 @@ class RunningOrder(MosFile):
             return other.merge(self)
         else:
             raise MosClosedMergeError('Cannot merge closed MOS file')
+
+    @property
+    def ro_slug(self):
+        return self.mos.find('roCreate').find('roSlug').text
 
     @property
     def tx_time(self):
