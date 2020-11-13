@@ -7,6 +7,12 @@
     <story>
       <storyID>STORY1</storyID>
       <storySlug>STORY 1</storySlug>
+      <mosExternalMetadata>
+        <mosPayload>
+          <TextTime>10</TextTime>
+          <MediaTime>20</MediaTime>
+        </mosPayload>
+      </mosExternalMetadata>
       <item>
         <itemID>ITEM1</itemID>
         <itemSlug>ITEM 1</itemSlug>
@@ -23,6 +29,12 @@
     <story>
       <storyID>STORY2</storyID>
       <storySlug>STORY 2</storySlug>
+      <mosExternalMetadata>
+        <mosPayload>
+          <TextTime>15</TextTime>
+          <MediaTime>5</MediaTime>
+        </mosPayload>
+      </mosExternalMetadata>
       <item>
         <itemID>ITEM21</itemID>
         <itemSlug>ITEM 21</itemSlug>
@@ -39,6 +51,12 @@
     <story>
       <storyID>STORY3</storyID>
       <storySlug>STORY 3</storySlug>
+      <mosExternalMetadata>
+        <mosPayload>
+          <TextTime>1</TextTime>
+          <MediaTime>2</MediaTime>
+        </mosPayload>
+      </mosExternalMetadata>
       <item>
         <itemID>ITEM31</itemID>
         <itemSlug>ITEM 31</itemSlug>

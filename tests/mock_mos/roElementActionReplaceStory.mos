@@ -11,6 +11,12 @@
         <storyID>STORY1</storyID>
         <storySlug>STORY ONE</storySlug>
         <storyNum></storyNum>
+        <mosExternalMetadata>
+          <mosPayload>
+            <TextTime>10</TextTime>
+            <MediaTime>20</MediaTime>
+          </mosPayload>
+        </mosExternalMetadata>
         <item>
           <itemID>ITEM1</itemID>
           <itemSlug>ITEM ONE</itemSlug>

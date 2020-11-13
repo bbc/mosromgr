@@ -125,91 +125,91 @@ def test_get_mos_object_with_elementaction_replace_story():
     """
     GIVEN: A path to a elementAction MOS file with the operation 'REPLACE' and
     no target itemID
-    EXPECT: An object of type EAReplaceStory
+    EXPECT: An object of type EAStoryReplace
     """
     ea = get_mos_object(ROELEMENTACTIONREPSTORY)
-    assert isinstance(ea, EAReplaceStory)
+    assert isinstance(ea, EAStoryReplace)
 
 def test_get_mos_object_with_elementaction_replace_item():
     """
     GIVEN: A path to a elementAction MOS file with the operation 'REPLACE' and
     a target itemID
-    EXPECT: An object of type EAReplaceItem
+    EXPECT: An object of type EAItemReplace
     """
     ea = get_mos_object(ROELEMENTACTIONREPITEM)
-    assert isinstance(ea, EAReplaceItem)
+    assert isinstance(ea, EAItemReplace)
 
 def test_get_mos_object_with_elementaction_delete_story():
     """
     GIVEN: A path to a elementAction MOS file with the operation 'DELETE' and
     no source itemID
-    EXPECT: An object of type EADeleteStory
+    EXPECT: An object of type EAStoryDelete
     """
     ea = get_mos_object(ROELEMENTACTIONDELSTORY)
-    assert isinstance(ea, EADeleteStory)
+    assert isinstance(ea, EAStoryDelete)
 
 def test_get_mos_object_with_elementaction_delete_item():
     """
     GIVEN: A path to a elementAction MOS file with the operation 'DELETE' and a
     source itemID
-    EXPECT: An object of type EADeleteItem
+    EXPECT: An object of type EAItemDelete
     """
     ea = get_mos_object(ROELEMENTACTIONDELITEM)
-    assert isinstance(ea, EADeleteItem)
+    assert isinstance(ea, EAItemDelete)
 
 def test_get_mos_object_with_elementaction_insert_story():
     """
     GIVEN: A path to a elementAction MOS file with the operation 'INSERT' and
     no target itemID
-    EXPECT: An object of type EAInsertStory
+    EXPECT: An object of type EAStoryInsert
     """
     ea = get_mos_object(ROELEMENTACTIONINSERTSTORY)
-    assert isinstance(ea, EAInsertStory)
+    assert isinstance(ea, EAStoryInsert)
 
 def test_get_mos_object_with_elementaction_insert_item():
     """
     GIVEN: A path to a elementAction MOS file with the operation 'INSERT' and a
     target itemID
-    EXPECT: An object of type EAInsertItem
+    EXPECT: An object of type EAItemInsert
     """
     ea = get_mos_object(ROELEMENTACTIONINSERTITEM)
-    assert isinstance(ea, EAInsertItem)
+    assert isinstance(ea, EAItemInsert)
 
 def test_get_mos_object_with_elementaction_swap_story():
     """
     GIVEN: A path to a elementAction MOS file with the operation 'SWAP' and no
     source itemID
-    EXPECT: An object of type EASwapStory
+    EXPECT: An object of type EAStorySwap
     """
     ea = get_mos_object(ROELEMENTACTIONSWAPSTORY)
-    assert isinstance(ea, EASwapStory)
+    assert isinstance(ea, EAStorySwap)
 
 def test_get_mos_object_with_elementaction_swap_item():
     """
     GIVEN: A path to a elementAction MOS file with the operation 'SWAP' and two
     source itemIDs
-    EXPECT: An object of type EASwapItem
+    EXPECT: An object of type EAItemSwap
     """
     ea = get_mos_object(ROELEMENTACTIONSWAPITEM)
-    assert isinstance(ea, EASwapItem)
+    assert isinstance(ea, EAItemSwap)
 
 def test_get_mos_object_with_elementaction_move_story():
     """
     GIVEN: A path to a elementAction MOS file with the operation 'MOVE' and no
     target itemID
-    EXPECT: An object of type EAMoveStory
+    EXPECT: An object of type EAStoryMove
     """
     ea = get_mos_object(ROELEMENTACTIONMOVESTORY)
-    assert isinstance(ea, EAMoveStory)
+    assert isinstance(ea, EAStoryMove)
 
 def test_get_mos_object_with_elementaction_move_item():
     """
     GIVEN: A path to a elementAction MOS file with the operation 'MOVE' and a
     target itemID
-    EXPECT: An object of type EAMoveItem
+    EXPECT: An object of type EAItemMove
     """
     ea = get_mos_object(ROELEMENTACTIONMOVEITEM)
-    assert isinstance(ea, EAMoveItem)
+    assert isinstance(ea, EAItemMove)
 
 def test_get_mos_object_with_metadata_replace():
     """

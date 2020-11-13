@@ -12,5 +12,11 @@
         <itemSlug>ITEM 1</itemSlug>
       </storyItem>
     </storyBody>
+    <mosExternalMetadata>
+      <mosPayload>
+        <TextTime>10</TextTime>
+        <MediaTime>20</MediaTime>
+      </mosPayload>
+    </mosExternalMetadata>
   </roStorySend>
 </mos>

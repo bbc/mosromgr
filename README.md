@@ -3,6 +3,7 @@
 # mosromgr
 
 Python library for managing [MOS](http://mosprotocol.com/) running orders.
+Pronounced *mos-ro-manager*.
 
 [![](docs/images/mos.jpg)](http://mosprotocol.com/)
 
@@ -11,9 +12,9 @@ files into a running order, and providing a "completed" programme including all
 additions and changes made between the first message (`roCreate`) and the last
 (`roDelete`).
 
-This can be used as a library, using the utilities provided in the module
-**mosromgr**, and the command line command `mosromgr` can be used to process
-either a directory of MOS files, or a folder within an S3 bucket.
+This can be used as a library, using the utilities provided in the **mosromgr**
+module, and the command line command `mosromgr` can be used to process either a
+directory of MOS files, or a folder within an S3 bucket.
 
 This library was developed by the [BBC News Labs](https://bbcnewslabs.co.uk/)
 team.
@@ -42,8 +43,19 @@ mosromgr -d dirname > FINAL.xml
 
 ### Library
 
-Simple example merging a single `roStorySend` into a `roCreate` and outputting
-the file to a new file:
+Load a `roCreate` file and view its stories:
+
+```python
+from mosromgr.mostypes import RunningOrder
+
+ro = RunningOrder('roCreate.mos.xml')
+
+for story in ro.stories:
+    print(story.slug)
+```
+
+Merge a single `roStorySend` into a `roCreate` and output the file to a new
+file:
 
 ```python
 from mosromgr.mostypes import RunningOrder, StorySend
@@ -77,13 +89,14 @@ with open('final.mos.xml', 'w') as f:
 
 - Python 3.6+
 - boto3
+- xmltodict
 
 Test dependencies:
 
 - pytest
 - coverage
 - mock
-- xmltodict
+- pylint
 
 Docs:
 
@@ -137,12 +150,6 @@ To serve the docs locally:
 
 ```bash
 make doc-serve
-```
-
-To deploy the docs:
-
-```bash
-make doc-deploy
 ```
 
 ## Contributing

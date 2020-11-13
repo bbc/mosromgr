@@ -34,7 +34,7 @@ class MosContainer:
     :param sns:
         SNS object used for lambda notifications
     """
-    def __init__(self, mos_file_paths=None, bucket_name=None, mos_file_keys=None, sns=None):
+    def __init__(self, mos_file_paths=None, *, bucket_name=None, mos_file_keys=None, sns=None):
         self.logger = logging.getLogger('mos_container')
         self.sns = sns
         if mos_file_paths is None:
@@ -46,7 +46,7 @@ class MosContainer:
             self.logger.info('containerising %s mos_files from directory', len(mos_file_paths))
             self.mos_readers = self._process_mos_file_paths(mos_file_paths=mos_file_paths)
         self._validate()
-        self.ro_slug = self.ro.slug
+        self.ro_slug = self.ro.ro_slug
         self.ro_id = self.ro.ro_id
 
     def __repr__(self):

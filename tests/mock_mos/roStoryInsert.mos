@@ -8,6 +8,12 @@
       <storyID>STORYNEW1</storyID>
       <storySlug>STORY NEW 1</storySlug>
       <storyNum></storyNum>
+      <mosExternalMetadata>
+        <mosPayload>
+          <TextTime>1</TextTime>
+          <MediaTime>5</MediaTime>
+        </mosPayload>
+      </mosExternalMetadata>
       <item>
         <itemID>ITEMNEW1</itemID>
         <itemSlug>ITEM NEW 1</itemSlug>
@@ -17,6 +23,12 @@
       <storyID>STORYNEW2</storyID>
       <storySlug>STORY NEW 2</storySlug>
       <storyNum></storyNum>
+      <mosExternalMetadata>
+        <mosPayload>
+          <TextTime>10</TextTime>
+          <MediaTime>5</MediaTime>
+        </mosPayload>
+      </mosExternalMetadata>
       <item>
         <itemID>ITEMNEW21</itemID>
         <itemSlug>ITEM NEW 21</itemSlug>

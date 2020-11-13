@@ -4,8 +4,6 @@ Utilities
 
 .. module:: mosromgr.utils
 
-.. currentmodule:: mosromgr
-
 The various utilities are typically imported like so::
 
     from mosromgr.utils import s3

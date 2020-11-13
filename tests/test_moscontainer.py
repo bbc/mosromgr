@@ -134,8 +134,8 @@ def test_mos_container_unsupported_mos_type():
 
 def test_mos_container_merge():
     """
-    GIVEN: Running order and EAInsertStory paths
-    EXPECT: Running order summary, with story from EAInsertStory added
+    GIVEN: Running order and EAStoryInsert paths
+    EXPECT: Running order summary, with story from EAStoryInsert added
     """
     mos_files = [ROCREATE, ROELEMENTACTIONINSERTSTORY, RODELETE]
     mc = MosContainer(mos_files)
@@ -151,8 +151,8 @@ def test_mos_container_merge():
 @patch('mosromgr.utils.s3.get_file_contents')
 def test_mos_container_s3_merge(get_file_contents, boto3):
     """
-    GIVEN: Running order and EAInsertStory s3 keys
-    EXPECT: Running order summary, with story from EAInsertStory added
+    GIVEN: Running order and EAStoryInsert s3 keys
+    EXPECT: Running order summary, with story from EAStoryInsert added
     """
     with open(ROCREATE) as f:
         rc = f.read()

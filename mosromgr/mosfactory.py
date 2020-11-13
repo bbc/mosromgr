@@ -3,15 +3,15 @@ import logging
 import warnings
 
 from .mostypes import (
-    RunningOrder, StorySend, EAReplaceStory, EAReplaceItem, EADeleteStory,
-    EADeleteItem, EAInsertStory, EAInsertItem, EASwapStory, EASwapItem,
-    EAMoveStory, EAMoveItem, MetaDataReplace, RunningOrderEnd, StoryAppend,
+    RunningOrder, StorySend, EAStoryReplace, EAItemReplace, EAStoryDelete,
+    EAItemDelete, EAStoryInsert, EAItemInsert, EAStorySwap, EAItemSwap,
+    EAStoryMove, EAItemMove, MetaDataReplace, RunningOrderEnd, StoryAppend,
     StoryDelete, StoryInsert, StoryMove, StoryReplace, ItemDelete, ItemInsert,
     ItemMoveMultiple, ItemReplace, RunningOrderReplace, MosFile
 )
 from .exc import MosInvalidXML, UnknownMosFileTypeWarning
 
-logger = logging.getLogger('mos_factory')
+logger = logging.getLogger('mosromgr.mosfactory')
 logging.basicConfig(level=logging.INFO)
 
 ignored_types = (
@@ -58,18 +58,19 @@ tag_class_map = {
 }
 
 ea_class_map = {
-    'REPLACE': lambda ea: EAReplaceStory if ea.find('element_target').find('itemID') is None else EAReplaceItem,
-    'DELETE': lambda ea: EADeleteStory if ea.find('element_target') is None else EADeleteItem,
-    'INSERT': lambda ea: EAInsertStory if ea.find('element_target').find('itemID') is None else EAInsertItem,
-    'SWAP': lambda ea: EASwapStory if ea.find('element_target') is None else EASwapItem,
-    'MOVE': lambda ea: EAMoveStory if ea.find('element_target').find('itemID') is None else EAMoveItem,
+    'REPLACE': lambda ea: EAStoryReplace if ea.find('element_target').find('itemID') is None else EAItemReplace,
+    'DELETE': lambda ea: EAStoryDelete if ea.find('element_target') is None else EAItemDelete,
+    'INSERT': lambda ea: EAStoryInsert if ea.find('element_target').find('itemID') is None else EAItemInsert,
+    'SWAP': lambda ea: EAStorySwap if ea.find('element_target') is None else EAItemSwap,
+    'MOVE': lambda ea: EAStoryMove if ea.find('element_target').find('itemID') is None else EAItemMove,
 }
 
 
-def get_mos_object(mos_file_path=None, mos_file_contents=None, mos_file_prefix=None, sns=None):
+def get_mos_object(mos_file_path=None, *, mos_file_contents=None, mos_file_prefix=None, sns=None):
     """
-    Factory function that detects the MOS file type, selects the appropriate class
-    based on the given MOS file, and constructs and returns an object.
+    Factory function that detects the MOS file type, selects the appropriate
+    class based on the contents of the MOS file, and constructs and returns an
+    object whose class is a subclass of :class:`~mosromgr.mostypes.MosFile`.
 
     The MOS file can be passed either as a file path using ``mos_file_path`` or
     as a string using ``mos_file_contents``. ``mos_file_prefix`` should be used
@@ -82,15 +83,15 @@ def get_mos_object(mos_file_path=None, mos_file_contents=None, mos_file_prefix=N
 
     :type mos_file_contents: str or None
     :param mos_file_contents:
-        XML string of MOS file contents
+        XML string of MOS file contents (keyword-only argument)
 
     :type mos_file_prefix: str or None
     :param mos_file_prefix:
-        AWS S3 file prefix
+        AWS S3 file prefix (keyword-only argument)
 
     :type sns: :class:`~mosromgr.utils.sns.SNS` or None
     :param sns:
-        SNS object used for lambda notifications
+        SNS object used for lambda notifications (keyword-only argument)
     """
     mo = None
     if mos_file_prefix is not None:
@@ -118,12 +119,12 @@ def get_mos_object(mos_file_path=None, mos_file_contents=None, mos_file_prefix=N
         if mos.find(tag) is not None:
             if tag in tag_class_map:
                 ClassName = tag_class_map[tag]
-                mo = ClassName(mos_file_path, mos_file_contents)
+                mo = ClassName(mos_file_path, mos_file_contents=mos_file_contents)
             elif tag == 'roElementAction':
                 if mos.find('roElementAction') is not None:
                     ea = mos.find('roElementAction')
                     ClassName = ea_class_map[ea.attrib['operation']](ea)
-                    mo = ClassName(mos_file_path, mos_file_contents)
+                    mo = ClassName(mos_file_path, mos_file_contents=mos_file_contents)
 
     if isinstance(mo, MosFile):
         logger.info('created %s from message %s', mo.__class__.__name__, mo.message_id)

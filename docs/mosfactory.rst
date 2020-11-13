@@ -4,15 +4,13 @@ MOS Factory
 
 .. module:: mosromgr.mosfactory
 
-.. currentmodule:: mosromgr
-
 This part of the module contains a single function,
-:func:`~mosfactory.get_mos_object`, that converts an XML MOS message into a
-:class:`~mostypes.MosFile` compatible object that matches the MOS message type.
-This function reads the XML and uses simple rules to determine the MOS message
-type. If the MOS message type cannot be identified then the function returns
-:data:`None`, if this happens a warning is triggered but this is not considered
-fatal.
+:func:`~mosromgr.mosfactory.get_mos_object`, that converts an XML MOS message
+into a :class:`~mosromgr.mostypes.MosFile` compatible object that matches the
+MOS message type. This function reads the XML and uses simple rules to determine
+the MOS message type. If the MOS message type cannot be identified then the
+function returns :data:`None`, if this happens a warning is triggered but this
+is not considered fatal.
 
 The MOS message type is detected by looking for a "fingerprint" in the structure
 of the XML. This is a combination of tags and attributes that uniquely
@@ -53,19 +51,19 @@ get_mos_object
 Example usage
 -------------
 
-:func:`~mosfactory.get_mos_object` produces a ``RunningOrder`` object from a
-``roCreate`` file.
+:func:`~mosromgr.mosfactory.get_mos_object` produces a
+:class:`~mosromgr.mostypes.RunningOrder` object from a ``roCreate`` file.
 
 From a file::
 
-    >>> ro = get_mos_object(mos_file_path="roCreate.mos.xml")
+    >>> ro = get_mos_object('roCreate.mos.xml')
     >>> ro
     <RunningOrder 1000>
 
 From a string::
 
-    >>> with open("roCreate.mos.xml") as f:
-    ...     mos_string = f.read()
-    >>> ro = get_mos_object(mos_file_contents=mos_string)
+    >>> with open('roCreate.mos.xml') as f:
+    ...     xml = f.read()
+    >>> ro = get_mos_object(mos_file_contents=xml)
     >>> ro
     <RunningOrder 1000>

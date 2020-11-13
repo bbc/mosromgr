@@ -20,9 +20,12 @@ install:
 
 develop:
 	pip install -e .[test,doc]
-	@echo "To build the docs you will also need to install sphinx and graphviz using apt/brew"
+	@echo "To build the docs you will also need to install graphviz using apt/brew"
 
-test:
+lint:
+	pylint -E mosromgr
+
+test: lint
 	coverage run --rcfile coverage.cfg -m pytest -v tests
 	coverage report --rcfile coverage.cfg
 
