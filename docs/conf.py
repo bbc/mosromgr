@@ -2,7 +2,8 @@ import sys
 import os
 from datetime import datetime
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../'))
-import mosromgr as _setup
+from mosromgr import __version__
+import sphinx_rtd_theme
 
 # Mock out certain modules while building documentation
 class Mock(object):
@@ -37,15 +38,15 @@ sys.modules['boto3'] = Mock()
 
 # -- General configuration ------------------------------------------------
 
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode', 'sphinx.ext.intersphinx']
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode', 'sphinx.ext.intersphinx', 'sphinx_rtd_theme']
 templates_path = ['_templates']
 source_suffix = '.rst'
 #source_encoding = 'utf-8-sig'
 master_doc = 'index'
-project = _setup.__project__
+project = 'mosromgr'
 copyright = '2020-%s %s' % (datetime.now().year, 'BBC')
-version = _setup.__version__
-release = _setup.__version__
+version = __version__
+release = __version__
 #language = None
 #today_fmt = '%B %d, %Y'
 exclude_patterns = ['_build']
@@ -70,7 +71,7 @@ intersphinx_mapping = {
 
 # -- Options for HTML output ----------------------------------------------
 
-html_theme = 'default'
+html_theme = 'sphinx_rtd_theme'
 #html_theme_options = {}
 #html_sidebars = {}
 html_title = '%s %s Documentation' % (project, version)
@@ -91,4 +92,4 @@ html_static_path = ['_static']
 #html_show_copyright = True
 #html_use_opensearch = ''
 #html_file_suffix = None
-htmlhelp_basename = '%sdoc' % _setup.__project__
+htmlhelp_basename = '%sdoc' % project

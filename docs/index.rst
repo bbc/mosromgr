@@ -124,9 +124,18 @@ Contributors
 .. _Rob French: https://github.com/FrencR
 .. _Lucy MacGlashan: https://github.com/lannem
 
+Licence
+=======
+
+TBC
+
 Contact
 =======
 
-Please contact `BBC News Labs Team`_ if you want to get in touch.
+Please contact `BBC News Labs team`_ if you want to get in touch.
 
-.. _BBC News Labs Team: mailto:BBCNewsLabsTeam@bbc.co.uk
+.. _BBC News Labs team: mailto:BBCNewsLabsTeam@bbc.co.uk
+
+.. image:: images/bbcnewslabs.*
+    :target: https://bbcnewslabs.co.uk/
+    :align: center
