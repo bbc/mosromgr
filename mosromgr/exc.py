@@ -2,6 +2,10 @@ class MosRoMgrException(Exception):
     "Base class for all ``mosromgr`` exceptions"
 
 
+class UnknownMosFileType(MosRoMgrException):
+    "Exception raised when a MOS file type cannot be determined"
+
+
 class MosMergeError(MosRoMgrException):
     "Exception raised when MOS merge fails"
 
@@ -15,7 +19,7 @@ class MosContainerBadInit(MosRoMgrException):
 
 
 class MosInvalidXML(MosRoMgrException):
-    "Exception raised when :func:`~mosromgr.mosfactory.get_mos_object` cannot parse given XML"
+    "Exception raised when :class:`~mosromgr.mostypes.MosFile` cannot parse given XML"
 
 
 class MosRoMgrWarning(Warning):
@@ -23,7 +27,11 @@ class MosRoMgrWarning(Warning):
 
 
 class UnknownMosFileTypeWarning(MosRoMgrWarning):
-    "Warning raised when :func:`~mosromgr.mosfactory.get_mos_object` cannot detect MOS file type"
+    "Warning raised when :class:`~mosromgr.mostypes.MosFile` cannot detect MOS file type"
+
+
+class MosInvalidXMLWarning(MosRoMgrWarning):
+    "Exception raised when :class:`~mosromgr.mostypes.MosFile` cannot parse given XML"
 
 
 class MergeAfterDeleteWarning(MosRoMgrWarning):
@@ -31,8 +39,8 @@ class MergeAfterDeleteWarning(MosRoMgrWarning):
 
 
 class ItemNotFoundWarning(MosRoMgrWarning):
-    "Warning raised when an item cannot be found during a :class:`~mosromgr.mostypes.MosFile merge"
+    "Warning raised when an item cannot be found during a :class:`~mosromgr.mostypes.MosFile` merge"
 
 
 class StoryNotFoundWarning(MosRoMgrWarning):
-    "Warning raised when a story cannot be found during a :class:`~mosromgr.mostypes.MosFile merge"
+    "Warning raised when a story cannot be found during a :class:`~mosromgr.mostypes.MosFile` merge"
