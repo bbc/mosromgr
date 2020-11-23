@@ -4,8 +4,6 @@ MOS Types
 
 .. module:: mosromgr.mostypes
 
-.. currentmodule:: mosromgr
-
 This part of the module provides the classes required for managing MOS files.
 
 .. note::
@@ -14,9 +12,25 @@ This part of the module provides the classes required for managing MOS files.
     class directly. To detect the class required for a particular MOS file, the
     :func:`~mosromgr.mosfactory.get_mos_object` function should be used.
 
+MOS message objects provide access to certain elements within the message, such
+as the list of :attr:`~RunningOrder.stories` within a :class:`RunningOrder`.
+The following documentation for each class lists the available properties. Read
+more in the :doc:`moselements` page.
+
 MOS message classes are typically imported like so::
 
     from mosromgr.mostypes import RunningOrder
+
+MOS objects can either be initialised from a file path::
+
+    ro = RunningOrder('roCreate.mos.xml')
+
+or from an XML string, using the ``mos_file_contents`` keyword argument::
+
+    with open('roCreate.mos.xml') as f:
+        xml = f.read()
+
+    ro = RunningOrder(mos_file_contents=xml)
 
 MOS message classes
 ===================
@@ -27,146 +41,218 @@ messages.
 RunningOrder
 ------------
 
-.. autoclass:: mosromgr.mostypes.RunningOrder
-    :members: to_dict
+.. autoclass:: RunningOrder
+    :members:
+    :inherited-members:
+    :show-inheritance:
+    :special-members: __add__, __lt__, __gt__, __str__
 
 StorySend
 ---------
 
-.. autoclass:: mosromgr.mostypes.StorySend
-    :members: merge
-
-EAReplaceStory
---------------
-
-.. autoclass:: mosromgr.mostypes.EAReplaceStory
-    :members: merge
-
-EAReplaceItem
--------------
-
-.. autoclass:: mosromgr.mostypes.EAReplaceItem
-    :members: merge
-
-EADeleteStory
--------------
-
-.. autoclass:: mosromgr.mostypes.EADeleteStory
-    :members: merge
-
-EADeleteItem
-------------
-
-.. autoclass:: mosromgr.mostypes.EADeleteItem
-    :members: merge
-
-EAInsertStory
--------------
-
-.. autoclass:: mosromgr.mostypes.EAInsertStory
-    :members: merge
-
-EAInsertItem
-------------
-
-.. autoclass:: mosromgr.mostypes.EAInsertItem
-    :members: merge
-
-EASwapStory
------------
-
-.. autoclass:: mosromgr.mostypes.EASwapStory
-    :members: merge
-
-EASwapItem
-----------
-
-.. autoclass:: mosromgr.mostypes.EASwapItem
-    :members: merge
-
-EAMoveStory
------------
-
-.. autoclass:: mosromgr.mostypes.EAMoveStory
-    :members: merge
-
-EAMoveItem
-----------
-
-.. autoclass:: mosromgr.mostypes.EAMoveItem
-    :members: merge
-
-MetaDataReplace
----------------
-
-.. autoclass:: mosromgr.mostypes.MetaDataReplace
-    :members: merge
-
-StoryAppend
------------
-
-.. autoclass:: mosromgr.mostypes.StoryAppend
-    :members: merge
-
-StoryDelete
------------
-
-.. autoclass:: mosromgr.mostypes.StoryDelete
-    :members: merge
-
-ItemDelete
-----------
-
-.. autoclass:: mosromgr.mostypes.ItemDelete
-    :members: merge
-
-StoryInsert
------------
-
-.. autoclass:: mosromgr.mostypes.StoryInsert
-    :members: merge
-
-ItemInsert
-----------
-
-.. autoclass:: mosromgr.mostypes.ItemInsert
-    :members: merge
-
-StoryMove
----------
-
-.. autoclass:: mosromgr.mostypes.StoryMove
-    :members: merge
-
-ItemMoveMultiple
-----------------
-
-.. autoclass:: mosromgr.mostypes.ItemMoveMultiple
-    :members: merge
+.. autoclass:: StorySend
+    :members:
+    :inherited-members:
+    :show-inheritance:
+    :special-members: __add__, __lt__, __gt__, __str__
 
 StoryReplace
 ------------
 
-.. autoclass:: mosromgr.mostypes.StoryReplace
-    :members: merge
+.. autoclass:: StoryReplace
+    :members:
+    :inherited-members:
+    :show-inheritance:
+    :special-members: __add__, __lt__, __gt__, __str__
+
+StoryInsert
+-----------
+
+.. autoclass:: StoryInsert
+    :members:
+    :inherited-members:
+    :show-inheritance:
+    :special-members: __add__, __lt__, __gt__, __str__
+
+StoryAppend
+-----------
+
+.. autoclass:: StoryAppend
+    :members:
+    :inherited-members:
+    :show-inheritance:
+    :special-members: __add__, __lt__, __gt__, __str__
+
+StoryMove
+---------
+
+.. autoclass:: StoryMove
+    :members:
+    :inherited-members:
+    :show-inheritance:
+    :special-members: __add__, __lt__, __gt__, __str__
+
+StoryDelete
+-----------
+
+.. autoclass:: StoryDelete
+    :members:
+    :inherited-members:
+    :show-inheritance:
+    :special-members: __add__, __lt__, __gt__, __str__
+
+MetaDataReplace
+---------------
+
+.. autoclass:: MetaDataReplace
+    :members:
+    :inherited-members:
+    :show-inheritance:
+    :special-members: __add__, __lt__, __gt__, __str__
+
+ItemDelete
+----------
+
+.. autoclass:: ItemDelete
+    :members:
+    :inherited-members:
+    :show-inheritance:
+    :special-members: __add__, __lt__, __gt__, __str__
+
+ItemInsert
+----------
+
+.. autoclass:: ItemInsert
+    :members:
+    :inherited-members:
+    :show-inheritance:
+    :special-members: __add__, __lt__, __gt__, __str__
+
+ItemMoveMultiple
+----------------
+
+.. autoclass:: ItemMoveMultiple
+    :members:
+    :inherited-members:
+    :show-inheritance:
+    :special-members: __add__, __lt__, __gt__, __str__
 
 ItemReplace
 -----------
 
-.. autoclass:: mosromgr.mostypes.ItemReplace
-    :members: merge
+.. autoclass:: ItemReplace
+    :members:
+    :inherited-members:
+    :show-inheritance:
+    :special-members: __add__, __lt__, __gt__, __str__
+
+EAStoryReplace
+--------------
+
+.. autoclass:: EAStoryReplace
+    :members:
+    :inherited-members:
+    :show-inheritance:
+    :special-members: __add__, __lt__, __gt__, __str__
+
+EAItemReplace
+-------------
+
+.. autoclass:: EAItemReplace
+    :members:
+    :inherited-members:
+    :show-inheritance:
+    :special-members: __add__, __lt__, __gt__, __str__
+
+EAStoryDelete
+-------------
+
+.. autoclass:: EAStoryDelete
+    :members:
+    :inherited-members:
+    :show-inheritance:
+    :special-members: __add__, __lt__, __gt__, __str__
+
+EAItemDelete
+------------
+
+.. autoclass:: EAItemDelete
+    :members:
+    :inherited-members:
+    :show-inheritance:
+    :special-members: __add__, __lt__, __gt__, __str__
+
+EAStoryInsert
+-------------
+
+.. autoclass:: EAStoryInsert
+    :members:
+    :inherited-members:
+    :show-inheritance:
+    :special-members: __add__, __lt__, __gt__, __str__
+
+EAItemInsert
+------------
+
+.. autoclass:: EAItemInsert
+    :members:
+    :inherited-members:
+    :show-inheritance:
+    :special-members: __add__, __lt__, __gt__, __str__
+
+EAStorySwap
+-----------
+
+.. autoclass:: EAStorySwap
+    :members:
+    :inherited-members:
+    :show-inheritance:
+    :special-members: __add__, __lt__, __gt__, __str__
+
+EAItemSwap
+----------
+
+.. autoclass:: EAItemSwap
+    :members:
+    :inherited-members:
+    :show-inheritance:
+    :special-members: __add__, __lt__, __gt__, __str__
+
+EAStoryMove
+-----------
+
+.. autoclass:: EAStoryMove
+    :members:
+    :inherited-members:
+    :show-inheritance:
+    :special-members: __add__, __lt__, __gt__, __str__
+
+EAItemMove
+----------
+
+.. autoclass:: EAItemMove
+    :members:
+    :inherited-members:
+    :show-inheritance:
+    :special-members: __add__, __lt__, __gt__, __str__
 
 RunningOrderReplace
 -------------------
 
-.. autoclass:: mosromgr.mostypes.RunningOrderReplace
-    :members: merge
+.. autoclass:: RunningOrderReplace
+    :members:
+    :inherited-members:
+    :show-inheritance:
+    :special-members: __add__, __lt__, __gt__, __str__
 
 RunningOrderEnd
 ---------------
 
-.. autoclass:: mosromgr.mostypes.RunningOrderEnd
-    :members: merge
+.. autoclass:: RunningOrderEnd
+    :members:
+    :inherited-members:
+    :show-inheritance:
+    :special-members: __add__, __lt__, __gt__, __str__
 
 Base classes
 ============
@@ -182,10 +268,13 @@ The following classes are abstract and should not be used directly.
 MosFile
 -------
 
-.. autoclass:: mosromgr.mostypes.MosFile
-    :members: to_dict
+.. autoclass:: MosFile
+    :members:
+    :inherited-members:
 
 ElementAction
 -------------
 
-.. autoclass:: mosromgr.mostypes.ElementAction
+.. autoclass:: ElementAction
+    :members:
+    :inherited-members:

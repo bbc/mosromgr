@@ -4,6 +4,7 @@ from pathlib import Path
 
 ABSTRACT_CLASSES = {
     'MosFile',
+    'ElementAction',
 }
 
 OMIT_CLASSES = {
@@ -11,6 +12,9 @@ OMIT_CLASSES = {
     'MosContainer',
     'MosRoMgrException',
     'MosRoMgrWarning',
+    'MosElement',
+    'Story',
+    'Item',
 }
 
 

@@ -4,8 +4,6 @@ MOS Container
 
 .. module:: mosromgr.moscontainer
 
-.. currentmodule:: mosromgr
-
 This part of the module provides a wrapper class
 :class:`~moscontainer.MosContainer` which stores paths to specified MOS objects
 in the given directory or S3 bucket. The wrapper can also access the files using
@@ -32,8 +30,8 @@ The MOS container class is typically imported like so::
 
 MosContainer
 ============
-.. autoclass:: mosromgr.moscontainer.MosContainer
-    :members: merge
+.. autoclass:: MosContainer
+    :members:
 
 Example usage
 -------------
@@ -58,7 +56,8 @@ Merge all MOS files into the running order::
     >>> mc = MosContainer(mos_files)
     >>> mc.merge()
 
-To access the final XML, simply print the :class:`~mosromgr.moscontainer.MosContainer` object::
+To access the final XML, simply print the
+:class:`~mosromgr.moscontainer.MosContainer` object::
 
     >>> print(mc)
     <mos>

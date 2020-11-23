@@ -2,20 +2,26 @@
 mosromgr
 ========
 
-Python library for managing `MOS`_ running orders, developed by `BBC News
-Labs`_.
+Python client for managing `MOS`_ running orders. Pronounced *mos-ro-manager*.
 
 .. _MOS: http://mosprotocol.com/
-.. _BBC News Labs: https://bbcnewslabs.co.uk
 
-The library provides functionality for detecting MOS file types, merging MOS
-files into a running order, and providing a "completed" programme including all
-additions and changes made between the first message (``roCreate``) and the last
-(``roDelete``).
+.. image:: images/mos.*
+    :target: http://mosprotocol.com/
+    :align: center
 
-This can be used as a library, using the utilities provided in the module
-**mosromgr**, and the command line command ``mosromgr`` can be used to process
+The library provides functionality for detecting MOS file types, processing and
+inspecting MOS message files, as well as merging MOS files into a running order,
+and providing a "completed" programme including all additions and changes made
+between the first message (``roCreate``) and the last (``roDelete``).
+
+This can be used as a library, using the utilities provided in the *mosromgr*
+module, and the command line command :ref:`cli-mosromgr` can be used to process
 either a directory of MOS files, or a folder within an S3 bucket.
+
+This library was developed by the `BBC News Labs`_ team.
+
+.. _BBC News Labs: https://bbcnewslabs.co.uk/
 
 Usage
 =====
@@ -23,24 +29,33 @@ Usage
 Command line
 ------------
 
-Merge all MOS files in directory ``dirname``::
+Merge all MOS files in directory `dirname`::
 
     mosromgr -d dirname
 
-Merge all MOS files in S3 folder ``prefix`` in bucket ``bucketname``::
+Merge all MOS files in S3 folder `prefix` in bucket `bucketname`::
 
     mosromgr -b bucketname -p prefix
 
-The final running order is output to stdout, so to save to a file use ``>``
-e.g::
+The final running order is output to stdout, so to save to a file use `>` e.g::
 
     mosromgr -d dirname > FINAL.xml
 
 Library
 -------
 
-Simple example merging a single ``roStorySend`` into a ``roCreate`` and
-outputting the file to a new file::
+Load a ``roCreate`` file and view its stories::
+
+    from mosromgr.mostypes import RunningOrder
+
+    ro = RunningOrder('roCreate.mos.xml')
+
+    for story in ro.stories:
+        print(story.slug)
+
+Merge a single ``roStorySend`` (:class:`~mosromgr.mostypes.StorySend`) into a
+``roCreate`` (:class:`~mosromgr.mostypes.RunningOrder`) and output the file to a
+new file::
 
     from mosromgr.mostypes import RunningOrder, StorySend
 
@@ -52,8 +67,8 @@ outputting the file to a new file::
     with open('final.mos.xml', 'w') as f:
         f.write(ro)
 
-Alternatively, use ``MosContainer`` which will sort and classify MOS types of
-all given files::
+Alternatively, use :class:`~mosromgr.moscontainer.MosContainer` which will sort
+and classify MOS types of all given files::
 
     from mosromgr.moscontainer import MosContainer
 
@@ -92,5 +107,6 @@ TBC
 Contact
 =======
 
-Please contact the BBC News Labs team (``BBCNewsLabsTeam@bbc.co.uk``) if you
-want to get in touch.
+Please contact `BBC News Labs team`_ if you want to get in touch.
+
+.. _BBC News Labs team: mailto:BBCNewsLabsTeam@bbc.co.uk

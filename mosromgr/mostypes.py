@@ -2,16 +2,18 @@ import xml.etree.ElementTree as ET
 import logging
 import warnings
 from datetime import datetime
+import copy
 
-try:
-    import xmltodict
-except ImportError:
-    xmltodict = None
+import xmltodict
 
 from .utils.xml import remove_node, replace_node, insert_node, find_child
-from .exc import MosClosedMergeError, MosMergeError, ItemNotFoundWarning, StoryNotFoundWarning
+from .moselements import Story, Item
+from .exc import (
+    MosClosedMergeError, MosMergeError, ItemNotFoundWarning,
+    StoryNotFoundWarning
+)
 
-logger = logging.getLogger('mos_types')
+logger = logging.getLogger('mosromgr.mostypes')
 logging.basicConfig(level=logging.INFO)
 
 
@@ -25,70 +27,77 @@ class MosFile:
 
     :type mos_file_contents: str or None
     :param mos_file_contents:
-        XML string of MOS file contents
+        XML string of MOS file contents (keyword-only argument)
     """
-    def __init__(self, mos_file_path=None, mos_file_contents=None):
-        self._notes = None
+    def __init__(self, mos_file_path=None, *, mos_file_contents=None):
+        self._base_tag = None
 
         if mos_file_path is not None:
-            xml = ET.parse(mos_file_path)
-            self.mos = xml.getroot()
+            self._xml = ET.parse(mos_file_path).getroot()
         elif mos_file_contents is not None:
-            self.mos = ET.fromstring(mos_file_contents)
+            self._xml = ET.fromstring(mos_file_contents)
         else:
-            raise TypeError('Must specify mos_file_path or mos_file_contents')
+            raise TypeError("Must specify mos_file_path or mos_file_contents")
 
     def __repr__(self):
-        if self.mos.find('mosromgrmeta') is None:
+        if self.xml.find('mosromgrmeta') is None:
             return f'<{self.__class__.__name__} {self.message_id}>'
         else:
             return f'<{self.__class__.__name__} {self.message_id} ended>'
 
     def __str__(self):
-        return ET.tostring(self.mos, encoding="unicode")
+        "The XML string"
+        return ET.tostring(self.xml, encoding='unicode')
 
     def __lt__(self, other):
+        "Sort by :attr:`message_id` i.e. ``ro < ss`` or ``sorted([ro, ss])``"
         return self.message_id < other.message_id
 
     def __gt__(self, other):
+        "Sort by :attr:`message_id` i.e. ``ss > ro`` or ``sorted([ro, ss])``"
         return self.message_id > other.message_id
 
     @property
+    def base_tag_name(self):
+        return
+
+    @property
+    def xml(self):
+        """
+        The XML element of the MOS file
+        (:class:`xml.etree.ElementTree.Element`)
+        """
+        return self._xml
+
+    @property
+    def base_tag(self):
+        """
+        The base tag (:class:`xml.etree.ElementTree.Element`) within the
+        :attr:`xml`, as determined by :attr:`base_tag_name`
+        """
+        if self._base_tag is None:
+            self._base_tag = self.xml.find(self.base_tag_name)
+        return self._base_tag
+
+    @property
     def message_id(self):
-        return int(self.mos.find('messageID').text)
+        "The MOS file's message ID (:class:`int`)"
+        return int(self.xml.find('messageID').text)
 
     @property
     def ro_id(self):
-        tag = class_tag_map[self.__class__.__name__]
-        return self.mos.find(tag).find('roID').text
-
-    @property
-    def notes(self):
-        # This property assumes all notes contain an element called *studioCommand*
-        # with type *note*. It also assumes that this element always appears at
-        # the same position within a story element. From quick testing these
-        # assumptions seem safe.
-
-        if self._notes is None:
-            self._notes = []
-            for story in self.mos.findall(".//studioCommand[@type='note']/../../../.."):
-                for item in story.findall(".//studioCommand[@type='note']/../../.."):
-                    self._notes.append({
-                        'item_id': item.find('itemID').text,
-                        'story_slug': story.find('storySlug').text,
-                        'text': item.find(".//studioCommand[@type='note']/text").text,
-                    })
-        return self._notes
+        "The running order ID (:class:`str`)"
+        return self.base_tag.find('roID').text
 
     def to_dict(self):
-        "Convert XML to dictionary using ``xmltodict`` library. Useful for testing."
-        if xmltodict is None:
-            raise RuntimeError('to_dict requires package xmltodict')
-        xml_string = ET.tostring(self.mos)
-        return xmltodict.parse(xml_string)
+        """
+        Convert XML to dictionary using ``xmltodict`` library. Useful for
+        testing.
+        """
+        return xmltodict.parse(str(self))
 
     def merge(self, ro):
-        raise NotImplementedError('merge method not implemented')
+        raise NotImplementedError("merge method not implemented")
 
 
 class RunningOrder(MosFile):
@@ -101,34 +110,53 @@ class RunningOrder(MosFile):
 
     :type mos_file_contents: str or None
     :param mos_file_contents:
-        XML string of MOS file contents
-
-    ``RunningOrder`` objects can be merged with other MOS files which implement
-    a ``merge`` method by using the ``+`` operator, for example::
-
-        ro = RunningOrder('roCreate.mos.xml')
-        ss = StorySend('roStorySend.mos.xml')
-        ro += ss
+        XML string of MOS file contents (keyword-only argument)
     """
-    def __init__(self, mos_file_path=None, mos_file_contents=None):
-        super().__init__(mos_file_path, mos_file_contents)
-        self.slug = self.mos.find('roCreate').find('roSlug').text
-
     def __add__(self, other):
-        if self.mos.find('mosromgrmeta') is None:
+        """
+        ``RunningOrder`` objects can be merged with other MOS files which
+        implement a ``merge`` method by using the ``+`` operator, for example::
+
+            ro = RunningOrder('roCreate.mos.xml')
+            ss = StorySend('roStorySend.mos.xml')
+            ro += ss
+        """
+        if self.xml.find('mosromgrmeta') is None:
             return other.merge(self)
         else:
-            raise MosClosedMergeError('Cannot merge closed MOS file')
+            raise MosClosedMergeError("Cannot merge closed MOS file")
+
+    @property
+    def base_tag_name(self):
+        "The name of the base XML tag for this file type (:class:`str`)"
+        return 'roCreate'
 
     @property
     def ro_slug(self):
-        return self.mos.find('roCreate').find('roSlug').text
+        "The running order slug (:class:`str`)"
+        return self.base_tag.find('roSlug').text
+
+    @property
+    def stories(self):
+        """
+        A list of :class:`~mosromgr.moselements.Story` objects within the
+        running order
+        """
+        return [
+            Story(story_tag)
+            for story_tag in self.base_tag.findall('story')
+        ]
 
     @property
     def tx_time(self):
-        ro_ed_start = self.mos.find("roCreate").find("roEdStart").text
-        tx_time = datetime.strptime(ro_ed_start, '%Y-%m-%dT%H:%M:%S')
-        return int(tx_time.timestamp())
+        "Transmission time (:class:`datetime.datetime`)"
+        ro_ed_start = self.base_tag.find('roEdStart').text
+        return datetime.strptime(ro_ed_start, '%Y-%m-%dT%H:%M:%S')
+
+    @property
+    def duration(self):
+        "Total running order duration in seconds (:class:`int`)"
+        return sum(story.duration for story in self.stories)
 
 
 class StorySend(MosFile):
@@ -145,34 +173,52 @@ class StorySend(MosFile):
 
     :type mos_file_contents: str or None
     :param mos_file_contents:
-        XML string of MOS file contents
+        XML string of MOS file contents (keyword-only argument)
     """
-    def __init__(self, mos_file_path=None, mos_file_contents=None):
-        super().__init__(mos_file_path, mos_file_contents)
-        self.mos.find('roStorySend').tag = 'story'
-        story = self.mos.find('story')
-        for item in story.find('storyBody').findall('storyItem'):
+    @property
+    def base_tag_name(self):
+        "The name of the base XML tag for this file type (:class:`str`)"
+        return 'roStorySend'
+
+    @property
+    def story(self):
+        "The :class:`~mosromgr.moselements.Story` object being sent"
+        story_tag = self._convert_story_send_to_story_tag(self.base_tag)
+        return Story(story_tag)
+
+    def _convert_story_send_to_story_tag(self, ss_tag_orig):
+        """
+        Converts <roStorySend> tag from roStorySend format to a <story> tag to
+        be merged into the roCreate, i.e:
+            <roStorySend><storyBody><storyItem>...</storyItem></storyBody></roStorySend>
+            to <story><item>...</item></story>
+        """
+        # take a copy to preserve the original
+        ss_tag = copy.deepcopy(ss_tag_orig)
+        # change <roStorySend> to <story>
+        ss_tag.tag = 'story'
+        for item in ss_tag.find('storyBody').findall('storyItem'):
+            # change <storyItem> to <item>
             item.tag = 'item'
-        sb, sb_index = find_child(parent=story, child_tag='storyBody')
-        children = list(sb)
-        for child in children:
-            insert_node(parent=story, node=child, index=sb_index)
-            sb_index += 1
-        remove_node(parent=story, node=sb)
-        self.id = self.mos.find('story').find('storyID').text
+        story_body, story_body_index = find_child(parent=ss_tag, child_tag='storyBody')
+        children = list(story_body)
+        # move all children of <storyBody> to <story>
+        for sb_index, child in enumerate(children, start=story_body_index):
+            insert_node(parent=ss_tag, node=child, index=story_body_index)
+        remove_node(parent=ss_tag, node=story_body)
+        return ss_tag
 
     def merge(self, ro):
         "Merge into the :class:`RunningOrder` object provided"
-        rc = ro.mos.find('roCreate')
-        story, story_index = find_child(parent=rc, child_tag='story', id=self.id)
+        story, story_index = find_child(parent=ro.base_tag, child_tag='story', id=self.story.id)
         if not story:
             msg = f'{self.__class__.__name__} error in {self.message_id} - story not found'
             logger.warning(msg)
             warnings.warn(msg, StoryNotFoundWarning)
         else:
-            new_story = self.mos.find('story')
-            remove_node(parent=rc, node=story)
-            insert_node(parent=rc, node=new_story, index=story_index)
+            new_story = self._convert_story_send_to_story_tag(self.base_tag)
+            remove_node(parent=ro.base_tag, node=story)
+            insert_node(parent=ro.base_tag, node=new_story, index=story_index)
         return ro
 
 
@@ -186,20 +232,20 @@ class ElementAction(MosFile):
 
     :type mos_file_contents: str or None
     :param mos_file_contents:
-        XML string of MOS file contents
+        XML string of MOS file contents (keyword-only argument)
     """
-    def __init__(self, mos_file_path=None, mos_file_contents=None):
-        super().__init__(mos_file_path, mos_file_contents)
-        self.target = self.mos.find('roElementAction').find('element_target')
-        self.source = self.mos.find('roElementAction').find('element_source')
+    @property
+    def base_tag_name(self):
+        "The name of the base XML tag for this file type (:class:`str`)"
+        return 'roElementAction'
 
 
-class EAReplaceStory(ElementAction):
+class EAStoryReplace(ElementAction):
     """
-    An ``EAReplaceStory`` object is created from a ``roElementAction`` MOS file
+    An ``EAStoryReplace`` object is created from a ``roElementAction`` MOS file
     containing a story replacement.
 
-    ``EAReplaceStory`` objects can be merged with a :class:`RunningOrder` by
+    ``EAStoryReplace`` objects can be merged with a :class:`RunningOrder` by
     using the ``+`` operator. This behaviour is defined in the :meth:`merge`
     method in this class.
 
@@ -209,35 +255,46 @@ class EAReplaceStory(ElementAction):
 
     :type mos_file_contents: str or None
     :param mos_file_contents:
-        XML string of MOS file contents
+        XML string of MOS file contents (keyword-only argument)
     """
+    @property
+    def target_story(self):
+        "The :class:`~mosromgr.moselements.Story` object being replaced"
+        return Story(self.base_tag.find('element_target'), unknown_items=True)
+
+    @property
+    def source_story(self):
+        "The replacement :class:`~mosromgr.moselements.Story` object"
+        return Story(self.base_tag.find('element_source').find('story'))
+
     def merge(self, ro):
         "Merge into the :class:`RunningOrder` object provided"
-        rc = ro.mos.find('roCreate')
-        target_story_id = self.target.find('storyID').text
-        story, story_index = find_child(parent=rc, child_tag='story', id=target_story_id)
+        target = self.base_tag.find('element_target')
+        source = self.base_tag.find('element_source')
+        target_story_id = target.find('storyID').text
+        story, story_index = find_child(parent=ro.base_tag, child_tag='story', id=target_story_id)
         if not story:
             raise MosMergeError(
                 f'{self.__class__.__name__} error in {self.message_id} - story not found'
             )
-        new_stories = self.source.findall('story')
+        new_stories = source.findall('story')
         if not new_stories:
             raise MosMergeError(
                 f'{self.__class__.__name__} error in {self.message_id} - story not found'
             )
-        remove_node(parent=rc, node=story)
+        remove_node(parent=ro.base_tag, node=story)
         for new_story in new_stories:
-            insert_node(parent=rc, node=new_story, index=story_index)
+            insert_node(parent=ro.base_tag, node=new_story, index=story_index)
             story_index += 1
         return ro
 
 
-class EAReplaceItem(ElementAction):
+class EAItemReplace(ElementAction):
     """
-    An ``EAReplaceItem`` object is created from a ``roElementAction`` MOS file
+    An ``EAItemReplace`` object is created from a ``roElementAction`` MOS file
     containing an item replacement.
 
-    ``EAReplaceItem`` objects can be merged with a :class:`RunningOrder` by
+    ``EAItemReplace`` objects can be merged with a :class:`RunningOrder` by
     using the ``+`` operator. This behaviour is defined in the :meth:`merge`
     method in this class.
 
@@ -247,26 +304,45 @@ class EAReplaceItem(ElementAction):
 
     :type mos_file_contents: str or None
     :param mos_file_contents:
-        XML string of MOS file contents
+        XML string of MOS file contents (keyword-only argument)
     """
+    @property
+    def target_story(self):
+        """
+        The :class:`~mosromgr.moselements.Story` object containing the item
+        being replaced
+        """
+        return Story(self.base_tag.find('element_target'), unknown_items=True)
+
+    @property
+    def target_item(self):
+        "The :class:`~mosromgr.moselements.Item` object being replaced"
+        return Item(self.base_tag.find('element_target'))
+
+    @property
+    def source_item(self):
+        "The replacement :class:`~mosromgr.moselements.Item` object"
+        return Item(self.base_tag.find('element_source').find('item'))
+
     def merge(self, ro):
         "Merge into the :class:`RunningOrder` object provided"
-        rc = ro.mos.find('roCreate')
-        target_story_id = self.target.find('storyID').text
-        story, story_index = find_child(parent=rc, child_tag='story', id=target_story_id)
+        target = self.base_tag.find('element_target')
+        source = self.base_tag.find('element_source')
+        target_story_id = target.find('storyID').text
+        story, story_index = find_child(parent=ro.base_tag, child_tag='story', id=target_story_id)
         if not story:
             msg = f'{self.__class__.__name__} error in {self.message_id} - story not found'
             logger.warning(msg)
             warnings.warn(msg, StoryNotFoundWarning)
             return ro
-        target_item_id = self.target.find('itemID').text
+        target_item_id = target.find('itemID').text
         item, item_index = find_child(parent=story, child_tag='item', id=target_item_id)
         if not item:
             msg = f'{self.__class__.__name__} error in {self.message_id} - item not found'
             logger.warning(msg)
             warnings.warn(msg, ItemNotFoundWarning)
             return ro
-        new_items = self.source.findall('item')
+        new_items = source.findall('item')
         if not new_items:
             raise MosMergeError(
                 f'{self.__class__.__name__} error in {self.message_id} - item not found'
@@ -278,12 +354,12 @@ class EAReplaceItem(ElementAction):
         return ro
 
 
-class EADeleteStory(ElementAction):
+class EAStoryDelete(ElementAction):
     """
-    An ``EADeleteStory`` object is created from a ``roElementAction`` MOS file
+    An ``EAStoryDelete`` object is created from a ``roElementAction`` MOS file
     containing a story deletion.
 
-    ``EADeleteStory`` objects can be merged with a :class:`RunningOrder` by
+    ``EAStoryDelete`` objects can be merged with a :class:`RunningOrder` by
     using the ``+`` operator. This behaviour is defined in the :meth:`merge`
     method in this class.
 
@@ -293,29 +369,35 @@ class EADeleteStory(ElementAction):
 
     :type mos_file_contents: str or None
     :param mos_file_contents:
-        XML string of MOS file contents
+        XML string of MOS file contents (keyword-only argument)
     """
+    @property
+    def story(self):
+        "The :class:`~mosromgr.moselements.Story` object to be deleted"
+        return Story(self.base_tag.find('element_source'))
+
     def merge(self, ro):
         "Merge into the :class:`RunningOrder` object provided"
-        rc = ro.mos.find('roCreate')
-        source_story_ids = self.source.findall('storyID')
+        target = self.base_tag.find('element_target')
+        source = self.base_tag.find('element_source')
+        source_story_ids = source.findall('storyID')
         for source_story_id in source_story_ids:
-            story, story_index = find_child(parent=rc, child_tag='story', id=source_story_id.text)
+            story, story_index = find_child(parent=ro.base_tag, child_tag='story', id=source_story_id.text)
             if not story:
                 msg = f'{self.__class__.__name__} error in {self.message_id} - story not found'
                 logger.warning(msg)
                 warnings.warn(msg, StoryNotFoundWarning)
             else:
-                remove_node(parent=rc, node=story)
+                remove_node(parent=ro.base_tag, node=story)
         return ro
 
 
-class EADeleteItem(ElementAction):
+class EAItemDelete(ElementAction):
     """
-    An ``EADeleteItem`` object is created from a ``roElementAction`` MOS file
+    An ``EAItemDelete`` object is created from a ``roElementAction`` MOS file
     containing an item deletion.
 
-    ``EADeleteItem`` objects can be merged with a :class:`RunningOrder` by using
+    ``EAItemDelete`` objects can be merged with a :class:`RunningOrder` by using
     the ``+`` operator. This behaviour is defined in the :meth:`merge` method in
     this class.
 
@@ -325,18 +407,32 @@ class EADeleteItem(ElementAction):
 
     :type mos_file_contents: str or None
     :param mos_file_contents:
-        XML string of MOS file contents
+        XML string of MOS file contents (keyword-only argument)
     """
+    @property
+    def target_story(self):
+        """
+        The :class:`~mosromgr.moselements.Story` object containing the item
+        being deleted
+        """
+        return Story(self.base_tag.find('element_target'), unknown_items=True)
+
+    @property
+    def source_item(self):
+        "The :class:`~mosromgr.moselements.Item` object being deleted"
+        return Item(self.base_tag.find('element_source'))
+
     def merge(self, ro):
         "Merge into the :class:`RunningOrder` object provided"
-        rc = ro.mos.find('roCreate')
-        target_story_id = self.target.find('storyID').text
-        story, story_index = find_child(parent=rc, child_tag='story', id=target_story_id)
+        target = self.base_tag.find('element_target')
+        source = self.base_tag.find('element_source')
+        target_story_id = target.find('storyID').text
+        story, story_index = find_child(parent=ro.base_tag, child_tag='story', id=target_story_id)
         if not story:
             raise MosMergeError(
                 f'{self.__class__.__name__} error in {self.message_id} - story not found'
             )
-        item_ids = self.source.findall('itemID')
+        item_ids = source.findall('itemID')
         for item_id in item_ids:
             item, item_index = find_child(parent=story, child_tag='item', id=item_id.text)
             if not item:
@@ -348,12 +444,12 @@ class EADeleteItem(ElementAction):
         return ro
 
 
-class EAInsertStory(ElementAction):
+class EAStoryInsert(ElementAction):
     """
-    An ``EAInsertStory`` object is created from a ``roElementAction`` MOS file
+    An ``EAStoryInsert`` object is created from a ``roElementAction`` MOS file
     containing a story insertion.
 
-    ``EAInsertStory`` objects can be merged with a :class:`RunningOrder` by
+    ``EAStoryInsert`` objects can be merged with a :class:`RunningOrder` by
     using the ``+`` operator. This behaviour is defined in the :meth:`merge`
     method in this class.
 
@@ -363,14 +459,28 @@ class EAInsertStory(ElementAction):
 
     :type mos_file_contents: str or None
     :param mos_file_contents:
-        XML string of MOS file contents
+        XML string of MOS file contents (keyword-only argument)
     """
+    @property
+    def target_story(self):
+        """
+        The :class:`~mosromgr.moselements.Story` object above which the source
+        story will be inserted
+        """
+        return Story(self.base_tag.find('element_target'), unknown_items=True)
+
+    @property
+    def source_story(self):
+        "The :class:`~mosromgr.moselements.Story` object to be inserted"
+        return Story(self.base_tag.find('element_source').find('story'))
+
     def merge(self, ro):
         "Merge into the :class:`RunningOrder` object provided"
-        rc = ro.mos.find('roCreate')
-        new_stories = self.source.findall('story')
-        target_story_id = self.target.find('storyID').text
-        story, story_index = find_child(parent=rc, child_tag='story', id=target_story_id)
+        target = self.base_tag.find('element_target')
+        source = self.base_tag.find('element_source')
+        new_stories = source.findall('story')
+        target_story_id = target.find('storyID').text
+        story, story_index = find_child(parent=ro.base_tag, child_tag='story', id=target_story_id)
         if not story:
             raise MosMergeError(
                 f'{self.__class__.__name__} error in {self.message_id} - story not found'
@@ -380,17 +490,17 @@ class EAInsertStory(ElementAction):
                 f'{self.__class__.__name__} error in {self.message_id} - story not found'
             )
         for new_story in new_stories:
-            insert_node(parent=rc, node=new_story, index=story_index)
+            insert_node(parent=ro.base_tag, node=new_story, index=story_index)
             story_index += 1
         return ro
 
 
-class EAInsertItem(ElementAction):
+class EAItemInsert(ElementAction):
     """
-    An ``EAInsertItem`` object is created from a ``roElementAction`` MOS file
+    An ``EAItemInsert`` object is created from a ``roElementAction`` MOS file
     containing an item insertion.
 
-    ``EAInsertItem`` objects can be merged with a :class:`RunningOrder` by using
+    ``EAItemInsert`` objects can be merged with a :class:`RunningOrder` by using
     the ``+`` operator. This behaviour is defined in the :meth:`merge` method in
     this class.
 
@@ -400,36 +510,58 @@ class EAInsertItem(ElementAction):
 
     :type mos_file_contents: str or None
     :param mos_file_contents:
-        XML string of MOS file contents
+        XML string of MOS file contents (keyword-only argument)
     """
+    @property
+    def target_story(self):
+        """
+        The :class:`~mosromgr.moselements.Story` object into which the item is
+        to be inserted
+        """
+        return Story(self.base_tag.find('element_target'), unknown_items=True)
+
+    @property
+    def target_item(self):
+        """
+        The :class:`~mosromgr.moselements.Item` object above which the source
+        item is to be be inserted
+        """
+        return Item(self.base_tag.find('element_target'))
+
+    @property
+    def source_item(self):
+        "The :class:`~mosromgr.moselements.Item` object to be inserted"
+        return Item(self.base_tag.find('element_source').find('item'))
+
     def merge(self, ro):
         "Merge into the :class:`RunningOrder` object provided"
-        rc = ro.mos.find('roCreate')
-        target_story_id = self.target.find('storyID').text
-        story, story_index = find_child(parent=rc, child_tag='story', id=target_story_id)
+        target = self.base_tag.find('element_target')
+        source = self.base_tag.find('element_source')
+        target_story_id = target.find('storyID').text
+        story, story_index = find_child(parent=ro.base_tag, child_tag='story', id=target_story_id)
         if not story:
             raise MosMergeError(
                 f'{self.__class__.__name__} error in {self.message_id} - story not found'
             )
-        target_item_id = self.target.find('itemID').text
+        target_item_id = target.find('itemID').text
         item_index = None
         if target_item_id:
             item, item_index = find_child(parent=story, child_tag='item', id=target_item_id)
         if not item_index:
             item_index = len(story.findall('item)'))
-        new_items = self.source.findall('item')
+        new_items = source.findall('item')
         for new_item in new_items:
             insert_node(parent=story, node=new_item, index=item_index)
             item_index += 1
         return ro
 
 
-class EASwapStory(ElementAction):
+class EAStorySwap(ElementAction):
     """
-    An ``EASwapStory`` object is created from a ``roElementAction`` MOS file
+    An ``EAStorySwap`` object is created from a ``roElementAction`` MOS file
     containing a story swap.
 
-    ``EASwapStory`` objects can be merged with a :class:`RunningOrder` by using
+    ``EAStorySwap`` objects can be merged with a :class:`RunningOrder` by using
     the ``+`` operator. This behaviour is defined in the :meth:`merge` method in
     this class.
 
@@ -439,35 +571,48 @@ class EASwapStory(ElementAction):
 
     :type mos_file_contents: str or None
     :param mos_file_contents:
-        XML string of MOS file contents
+        XML string of MOS file contents (keyword-only argument)
     """
+    @property
+    def stories(self):
+        """
+        A set of the two :class:`~mosromgr.moselements.Story` objects to be
+        swapped
+        """
+        source = self.base_tag.find('element_source')
+        return {
+            Story(source, id=story_id.text)
+            for story_id in source.findall('storyID')
+        }
+
     def merge(self, ro):
         "Merge into the :class:`RunningOrder` object provided"
-        rc = ro.mos.find('roCreate')
-        source_story_ids = self.source.findall('storyID')
-        story1, story1_index = find_child(parent=rc, child_tag='story', id=source_story_ids[0].text)
+        target = self.base_tag.find('element_target')
+        source = self.base_tag.find('element_source')
+        source_story_ids = source.findall('storyID')
+        story1, story1_index = find_child(parent=ro.base_tag, child_tag='story', id=source_story_ids[0].text)
         if not story1:
             raise MosMergeError(
                 f'{self.__class__.__name__} error in {self.message_id} - story 1 not found'
             )
-        story2, story2_index = find_child(parent=rc, child_tag='story', id=source_story_ids[1].text)
+        story2, story2_index = find_child(parent=ro.base_tag, child_tag='story', id=source_story_ids[1].text)
         if not story2:
             raise MosMergeError(
                 f'{self.__class__.__name__} error in {self.message_id} - story 2 not found'
             )
-        remove_node(parent=rc, node=story1)
-        remove_node(parent=rc, node=story2)
-        insert_node(parent=rc, node=story2, index=story1_index)
-        insert_node(parent=rc, node=story1, index=story2_index)
+        remove_node(parent=ro.base_tag, node=story1)
+        remove_node(parent=ro.base_tag, node=story2)
+        insert_node(parent=ro.base_tag, node=story2, index=story1_index)
+        insert_node(parent=ro.base_tag, node=story1, index=story2_index)
         return ro
 
 
-class EASwapItem(ElementAction):
+class EAItemSwap(ElementAction):
     """
-    An ``EASwapItem`` object is created from a ``roElementAction`` MOS file
+    An ``EAItemSwap`` object is created from a ``roElementAction`` MOS file
     containing an item swap.
 
-    ``EASwapItem`` objects can be merged with a :class:`RunningOrder` by using
+    ``EAItemSwap`` objects can be merged with a :class:`RunningOrder` by using
     the ``+`` operator. This behaviour is defined in the :meth:`merge` method in
     this class.
 
@@ -477,18 +622,36 @@ class EASwapItem(ElementAction):
 
     :type mos_file_contents: str or None
     :param mos_file_contents:
-        XML string of MOS file contents
+        XML string of MOS file contents (keyword-only argument)
     """
+    @property
+    def target_story(self):
+        """
+        The :class:`~mosromgr.moselements.Story` object containing the items
+        being swapped
+        """
+        return Story(self.base_tag.find('element_target'), unknown_items=True)
+
+    @property
+    def source_items(self):
+        "A set of :class:`~mosromgr.moselements.Item` objects to be swapped"
+        source = self.base_tag.find('element_source')
+        return {
+            Item(source, id=item_id.text)
+            for item_id in source.findall('itemID')
+        }
+
     def merge(self, ro):
         "Merge into the :class:`RunningOrder` object provided"
-        rc = ro.mos.find('roCreate')
-        target_story_id = self.target.find('storyID').text
-        story, story_index = find_child(parent=rc, child_tag='story', id=target_story_id)
+        target = self.base_tag.find('element_target')
+        source = self.base_tag.find('element_source')
+        target_story_id = target.find('storyID').text
+        story, story_index = find_child(parent=ro.base_tag, child_tag='story', id=target_story_id)
         if not story:
             raise MosMergeError(
                 f'{self.__class__.__name__} error in {self.message_id} - story not found'
             )
-        source_item_ids = self.source.findall('itemID')
+        source_item_ids = source.findall('itemID')
         item1, item1_index = find_child(parent=story, child_tag='item', id=source_item_ids[0].text)
         if not item1:
             raise MosMergeError(
@@ -506,12 +669,12 @@ class EASwapItem(ElementAction):
         return ro
 
 
-class EAMoveStory(ElementAction):
+class EAStoryMove(ElementAction):
     """
-    An ``EAMoveStory`` object is created from a ``roElementAction`` MOS file
+    An ``EAStoryMove`` object is created from a ``roElementAction`` MOS file
     containing a story move.
 
-    ``EAMoveStory`` objects can be merged with a :class:`RunningOrder` by using
+    ``EAStoryMove`` objects can be merged with a :class:`RunningOrder` by using
     the ``+`` operator. This behaviour is defined in the :meth:`merge` method in
     this class.
 
@@ -521,36 +684,47 @@ class EAMoveStory(ElementAction):
 
     :type mos_file_contents: str or None
     :param mos_file_contents:
-        XML string of MOS file contents
+        XML string of MOS file contents (keyword-only argument)
     """
+    @property
+    def target_story(self):
+        "The :class:`~mosromgr.moselements.Story` object being replaced"
+        return Story(self.base_tag.find('element_target'), unknown_items=True)
+
+    @property
+    def source_story(self):
+        "The replacement :class:`~mosromgr.moselements.Story` object"
+        return Story(self.base_tag.find('element_source'))
+
     def merge(self, ro):
         "Merge into the :class:`RunningOrder` object provided"
-        rc = ro.mos.find('roCreate')
-        target_story_id = self.target.find('storyID').text
-        target_story, target_index = find_child(parent=rc, child_tag='story', id=target_story_id)
+        target = self.base_tag.find('element_target')
+        source = self.base_tag.find('element_source')
+        target_story_id = target.find('storyID').text
+        target_story, target_index = find_child(parent=ro.base_tag, child_tag='story', id=target_story_id)
         if not target_story:
             raise MosMergeError(
                 f'{self.__class__.__name__} error in {self.message_id} - target story not found'
             )
 
-        source_story_ids = self.source.findall('storyID')
+        source_story_ids = source.findall('storyID')
         for source_story_id in source_story_ids:
-            source_story, source_index = find_child(parent=rc, child_tag='story', id=source_story_id.text)
+            source_story, source_index = find_child(parent=ro.base_tag, child_tag='story', id=source_story_id.text)
             if not source_story:
                 raise MosMergeError(
                     f'{self.__class__.__name__} error in {self.message_id} - source story not found'
                 )
-            remove_node(parent=rc, node=source_story)
-            insert_node(parent=rc, node=source_story, index=target_index)
+            remove_node(parent=ro.base_tag, node=source_story)
+            insert_node(parent=ro.base_tag, node=source_story, index=target_index)
         return ro
 
 
-class EAMoveItem(ElementAction):
+class EAItemMove(ElementAction):
     """
-    An ``EAMoveItem`` object is created from a ``roElementAction`` MOS file
+    An ``EAItemMove`` object is created from a ``roElementAction`` MOS file
     containing an item move.
 
-    ``EAMoveItem`` objects can be merged with a :class:`RunningOrder` by using
+    ``EAItemMove`` objects can be merged with a :class:`RunningOrder` by using
     the ``+`` operator. This behaviour is defined in the :meth:`merge` method in
     this class.
 
@@ -560,24 +734,46 @@ class EAMoveItem(ElementAction):
 
     :type mos_file_contents: str or None
     :param mos_file_contents:
-        XML string of MOS file contents
+        XML string of MOS file contents (keyword-only argument)
     """
+    @property
+    def target_story(self):
+        """
+        The :class:`~mosromgr.moselements.Story` object containing the item
+        being replaced
+        """
+        return Story(self.base_tag.find('element_target'), unknown_items=True)
+
+    @property
+    def target_item(self):
+        """
+        The :class:`~mosromgr.moselements.Item` object above which the source
+        items will be moved
+        """
+        return Item(self.base_tag.find('element_target'))
+
+    @property
+    def source_item(self):
+        "The :class:`~mosromgr.moselements.Item` object to be moved"
+        return Item(self.base_tag.find('element_source'))
+
     def merge(self, ro):
         "Merge into the :class:`RunningOrder` object provided"
-        rc = ro.mos.find('roCreate')
-        target_story_id = self.target.find('storyID').text
-        story, story_index = find_child(parent=rc, child_tag='story', id=target_story_id)
+        target = self.base_tag.find('element_target')
+        source = self.base_tag.find('element_source')
+        target_story_id = target.find('storyID').text
+        story, story_index = find_child(parent=ro.base_tag, child_tag='story', id=target_story_id)
         if not story:
             raise MosMergeError(
                 f'{self.__class__.__name__} error in {self.message_id} - story not found'
             )
-        target_item_id = self.target.find('itemID').text
+        target_item_id = target.find('itemID').text
         target_item, target_item_index = find_child(parent=story, child_tag='item', id=target_item_id)
         if not target_item:
             raise MosMergeError(
                 f'{self.__class__.__name__} error in {self.message_id} - target item not found'
             )
-        source_item_ids = self.source.findall('itemID')
+        source_item_ids = source.findall('itemID')
         for source_item_id in source_item_ids:
             source_item, source_item_index = find_child(parent=story, child_tag='item', id=source_item_id.text)
             if not source_item:
@@ -604,18 +800,27 @@ class MetaDataReplace(MosFile):
 
     :type mos_file_contents: str or None
     :param mos_file_contents:
-        XML string of MOS file contents
+        XML string of MOS file contents (keyword-only argument)
     """
+    @property
+    def base_tag_name(self):
+        "The name of the base XML tag for this file type (:class:`str`)"
+        return 'roMetadataReplace'
+
+    @property
+    def ro_slug(self):
+        "The running order slug (:class:`str`)"
+        return self.base_tag.find('roSlug').text
+
     def merge(self, ro):
         "Merge into the :class:`RunningOrder` object provided"
-        rc = ro.mos.find('roCreate')
-        for source in list(self.mos.find('roMetadataReplace')):
-            target, target_index = find_child(parent=rc, child_tag=source.tag)
+        for source in list(self.base_tag):
+            target, target_index = find_child(parent=ro.base_tag, child_tag=source.tag)
             if target is None:
                 raise MosMergeError(
                     f'{self.__class__.__name__} error in {self.message_id} - {source.tag} not found'
                 )
-            replace_node(parent=rc, old_node=target, new_node=source, index=target_index)
+            replace_node(parent=ro.base_tag, old_node=target, new_node=source, index=target_index)
         return ro
 
 
@@ -633,20 +838,30 @@ class StoryAppend(MosFile):
 
     :type mos_file_contents: str or None
     :param mos_file_contents:
-        XML string of MOS file contents
+        XML string of MOS file contents (keyword-only argument)
     """
+    @property
+    def base_tag_name(self):
+        "The name of the base XML tag for this file type (:class:`str`)"
+        return 'roStoryAppend'
+
+    @property
+    def stories(self):
+        "A list of :class:`~mosromgr.moselements.Story` objects to be appended"
+        return [
+            Story(story_tag)
+            for story_tag in self.base_tag.findall('story')
+        ]
 
     def merge(self, ro):
         "Merge into the :class:`RunningOrder` object provided"
-        rc = ro.mos.find('roCreate')
-        sa = self.mos.find('roStoryAppend')
-        stories = sa.findall('story')
+        stories = self.base_tag.findall('story')
         if not stories:
             raise MosMergeError(
                 f'{self.__class__.__name__} error in {self.message_id} - no stories to append'
             )
         for story in stories:
-            rc.append(story)
+            ro.base_tag.append(story)
         return ro
 
 
@@ -664,26 +879,36 @@ class StoryDelete(MosFile):
 
     :type mos_file_contents: str or None
     :param mos_file_contents:
-        XML string of MOS file contents
+        XML string of MOS file contents (keyword-only argument)
     """
+    @property
+    def base_tag_name(self):
+        "The name of the base XML tag for this file type (:class:`str`)"
+        return 'roStoryDelete'
+
+    @property
+    def stories(self):
+        "A list of :class:`~mosromgr.moselements.Story` objects to be deleted"
+        return [
+            Story(self.base_tag, id=story_id.text)
+            for story_id in self.base_tag.findall('storyID')
+        ]
 
     def merge(self, ro):
         "Merge into the :class:`RunningOrder` object provided"
-        rc = ro.mos.find('roCreate')
-        sd = self.mos.find('roStoryDelete')
-        story_ids = sd.findall('storyID')
+        story_ids = self.base_tag.findall('storyID')
         if not story_ids:
             raise MosMergeError(
                 f'{self.__class__.__name__} error in {self.message_id} - no stories to delete'
             )
         for id in story_ids:
-            found_node, found_index = find_child(parent=rc, child_tag='story', id=id.text)
+            found_node, found_index = find_child(parent=ro.base_tag, child_tag='story', id=id.text)
             if not found_node:
                 msg = f'{self.__class__.__name__} error in {self.message_id} - story not found'
                 logger.warning(msg)
                 warnings.warn(msg, StoryNotFoundWarning)
             else:
-                remove_node(parent=rc, node=found_node)
+                remove_node(parent=ro.base_tag, node=found_node)
         return ro
 
 
@@ -701,26 +926,43 @@ class ItemDelete(MosFile):
 
     :type mos_file_contents: str or None
     :param mos_file_contents:
-        XML string of MOS file contents
+        XML string of MOS file contents (keyword-only argument)
     """
+    @property
+    def base_tag_name(self):
+        "The name of the base XML tag for this file type (:class:`str`)"
+        return 'roItemDelete'
+
+    @property
+    def target_story(self):
+        """
+        The :class:`~mosromgr.moselements.Story` object containing the items
+        being replaced
+        """
+        return Story(self.base_tag, unknown_items=True)
+
+    @property
+    def target_items(self):
+        "The :class:`~mosromgr.moselements.Item` objects being deleted"
+        return {
+            Item(self.base_tag, id=item_id.text)
+            for item_id in self.base_tag.findall('itemID')
+        }
 
     def merge(self, ro):
         "Merge into the :class:`RunningOrder` object provided"
-        rc = ro.mos.find('roCreate')
-        id = self.mos.find('roItemDelete')
-
-        story_id = id.find('storyID').text
+        story_id = self.base_tag.find('storyID').text
         if not story_id:
             raise MosMergeError(
                 f'{self.__class__.__name__} error in {self.message_id} - no story to delete item from'
             )
-        story, story_index = find_child(parent=rc, child_tag='story', id=story_id)
+        story, story_index = find_child(parent=ro.base_tag, child_tag='story', id=story_id)
         if story is None:
             raise MosMergeError(
                 f'{self.__class__.__name__} error in {self.message_id} - story not found'
             )
 
-        item_ids = id.findall('itemID')
+        item_ids = self.base_tag.findall('itemID')
         if not item_ids:
             raise MosMergeError(
                 f'{self.__class__.__name__} error in {self.message_id} - no items to delete'
@@ -750,25 +992,44 @@ class StoryInsert(MosFile):
 
     :type mos_file_contents: str or None
     :param mos_file_contents:
-        XML string of MOS file contents
+        XML string of MOS file contents (keyword-only argument)
     """
+    @property
+    def base_tag_name(self):
+        "The name of the base XML tag for this file type (:class:`str`)"
+        return 'roStoryInsert'
+
+    @property
+    def target_story(self):
+        """
+        The :class:`~mosromgr.moselements.Story` object above which the source
+        stories are to be inserted
+        """
+        return Story(self.base_tag, unknown_items=True)
+
+    @property
+    def source_stories(self):
+        "A list of :class:`~mosromgr.moselements.Story` objects to be inserted"
+        return [
+            Story(story_tag)
+            for story_tag in self.base_tag.findall('story')
+        ]
+
     def merge(self, ro):
         "Merge into the :class:`RunningOrder` object provided"
-        rc = ro.mos.find('roCreate')
-        si = self.mos.find('roStoryInsert')
-        target_id = si.find('storyID').text
+        target_id = self.base_tag.find('storyID').text
         if not target_id:
             raise MosMergeError(
                 f'{self.__class__.__name__} error in {self.message_id} - no target storyID'
             )
-        target_node, target_index = find_child(parent=rc, child_tag='story', id=target_id)
-        stories = si.findall('story')
+        target_node, target_index = find_child(parent=ro.base_tag, child_tag='story', id=target_id)
+        stories = self.base_tag.findall('story')
         if not stories:
             raise MosMergeError(
                 f'{self.__class__.__name__} error in {self.message_id} - no story to insert'
             )
         for story in stories:
-            insert_node(parent=rc, node=story, index=target_index)
+            insert_node(parent=ro.base_tag, node=story, index=target_index)
             target_index += 1
         return ro
 
@@ -787,28 +1048,55 @@ class ItemInsert(MosFile):
 
     :type mos_file_contents: str or None
     :param mos_file_contents:
-        XML string of MOS file contents
+        XML string of MOS file contents (keyword-only argument)
     """
+    @property
+    def base_tag_name(self):
+        "The name of the base XML tag for this file type (:class:`str`)"
+        return 'roItemInsert'
+
+    @property
+    def target_story(self):
+        """
+        The :class:`~mosromgr.moselements.Story` object into which the items are
+        to be inserted
+        """
+        return Story(self.base_tag, unknown_items=True)
+
+    @property
+    def target_item(self):
+        """
+        The :class:`~mosromgr.moselements.Item` object above which the source
+        items will be inserted
+        """
+        return Item(self.base_tag)
+
+    @property
+    def source_items(self):
+        "A list of :class:`~mosromgr.moselements.Item` objects to be inserted"
+        return [
+            Item(item)
+            for item in self.base_tag.findall('item')
+        ]
+
     def merge(self, ro):
         "Merge into the :class:`RunningOrder` object provided"
-        rc = ro.mos.find('roCreate')
-        ii = self.mos.find('roItemInsert')
-        target_story_id = ii.find('storyID').text
+        target_story_id = self.base_tag.find('storyID').text
         if not target_story_id:
             raise MosMergeError(
                 f'{self.__class__.__name__} error in {self.message_id} - no target storyID'
             )
-        target_story, story_index = find_child(parent=rc, child_tag='story', id=target_story_id)
+        target_story, story_index = find_child(parent=ro.base_tag, child_tag='story', id=target_story_id)
         if not target_story:
             raise MosMergeError(
                 f'{self.__class__.__name__} error in {self.message_id} - no target story not found'
             )
-        target_item_id = ii.find('itemID').text
+        target_item_id = self.base_tag.find('itemID').text
         if target_item_id:
             target_item, item_index = find_child(parent=target_story, child_tag='item', id=target_item_id)
         else:
             item_index = len(target_story.findall('item)'))
-        items = ii.findall('item')
+        items = self.base_tag.findall('item')
         if not items:
             raise MosMergeError(
                 f'{self.__class__.__name__} error in {self.message_id} - no item to insert'
@@ -833,33 +1121,50 @@ class StoryMove(MosFile):
 
     :type mos_file_contents: str or None
     :param mos_file_contents:
-        XML string of MOS file contents
+        XML string of MOS file contents (keyword-only argument)
     """
+    @property
+    def base_tag_name(self):
+        "The name of the base XML tag for this file type (:class:`str`)"
+        return 'roStoryMove'
+
+    @property
+    def target_story(self):
+        """
+        The :class:`~mosromgr.moselements.Story` object above which the source
+        story is to be moved
+        """
+        source, target = self.base_tag.findall('storyID')
+        return Story(self.base_tag, id=target.text, unknown_items=True)
+
+    @property
+    def source_story(self):
+        "The :class:`~mosromgr.moselements.Story` object to be moved"
+        source, target = self.base_tag.findall('storyID')
+        return Story(self.base_tag, id=source.text)
 
     def merge(self, ro):
         "Merge into the :class:`RunningOrder` object provided"
-        rc = ro.mos.find('roCreate')
-        sm = self.mos.find('roStoryMove')
-        story_ids = sm.findall('storyID')
+        story_ids = self.base_tag.findall('storyID')
         if not story_ids:
             raise MosMergeError(
                 f'{self.__class__.__name__} error in {self.message_id} - no storyIDs in MOS message'
             )
         target_id = story_ids[1].text
-        target_node, target_index = find_child(parent=rc, child_tag='story', id=target_id)
+        target_node, target_index = find_child(parent=ro.base_tag, child_tag='story', id=target_id)
         if not target_node:
             raise MosMergeError(
                 f'{self.__class__.__name__} error in {self.message_id} - traget storyID not found'
             )
         source_id = story_ids[0].text
-        source_node, source_index = find_child(parent=rc, child_tag='story', id=source_id)
+        source_node, source_index = find_child(parent=ro.base_tag, child_tag='story', id=source_id)
         if not source_node:
             raise MosMergeError(
                 f'{self.__class__.__name__} error in {self.message_id} - storyID not found'
             )
 
-        remove_node(parent=rc, node=source_node)
-        insert_node(parent=rc, node=source_node, index=target_index)
+        remove_node(parent=ro.base_tag, node=source_node)
+        insert_node(parent=ro.base_tag, node=source_node, index=target_index)
 
         return ro
 
@@ -879,22 +1184,49 @@ class ItemMoveMultiple(MosFile):
 
     :type mos_file_contents: str or None
     :param mos_file_contents:
-        XML string of MOS file contents
+        XML string of MOS file contents (keyword-only argument)
     """
+    @property
+    def base_tag_name(self):
+        "The name of the base XML tag for this file type (:class:`str`)"
+        return 'roItemMoveMultiple'
+
+    @property
+    def target_story(self):
+        """
+        The :class:`~mosromgr.moselements.Story` object containing the items
+        being moved
+        """
+        return Story(self.base_tag, unknown_items=True)
+
+    @property
+    def target_item(self):
+        """
+        The :class:`~mosromgr.moselements.Item` object above which the source
+        items will be moved
+        """
+        target = self.base_tag.findall('itemID')[-1]
+        return Item(self.base_tag, id=target.text)
+
+    @property
+    def source_items(self):
+        "A list of :class:`~mosromgr.moselements.Item` objects to be moved"
+        items = self.base_tag.findall('itemID')[:-1]
+        return [
+            Item(self.base_tag, id=item.text)
+            for item in items
+        ]
 
     def merge(self, ro):
         "Merge into the :class:`RunningOrder` object provided"
-        rc = ro.mos.find('roCreate')
-        imm = self.mos.find('roItemMoveMultiple')
-
-        target_story_id = imm.find('storyID').text
+        target_story_id = self.base_tag.find('storyID').text
         if not target_story_id:
             raise MosMergeError(
                 f'{self.__class__.__name__} error in {self.message_id} - no target storyID'
             )
-        target_story, story_index = find_child(parent=rc, child_tag='story', id=target_story_id)
+        target_story, story_index = find_child(parent=ro.base_tag, child_tag='story', id=target_story_id)
 
-        item_ids = imm.findall('itemID')
+        item_ids = self.base_tag.findall('itemID')
         target_item_id = item_ids[-1].text
         target_item_node, target_item_index = find_child(parent=target_story, child_tag='item', id=target_item_id)
         source_item_ids = item_ids[:-1]
@@ -922,26 +1254,39 @@ class StoryReplace(MosFile):
 
     :type mos_file_contents: str or None
     :param mos_file_contents:
-        XML string of MOS file contents
+        XML string of MOS file contents (keyword-only argument)
     """
+    @property
+    def base_tag_name(self):
+        "The name of the base XML tag for this file type (:class:`str`)"
+        return 'roStoryReplace'
+
+    @property
+    def target_story(self):
+        "The :class:`~mosromgr.moselements.Story` object being replaced"
+        return Story(self.base_tag, unknown_items=True)
+
+    @property
+    def source_story(self):
+        "The replacement :class:`~mosromgr.moselements.Story` object"
+        return Story(self.base_tag.find('story'))
+
     def merge(self, ro):
         "Merge into the :class:`RunningOrder` object provided"
-        rc = ro.mos.find('roCreate')
-        sr = self.mos.find('roStoryReplace')
-        target_id = sr.find('storyID').text
+        target_id = self.base_tag.find('storyID').text
         if not target_id:
             raise MosMergeError(
                 f'{self.__class__.__name__} error in {self.message_id} - no target storyID'
             )
-        target_node, target_index = find_child(parent=rc, child_tag='story', id=target_id)
-        remove_node(parent=rc, node=target_node)
-        stories = sr.findall('story')
+        target_node, target_index = find_child(parent=ro.base_tag, child_tag='story', id=target_id)
+        remove_node(parent=ro.base_tag, node=target_node)
+        stories = self.base_tag.findall('story')
         if not stories:
             raise MosMergeError(
                 f'{self.__class__.__name__} error in {self.message_id} - no story to insert'
             )
         for story in stories:
-            insert_node(parent=rc, node=story, index=target_index)
+            insert_node(parent=ro.base_tag, node=story, index=target_index)
             target_index += 1
         return ro
 
@@ -960,32 +1305,52 @@ class ItemReplace(MosFile):
 
     :type mos_file_contents: str or None
     :param mos_file_contents:
-        XML string of MOS file contents
+        XML string of MOS file contents (keyword-only argument)
     """
+    @property
+    def base_tag_name(self):
+        "The name of the base XML tag for this file type (:class:`str`)"
+        return 'roItemReplace'
+
+    @property
+    def target_story(self):
+        """
+        The :class:`~mosromgr.moselements.Story` object containing the item
+        being replaced
+        """
+        return Story(self.base_tag, unknown_items=True)
+
+    @property
+    def target_item(self):
+        "The :class:`~mosromgr.moselements.Item` object being replaced"
+        return Item(self.base_tag)
+
+    @property
+    def source_item(self):
+        "The replacement :class:`~mosromgr.moselements.Item` object"
+        return Item(self.base_tag.find('item'))
 
     def merge(self, ro):
         "Merge into the :class:`RunningOrder` object provided"
-        rc = ro.mos.find('roCreate')
-        ir = self.mos.find('roItemReplace')
-        story_id = ir.find('storyID').text
+        story_id = self.base_tag.find('storyID').text
         if not story_id:
             raise MosMergeError(
                 f'{self.__class__.__name__} error in {self.message_id} - no target storyID'
             )
-        story_node, story_index = find_child(parent=rc, child_tag='story', id=story_id)
+        story_node, story_index = find_child(parent=ro.base_tag, child_tag='story', id=story_id)
         if not story_node:
             msg = f'{self.__class__.__name__} error in {self.message_id} - story not found'
             logger.warning(msg)
             warnings.warn(msg, ItemNotFoundWarning)
             return ro
-        item_id = ir.find('itemID').text
+        item_id = self.base_tag.find('itemID').text
         if not item_id:
             raise MosMergeError(
                 f'{self.__class__.__name__} error in {self.message_id} - no target itemID'
             )
         item_node, item_index = find_child(parent=story_node, child_tag='item', id=item_id)
         remove_node(parent=story_node, node=item_node)
-        items = ir.findall('item')
+        items = self.base_tag.findall('item')
         for item in items:
             if not item:
                 msg = f'{self.__class__.__name__} error in {self.message_id} - item not found'
@@ -1011,19 +1376,35 @@ class RunningOrderReplace(MosFile):
 
     :type mos_file_contents: str or None
     :param mos_file_contents:
-        XML string of MOS file contents
+        XML string of MOS file contents (keyword-only argument)
     """
+    @property
+    def base_tag_name(self):
+        "The name of the base XML tag for this file type (:class:`str`)"
+        return 'roReplace'
+
+    @property
+    def stories(self):
+        """
+        A list of :class:`~mosromgr.moselements.Story` objects within the
+        replacement running order
+        """
+        return [
+            Story(story_tag)
+            for story_tag in self.base_tag.findall('story')
+        ]
+
+    @property
+    def duration(self):
+        return sum(story.duration for story in self.stories)
+
     def merge(self, ro):
         "Merge into the :class:`RunningOrder` object provided"
-        rc, rc_index = find_child(parent=ro.mos, child_tag='roCreate')
-        rr = self.mos.find('roReplace')
-        if not rr:
-            raise MosMergeError(
-                f'{self.__class__.__name__} error in {self.message_id} - no target storyID'
-            )
+        rc, rc_index = find_child(parent=ro.xml, child_tag='roCreate')
+        rr = copy.deepcopy(self.xml.find('roReplace'))
         rr.tag = 'roCreate'
-        remove_node(parent=ro.mos, node=rc)
-        insert_node(parent=ro.mos, node=rr, index=rc_index)
+        remove_node(parent=ro.xml, node=ro.base_tag)
+        insert_node(parent=ro.xml, node=rr, index=rc_index)
         return ro
 
 
@@ -1041,39 +1422,15 @@ class RunningOrderEnd(MosFile):
 
     :type mos_file_contents: str or None
     :param mos_file_contents:
-        XML string of MOS file contents
+        XML string of MOS file contents (keyword-only argument)
     """
+    @property
+    def base_tag_name(self):
+        "The name of the base XML tag for this file type (:class:`str`)"
+        return 'roDelete'
+
     def merge(self, ro):
         "Merge into the :class:`RunningOrder` object provided"
-        rd = self.mos.find('roDelete')
-        mosromgrmeta = ET.SubElement(ro.mos, 'mosromgrmeta')
-        mosromgrmeta.append(rd)
+        mosromgrmeta = ET.SubElement(ro.xml, 'mosromgrmeta')
+        mosromgrmeta.append(self.base_tag)
         return ro
-
-
-class_tag_map = {
-    'RunningOrder': 'roCreate',
-    'StorySend': 'story',  # we change this to story on init
-    'EAReplaceStory': 'roElementAction',
-    'EAReplaceItem': 'roElementAction',
-    'EADeleteStory': 'roElementAction',
-    'EADeleteItem': 'roElementAction',
-    'EAInsertStory': 'roElementAction',
-    'EAInsertItem': 'roElementAction',
-    'EASwapStory': 'roElementAction',
-    'EASwapItem': 'roElementAction',
-    'EAMoveStory': 'roElementAction',
-    'EAMoveItem': 'roElementAction',
-    'MetaDataReplace': 'roMetadataReplace',
-    'RunningOrderEnd': 'roDelete',
-    'StoryAppend': 'roStoryAppend',
-    'StoryDelete': 'roStoryDelete',
-    'StoryInsert': 'roStoryInsert',
-    'StoryMove': 'roStoryMove',
-    'StoryReplace': 'roStoryReplace',
-    'ItemDelete': 'roItemDelete',
-    'ItemInsert': 'roItemInsert',
-    'ItemMoveMultiple': 'roItemMoveMultiple',
-    'ItemReplace': 'roItemReplace',
-    'RunningOrderReplace': 'roReplace',
-}

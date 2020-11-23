@@ -1,6 +1,7 @@
 # vim: set noet sw=4 ts=4 fileencoding=utf-8:
 
 # Project-specific constants
+NAME=mosromgr
 DOC_HTML=docs/build/html
 DOC_TREES=docs/build/doctrees
 DOC_S3=s3://apps.test.newslabs.co.documentroot/docs/mosromgr/
@@ -9,6 +10,9 @@ DOC_S3=s3://apps.test.newslabs.co.documentroot/docs/mosromgr/
 all:
 	@echo "make install - Install on local system"
 	@echo "make develop - Install symlinks for development"
+	@echo "make build - Build sdist and bdist_wheel"
+	@echo "make clean - Remove all generated files"
+	@echo "make lint - Run linter"
 	@echo "make test - Run tests"
 	@echo "make doc-graphs - Generate graphviz graphs"
 	@echo "make doc - Build the docs as HTML"
@@ -20,9 +24,18 @@ install:
 
 develop:
 	pip install -e .[test,doc]
-	@echo "To build the docs you will also need to install sphinx and graphviz using apt/brew"
+	@echo "To build the docs you will also need to install graphviz using apt/brew"
 
-test:
+build: clean
+	python setup.py sdist bdist_wheel
+
+clean:
+	rm -rf build/ dist/ $(NAME).egg-info/ docs/build/ .pytest_cache/ .coverage
+
+lint:
+	pylint -E mosromgr
+
+test: lint
 	coverage run --rcfile coverage.cfg -m pytest -v tests
 	coverage report --rcfile coverage.cfg
 
@@ -32,6 +45,7 @@ doc-graphs:
 	dot -Tsvg docs/images/class_hierarchy.dot -o docs/images/class_hierarchy.svg
 
 doc: doc-graphs
+	rm -rf docs/build/
 	sphinx-build -b html -d $(DOC_TREES) docs/ $(DOC_HTML)
 
 doc-serve:
@@ -40,3 +54,5 @@ doc-serve:
 doc-deploy:
 	aws s3 rm $(DOC_S3)* --recursive
 	aws s3 cp $(DOC_HTML) $(DOC_S3) --recursive
+
+.PHONY: all install develop build clean lint test doc-graphs doc doc-serve doc-deploy

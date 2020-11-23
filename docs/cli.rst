@@ -2,7 +2,9 @@
 Command line tools
 ==================
 
-Command line utilities provided by this module:
+Command line utilities provided by this module
+
+.. _cli-mosromgr:
 
 mosromgr
 ========
