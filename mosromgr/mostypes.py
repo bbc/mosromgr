@@ -162,9 +162,11 @@ class RunningOrder(MosFile):
         A list of :class:`~mosromgr.moselements.Story` objects within the
         running order
         """
+        story_tags = list(self.base_tag.findall('story'))
+
         return [
-            Story(story_tag)
-            for story_tag in self.base_tag.findall('story')
+            Story(story_tag, all_stories=story_tags, prog_tx_time=self.tx_time)
+            for story_tag in story_tags
         ]
 
     @property
@@ -749,7 +751,7 @@ class ItemReplace(MosFile):
         return ro
 
 
-class RunningOrderReplace(MosFile):
+class RunningOrderReplace(RunningOrder):
     """
     An ``RunningOrderReplace`` object is created from a ``roReplace`` MOS file
     and can be initialised using classmethods :meth:`from_file` or
@@ -763,21 +765,6 @@ class RunningOrderReplace(MosFile):
     def base_tag_name(self):
         "The name of the base XML tag for this file type (:class:`str`)"
         return 'roReplace'
-
-    @property
-    def stories(self):
-        """
-        A list of :class:`~mosromgr.moselements.Story` objects within the
-        replacement running order
-        """
-        return [
-            Story(story_tag)
-            for story_tag in self.base_tag.findall('story')
-        ]
-
-    @property
-    def duration(self):
-        return sum(story.duration for story in self.stories)
 
     def merge(self, ro):
         "Merge into the :class:`RunningOrder` object provided"

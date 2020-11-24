@@ -4,6 +4,7 @@
   <roReplace>
     <roID>RO ID</roID>
     <roSlug>RO SLUG NEW</roSlug>
+    <roEdStart>2020-01-01T12:30:00</roEdStart>
     <story>
       <storyID>STORY1</storyID>
       <storySlug>STORY 1</storySlug>

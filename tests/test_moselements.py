@@ -1,4 +1,5 @@
 from xml.etree.ElementTree import Element
+from datetime import datetime
 
 from mosromgr.mostypes import *
 from mosromgr.moselements import *
@@ -22,6 +23,7 @@ def test_running_order():
     assert isinstance(ro.stories, list)
     assert len(ro.stories) == 3
     assert ro.duration == 31
+    assert isinstance(ro.tx_time, datetime)
 
     story1 = ro.stories[0]
     assert repr(story1) == '<Story STORY1>'
@@ -32,6 +34,8 @@ def test_running_order():
     assert story1.id == 'STORY1'
     assert story1.slug == 'STORY 1'
     assert story1.duration == 3
+    assert isinstance(story1.tx_time, datetime)
+    assert story1.tx_time == ro.tx_time
 
     assert isinstance(story1.items, list)
     assert len(story1.items) == 3
@@ -54,6 +58,8 @@ def test_running_order():
     assert story2.id == 'STORY2'
     assert story2.slug == 'STORY 2'
     assert story2.duration == 8
+    assert isinstance(story2.tx_time, datetime)
+    assert story2.tx_time > story1.tx_time
 
     assert isinstance(story2.items, list)
     assert len(story2.items) == 3

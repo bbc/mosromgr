@@ -1,4 +1,33 @@
 import xml.etree.ElementTree as ET
+from datetime import timedelta
+
+
+def _get_story_times(all_stories, prog_tx_time):
+    "Create a dict of {story_id: story_tx_time}"
+    print(all_stories)
+    print(prog_tx_time)
+    story_times = {}
+    if all_stories and prog_tx_time:
+        tx_time = prog_tx_time
+        for story in all_stories:
+            story_times[story.find('storyID').text] = tx_time
+            story_duration = _get_story_duration(story)
+            tx_time += timedelta(seconds=story_duration)
+    return story_times
+
+
+def _get_story_duration(story_tag):
+    """
+    Return the sum of the text time and media time, or return None if not found
+    """
+    try:
+        metadata = story_tag.find('mosExternalMetadata')
+        payload = metadata.find('mosPayload')
+    except AttributeError:
+        return
+    text_time = int(payload.find('TextTime').text)
+    media_time = int(payload.find('MediaTime').text)
+    return text_time + media_time
 
 
 class MosElement:
@@ -53,12 +82,14 @@ class Story(MosElement):
     story. The Story ID, Story slug and duration are exposed as properties, and
     the parent XML element is provided for further introspection.
     """
-    def __init__(self, xml, *, id=None, slug=None, duration=None, unknown_items=False):
+    def __init__(self, xml, *, id=None, slug=None, duration=None,
+                 unknown_items=False, all_stories=None, prog_tx_time=None):
         super().__init__(xml, id=id, slug=slug)
         self._id_tag = 'storyID'
         self._slug_tag = 'storySlug'
         self._duration = duration
         self._unknown_items = unknown_items
+        self._story_times = _get_story_times(all_stories, prog_tx_time)
 
     @property
     def id(self):
@@ -89,17 +120,17 @@ class Story(MosElement):
     def duration(self):
         """
         The story duration (the sum of the text time and media time found
-        within ``mosExternalMetadata->mosPayload``)
+        within ``mosExternalMetadata->mosPayload``), in seconds (:class:`int`).
         """
-        try:
-            metadata = self.xml.find('mosExternalMetadata')
-            payload = metadata.find('mosPayload')
-        except AttributeError:
-            return
-        text_time = int(payload.find('TextTime').text)
-        media_time = int(payload.find('MediaTime').text)
-        self._duration = text_time + media_time
-        return self._duration
+        return _get_story_duration(self.xml)
+
+    @property
+    def tx_time(self):
+        """
+        The transmission time of the story (:class:`datetime.dateime` or
+        ``None`` if not available in the XML).
+        """
+        return self._story_times.get(self.id)
 
 
 class Item(MosElement):

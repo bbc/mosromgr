@@ -30,7 +30,7 @@ digraph classes {
     MetaDataReplace->MosFile;
     RunningOrder->MosFile;
     RunningOrderEnd->MosFile;
-    RunningOrderReplace->MosFile;
+    RunningOrderReplace->RunningOrder;
     StoryAppend->MosFile;
     StoryDelete->MosFile;
     StoryInsert->MosFile;
