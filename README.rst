@@ -48,7 +48,7 @@ Load a ``roCreate`` file and view its stories::
 
     from mosromgr.mostypes import RunningOrder
 
-    ro = RunningOrder('roCreate.mos.xml')
+    ro = RunningOrder.from_file('roCreate.mos.xml')
 
     for story in ro.stories:
         print(story.slug)
@@ -67,13 +67,13 @@ new file::
     with open('final.mos.xml', 'w') as f:
         f.write(ro)
 
-Alternatively, use :class:`~mosromgr.moscontainer.MosContainer` which will sort
-and classify MOS types of all given files::
+Alternatively, use :class:`~mosromgr.moscollection.MosCollection` which will
+sort and classify MOS types of all given files::
 
-    from mosromgr.moscontainer import MosContainer
+    from mosromgr.moscollection import MosCollection
 
     mos_files = ['roCreate.mos.xml', 'roStorySend.mos.xml', 'roDelete.mos.xml']
-    mc = MosContainer(mos_files)
+    mc = MosCollection.from_files(mos_files)
 
     mc.merge()
     with open('final.mos.xml', 'w') as f:
