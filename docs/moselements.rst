@@ -16,7 +16,7 @@ of :class:`~mosromgr.moselements.Item` objects::
     >>> ro = RunningOrder.from_file('roCreate.mos.xml')
     >>> ro.stories
     [<Story 1234>, <Story 1235>, <Story 1236>]
-    >>> [story.duration for story in stories]
+    >>> [story.duration for story in ro.stories]
     [10, 20, 30]
     >>> ro.duration
     60
