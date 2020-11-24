@@ -138,8 +138,8 @@ class RunningOrder(MosFile):
         ``RunningOrder`` objects can be merged with other MOS files which
         implement a ``merge`` method by using the ``+`` operator, for example::
 
-            ro = RunningOrder('roCreate.mos.xml')
-            ss = StorySend('roStorySend.mos.xml')
+            ro = RunningOrder.from_file('roCreate.mos.xml')
+            ss = StorySend.from_file('roStorySend.mos.xml')
             ro += ss
         """
         if self.xml.find('mosromgrmeta') is None:
