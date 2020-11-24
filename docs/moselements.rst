@@ -13,7 +13,7 @@ several :class:`~mosromgr.moselements.Story` objects, each containing a number
 of :class:`~mosromgr.moselements.Item` objects::
 
     >>> from mosromgr.mostypes import RunningOrder
-    >>> ro = RunningOrder('roCreate.mos.xml')
+    >>> ro = RunningOrder.from_file('roCreate.mos.xml')
     >>> ro.stories
     [<Story 1234>, <Story 1235>, <Story 1236>]
     >>> [story.duration for story in stories]
@@ -33,7 +33,7 @@ In the case of a :class:`~mosromgr.mostypes.StoryAppend` object, this would
 contain a single story::
 
     >>> from mosromgr.mostypes import StoryAppend
-    >>> sa = StoryAppend('roStoryAppend.mos.xml')
+    >>> sa = StoryAppend.from_file('roStoryAppend.mos.xml')
     >>> sa.story
     <Story STORY1>
     >>> sa.duration
@@ -45,8 +45,8 @@ accessible in the :class:`~mosromgr.mostypes.RunningOrder`
 :attr:`~mosromgr.mostypes.RunningOrder.stories` property::
 
     >>> from mosromgr.mostypes import RunningOrder, StoryAppend
-    >>> ro = RunningOrder('roCreate.mos.xml')
-    >>> sa = StoryAppend('roStoryAppend.mos.xml')
+    >>> ro = RunningOrder.from_file('roCreate.mos.xml')
+    >>> sa = StoryAppend.from_file('roStoryAppend.mos.xml')
     >>> len(ro.stories)
     3
     >>> ro += sa
