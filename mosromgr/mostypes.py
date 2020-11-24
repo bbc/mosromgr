@@ -7,6 +7,7 @@ import copy
 import xmltodict
 
 from .utils.xml import remove_node, replace_node, insert_node, find_child
+from .utils import s3
 from .moselements import Story, Item
 from .exc import (
     MosInvalidXML, UnknownMosFileType, MosClosedMergeError, MosMergeError,
@@ -45,6 +46,12 @@ class MosFile:
         if cls == MosFile:
             return cls._classify(xml)
         return cls(xml)
+
+    @classmethod
+    def from_s3(cls, bucket_name, file_key):
+        "Initialise from a MOS file in an S3 bucket"
+        xml = s3.get_file_contents(bucket_name, file_key)
+        return cls.from_string(xml)
 
     @classmethod
     def _classify(cls, xml):

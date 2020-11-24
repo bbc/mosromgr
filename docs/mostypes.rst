@@ -16,19 +16,21 @@ MOS message classes are typically imported like so::
 
     from mosromgr.mostypes import RunningOrder
 
-MOS objects are initialised using one of two classmethods. Either from a file
+MOS objects are initialised using one of three classmethods. Either from a file
 path::
 
     ro = RunningOrder.from_file('roCreate.mos.xml')
 
-or from an XML string::
+from an XML string::
 
     with open('roCreate.mos.xml') as f:
         xml = f.read()
 
     ro = RunningOrder.from_string(xml)
 
-The latter example is particularly useful when loading MOS files from S3.
+or from an S3 file key::
+
+    ro = RunningOrder.from_s3(bucket_name, file_key)
 
 Similarly, objects initialised using these classmethods on the :class:`MosFile`
 base class will be automatically classified and an instance of the relevant
@@ -40,8 +42,6 @@ class will be created::
     >>> ss = MosFile.from_file('roStorySend.mos.xml')
     >>> ss
     <StorySend 1001>
-
-
     >>> ro = MosFile.from_string(xml1)
     >>> ro
     <RunningOrder 1000>

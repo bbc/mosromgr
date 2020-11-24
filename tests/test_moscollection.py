@@ -89,7 +89,7 @@ def test_mos_collection_init_s3(get_file_contents, boto3):
     with open(RODELETE) as f:
         rodelete = f.read()
 
-    get_file_contents.side_effect = [rocreate, rodelete]
+    get_file_contents.side_effect = [rocreate, rodelete, rocreate, rodelete]
 
     bucket_name = 'bucket_name'
     mos_file_keys = ['key', 'key']
@@ -160,8 +160,7 @@ def test_mos_collection_s3_merge(get_file_contents, boto3):
         ea = f.read()
     with open(RODELETE) as f:
         rd = f.read()
-    # we call get_file_contents on rc once, and ea/rd twice
-    get_file_contents.side_effect = [rc, ea, rd, ea, rd]
+    get_file_contents.side_effect = [rc, ea, rd, rc, ea, rd]
 
     # contents of these vars are ignored
     # but len of mos_file_keys needs to be correct
@@ -170,6 +169,7 @@ def test_mos_collection_s3_merge(get_file_contents, boto3):
     mc = MosCollection.from_s3(bucket_name=bucket_name, mos_file_keys=mos_file_keys)
     assert len(mc.mos_readers) == 2
     d = mc.ro.to_dict()
+    print(d['mos'].keys())
     assert len(d['mos']['roCreate']['story']) == 3
 
     mc.merge()

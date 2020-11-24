@@ -3,7 +3,6 @@ import logging
 import warnings
 
 from .mostypes import MosFile, RunningOrder, RunningOrderEnd
-from .utils import s3
 from .exc import (
     InvalidMosCollection, MosMergeError, MosInvalidXML, UnknownMosFileType,
     UnknownMosFileTypeWarning, MosInvalidXMLWarning, MosMergeWarning
@@ -15,7 +14,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 class MosReader:
-    def __init__(self, mo, restore_fn):
+    def __init__(self, mo, *, restore_fn):
         self.message_id = mo.message_id
         self.ro_id = mo.ro_id
         self.mos_type = mo.__class__
@@ -26,8 +25,9 @@ class MosReader:
     def from_file(cls, mos_file_path):
         try:
             mo = MosFile.from_file(mos_file_path)
+            # store a method of restoring the mos object from the determined class
             restore = lambda: mo.__class__.from_file(mos_file_path)
-            return cls(mo, restore)
+            return cls(mo, restore_fn=restore)
         except MosInvalidXML as e:
             warnings.warn(str(e), MosInvalidXMLWarning)
         except UnknownMosFileType as e:
@@ -37,8 +37,9 @@ class MosReader:
     def from_string(cls, mos_file_contents):
         try:
             mo = MosFile.from_string(mos_file_contents)
+            # store a method of restoring the mos object from the determined class
             restore = lambda: mo.__class__.from_string(mos_file_contents)
-            return cls(mo, restore)
+            return cls(mo, restore_fn=restore)
         except MosInvalidXML as e:
             warnings.warn(e, MosInvalidXMLWarning)
         except UnknownMosFileType as e:
@@ -47,10 +48,10 @@ class MosReader:
     @classmethod
     def from_s3(cls, bucket_name, file_key):
         try:
-            xml = s3.get_file_contents(bucket_name, file_key)
-            mo = MosFile.from_string(xml)
-            restore = lambda: mo.__class__.from_string(xml)
-            return cls(mo, restore)
+            mo = MosFile.from_s3(bucket_name, file_key)
+            # store a method of restoring the mos object from the determined class
+            restore = lambda: mo.__class__.from_s3(bucket_name, file_key)
+            return cls(mo, restore_fn=restore)
         except MosInvalidXML as e:
             warnings.warn(e, MosInvalidXMLWarning)
         except UnknownMosFileType as e:
