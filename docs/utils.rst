@@ -27,17 +27,6 @@ get_file_contents
 
 .. autofunction:: mosromgr.utils.s3.get_file_contents
 
-SNS
-===
-
-.. autoclass:: mosromgr.utils.sns.SNS
-    :members: send_sns_notification
-
-.. autoattribute:: mosromgr.utils.sns.SNS.INFOLVL
-.. autoattribute:: mosromgr.utils.sns.SNS.DEBUGLVL
-.. autoattribute:: mosromgr.utils.sns.SNS.WARNLVL
-.. autoattribute:: mosromgr.utils.sns.SNS.ERRORLVL
-
 XML
 ===
 
