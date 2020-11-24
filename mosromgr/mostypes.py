@@ -56,9 +56,8 @@ class MosFile:
     @classmethod
     def _classify(cls, xml):
         "classify the MOS type and return an instance of the relevant class"
-        for tag in TAG_CLASS_MAP:
+        for tag, SubClass in TAG_CLASS_MAP.items():
             if xml.find(tag):
-                SubClass = TAG_CLASS_MAP[tag]
                 if SubClass == ElementAction:
                     return ElementAction._classify(xml)
                 return SubClass(xml)
