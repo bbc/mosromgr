@@ -32,7 +32,7 @@ class MosFile:
         except ET.ParseError as e:
             raise MosInvalidXML from e
         if cls == MosFile:
-            return cls._detect(xml)
+            return cls._classify(xml)
         return cls(xml)
 
     @classmethod
@@ -43,17 +43,17 @@ class MosFile:
         except ET.ParseError as e:
             raise MosInvalidXML from e
         if cls == MosFile:
-            return cls._detect(xml)
+            return cls._classify(xml)
         return cls(xml)
 
     @classmethod
-    def _detect(cls, xml):
-        "Detect the MOS type and return an instance of the relevant class"
+    def _classify(cls, xml):
+        "classify the MOS type and return an instance of the relevant class"
         for tag in TAG_CLASS_MAP:
             if xml.find(tag):
                 SubClass = TAG_CLASS_MAP[tag]
                 if SubClass == ElementAction:
-                    return ElementAction._detect(xml)
+                    return ElementAction._classify(xml)
                 return SubClass(xml)
         raise UnknownMosFileType("Unable to determine MOS file type")
 
@@ -806,8 +806,8 @@ class RunningOrderEnd(MosFile):
 class ElementAction(MosFile):
     "Base class for various ``roElementAction`` MOS files."
     @classmethod
-    def _detect(cls, xml):
-        "Detect the MOS type and return an instance of the relevant class"
+    def _classify(cls, xml):
+        "classify the MOS type and return an instance of the relevant class"
         ea = xml.find('roElementAction')
         SubClass = EA_CLASS_MAP[ea.attrib['operation']](ea)
         return SubClass(xml)

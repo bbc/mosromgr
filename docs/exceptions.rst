@@ -4,8 +4,6 @@ Exceptions
 
 .. module:: mosromgr.exc
 
-.. currentmodule:: mosromgr
-
 The module's exceptions are typically imported like so::
 
     from mosromgr.exc import MosRoMgrException
@@ -17,6 +15,12 @@ MosRoMgrException
 -----------------
 
 .. autoexception:: mosromgr.exc.MosRoMgrException
+    :show-inheritance:
+
+UnknownMosFileType
+------------------
+
+.. autoexception:: mosromgr.exc.UnknownMosFileType
     :show-inheritance:
 
 MosMergeError
@@ -31,10 +35,10 @@ MosClosedMergeError
 .. autoexception:: mosromgr.exc.MosClosedMergeError
     :show-inheritance:
 
-MosContainerBadInit
--------------------
+InvalidMosCollection
+--------------------
 
-.. autoexception:: mosromgr.exc.MosContainerBadInit
+.. autoexception:: mosromgr.exc.InvalidMosCollection
     :show-inheritance:
 
 MosInvalidXML
@@ -52,9 +56,32 @@ MosRoMgrWarning
 .. autoexception:: mosromgr.exc.MosRoMgrWarning
     :show-inheritance:
 
-
 UnknownMosFileTypeWarning
 -------------------------
 
 .. autoexception:: mosromgr.exc.UnknownMosFileTypeWarning
+    :show-inheritance:
+
+MosInvalidXMLWarning
+--------------------
+
+.. autoexception:: mosromgr.exc.MosInvalidXMLWarning
+    :show-inheritance:
+
+MosMergeWarning
+---------------
+
+.. autoexception:: mosromgr.exc.MosMergeWarning
+    :show-inheritance:
+
+ItemNotFoundWarning
+-------------------
+
+.. autoexception:: mosromgr.exc.ItemNotFoundWarning
+    :show-inheritance:
+
+StoryNotFoundWarning
+--------------------
+
+.. autoexception:: mosromgr.exc.StoryNotFoundWarning
     :show-inheritance:

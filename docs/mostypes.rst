@@ -4,13 +4,8 @@ MOS Types
 
 .. module:: mosromgr.mostypes
 
-This part of the module provides the classes required for managing MOS files.
-
-.. note::
-
-    Note that no detection or validation is applied when using a MOS message
-    class directly. To detect the class required for a particular MOS file, the
-    :func:`~mosromgr.mosfactory.get_mos_object` function should be used.
+This part of the module provides the classes required for classifying and
+managing MOS files.
 
 MOS message objects provide access to certain elements within the message, such
 as the list of :attr:`~RunningOrder.stories` within a :class:`RunningOrder`.
@@ -34,6 +29,35 @@ or from an XML string::
     ro = RunningOrder.from_string(xml)
 
 The latter example is particularly useful when loading MOS files from S3.
+
+Similarly, objects initialised using these classmethods on the :class:`MosFile`
+base class will be automatically classified and an instance of the relevant
+class will be created::
+
+    >>> ro = MosFile.from_file('roCreate.mos.xml')
+    >>> ro
+    <RunningOrder 1000>
+    >>> ss = MosFile.from_file('roStorySend.mos.xml')
+    >>> ss
+    <StorySend 1001>
+
+
+    >>> ro = MosFile.from_string(xml1)
+    >>> ro
+    <RunningOrder 1000>
+    >>> ss = MosFile.from_string(xml2)
+    >>> ss
+    <StorySend 1001>
+
+Even ``roElementAction`` files, which require a number of different subclasses,
+can be classified this way::
+
+    >>> ea1 = MosFile.from_file('roElementAction1.mos.xml')
+    >>> ea1
+    <EAStorySwap 1012>
+    >>> ea2 = MosFile.from_string(xml)
+    >>> ea2
+    <EAItemMove 1013>
 
 MOS message classes
 ===================

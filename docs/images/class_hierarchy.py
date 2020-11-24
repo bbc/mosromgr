@@ -15,6 +15,7 @@ OMIT_CLASSES = {
     'MosElement',
     'Story',
     'Item',
+    'MosMergeError',
 }
 
 

@@ -1,16 +1,33 @@
 import boto3
 
 
-s3r = boto3.resource('s3')
-s3c = boto3.client('s3')
+class S3:
+    "Class to defer initialising S3 resources until needed"
+    def __init__(self):
+        self._resource = None
+        self._client = None
+
+    @property
+    def resource(self):
+        if self._resource is None:
+            self._resource = boto3.resource('s3')
+        return self._resource
+
+    @property
+    def client(self):
+        if self._client is None:
+            self._client = boto3.client('s3')
+        return self._client
+
+s3 = S3()
 
 
-def get_mos_files(bucket_name, prefix, suffix='.mos.xml'):
+def get_mos_files(bucket_name, prefix, *, suffix='.mos.xml'):
     """
     Retrieve MOS files from given S3 bucket in location defined by *prefix*.
     Returns a list of file keys.
     """
-    paginator = s3c.get_paginator('list_objects')
+    paginator = s3.client.get_paginator('list_objects')
     files = []
     for page in paginator.paginate(Bucket=bucket_name, Prefix=prefix):
         try:
@@ -25,8 +42,8 @@ def get_mos_files(bucket_name, prefix, suffix='.mos.xml'):
     return files
 
 
-def get_file_contents(bucket_name, mos_file_key):
+def get_file_contents(bucket_name, file_key):
     "Open the S3 file and return its contents as a string."
-    o = s3r.Object(bucket_name, mos_file_key).get()
+    o = s3.resource.Object(bucket_name, file_key).get()
     b = o['Body']
     return b.read()

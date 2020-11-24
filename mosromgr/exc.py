@@ -10,12 +10,12 @@ class MosMergeError(MosRoMgrException):
     "Exception raised when MOS merge fails"
 
 
-class MosClosedMergeError(MosRoMgrException):
+class MosClosedMergeError(MosMergeError):
     "Exception raised when MOS merge is attempted on a closed :class:`~mosromgr.mostypes.RunningOrder`"
 
 
-class MosContainerBadInit(MosRoMgrException):
-    "Exception raised when MosContainer is created without a ``roCreate`` MOS message"
+class InvalidMosCollection(MosRoMgrException):
+    "Exception raised when MosCollection fails validation"
 
 
 class MosInvalidXML(MosRoMgrException):
@@ -27,15 +27,15 @@ class MosRoMgrWarning(Warning):
 
 
 class UnknownMosFileTypeWarning(MosRoMgrWarning):
-    "Warning raised when :class:`~mosromgr.mostypes.MosFile` cannot detect MOS file type"
+    "Warning raised when :class:`~mosromgr.mostypes.MosFile` cannot classify MOS file type"
 
 
 class MosInvalidXMLWarning(MosRoMgrWarning):
     "Exception raised when :class:`~mosromgr.mostypes.MosFile` cannot parse given XML"
 
 
-class MergeAfterDeleteWarning(MosRoMgrWarning):
-    "Warning raised when :class:`~mosromgr.moscontainer.MosContainer` merge finds files after roDelete"
+class MosMergeWarning(MosRoMgrWarning):
+    "Warning raised when MOS merge fails in :class:`~mosromgr.moscollection.MosCollection`"
 
 
 class ItemNotFoundWarning(MosRoMgrWarning):

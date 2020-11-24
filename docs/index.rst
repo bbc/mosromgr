@@ -10,10 +10,10 @@ Python client for managing `MOS`_ running orders. Pronounced *mos-ro-manager*.
     :target: http://mosprotocol.com/
     :align: center
 
-The library provides functionality for detecting MOS file types, processing and
-inspecting MOS message files, as well as merging MOS files into a running order,
-and providing a "completed" programme including all additions and changes made
-between the first message (``roCreate``) and the last (``roDelete``).
+The library provides functionality for classifying MOS file types, processing
+and inspecting MOS message files, as well as merging MOS files into a running
+order, and providing a "completed" programme including all additions and changes
+made between the first message (``roCreate``) and the last (``roDelete``).
 
 This can be used as a library, using the utilities provided in the *mosromgr*
 module, and the command line command :ref:`cli-mosromgr` can be used to process
@@ -48,7 +48,7 @@ Load a ``roCreate`` file and view its stories::
 
     from mosromgr.mostypes import RunningOrder
 
-    ro = RunningOrder('roCreate.mos.xml')
+    ro = RunningOrder.from_file('roCreate.mos.xml')
 
     for story in ro.stories:
         print(story.slug)
@@ -59,21 +59,21 @@ new file::
 
     from mosromgr.mostypes import RunningOrder, StorySend
 
-    ro = RunningOrder('roCreate.mos.xml')
-    ss = StorySend('roStorySend.mos.xml')
+    ro = RunningOrder.from_file('roCreate.mos.xml')
+    ss = StorySend.from_file('roStorySend.mos.xml')
 
     ro += ss
 
     with open('final.mos.xml', 'w') as f:
         f.write(ro)
 
-Alternatively, use :class:`~mosromgr.moscontainer.MosContainer` which will sort
-and classify MOS types of all given files::
+Alternatively, use :class:`~mosromgr.moscollection.MosCollection` which will
+sort and classify MOS types of all given files::
 
-    from mosromgr.moscontainer import MosContainer
+    from mosromgr.moscollection import MosCollection
 
     mos_files = ['roCreate.mos.xml', 'roStorySend.mos.xml', 'roDelete.mos.xml']
-    mc = MosContainer(mos_files)
+    mc = MosCollection.from_files(mos_files)
 
     mc.merge()
     with open('final.mos.xml', 'w') as f:
@@ -88,8 +88,7 @@ Table of Contents
 
     mostypes
     moselements
-    mosfactory
-    moscontainer
+    moscollection
     cli
     utils
     exceptions

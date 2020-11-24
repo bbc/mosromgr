@@ -2,87 +2,87 @@ import pytest
 from mock import patch
 import warnings
 
-from mosromgr.moscontainer import *
+from mosromgr.moscollection import *
 from mosromgr.mostypes import *
 from mosromgr.exc import *
 from const import *
 
 
-def test_mos_container_init_path():
+def test_mos_collection_init_path():
     """
     GIVEN: A list containing a filepath to a roCreate and roDelete message
-    EXPECT: MosContainer object with 1 file
+    EXPECT: MosCollection object with 1 file
     """
     mos_files = [ROCREATE, RODELETE]
-    mc = MosContainer(mos_files)
-    assert repr(mc) == "<MosContainer RO SLUG>"
+    mc = MosCollection.from_files(mos_files)
+    assert repr(mc) == "<MosCollection RO SLUG>"
     assert isinstance(mc.ro, RunningOrder)
     assert isinstance(mc.mos_readers, list)
     assert len(mc.mos_readers) == 1
 
-def test_mos_container_bad_init_params():
-    "Test MosContainer cannot be created with bad input"
+def test_mos_collection_bad_init_params():
+    "Test MosCollection cannot be created with bad input"
     with pytest.raises(TypeError):
-        MosContainer()
+        MosCollection.from_files()
     with pytest.raises(TypeError):
-        MosContainer(bucket_name='bucket_name')
+        MosCollection.from_s3(bucket_name='bucket_name')
     with pytest.raises(TypeError):
-        MosContainer(mos_file_keys=['a', 'b', 'c'])
+        MosCollection.from_files(mos_file_keys=['a', 'b', 'c'])
 
-def test_mos_container_bad_init():
-    "Test MosContainer cannot be created without a roCreate message"
+def test_mos_collection_bad_init():
+    "Test MosCollection cannot be created without a roCreate message"
     mos_files = [ROSTORYSEND1]
-    with pytest.raises(MosContainerBadInit):
-        MosContainer(mos_files)
+    with pytest.raises(InvalidMosCollection):
+        MosCollection.from_files(mos_files)
 
     mos_files = [ROCREATE]
-    with pytest.raises(MosContainerBadInit):
-        MosContainer(mos_files)
+    with pytest.raises(InvalidMosCollection):
+        MosCollection.from_files(mos_files)
 
     mos_files = [RODELETE]
-    with pytest.raises(MosContainerBadInit):
-        MosContainer(mos_files)
+    with pytest.raises(InvalidMosCollection):
+        MosCollection.from_files(mos_files)
 
     mos_files = [ROCREATE, ROSTORYSEND1]
-    with pytest.raises(MosContainerBadInit):
-        MosContainer(mos_files)
+    with pytest.raises(InvalidMosCollection):
+        MosCollection.from_files(mos_files)
 
     mos_files = [ROCREATE, ROCREATE2, RODELETE]
-    with pytest.raises(MosContainerBadInit):
-        MosContainer(mos_files)
+    with pytest.raises(InvalidMosCollection):
+        MosCollection.from_files(mos_files)
 
     mos_files = [ROCREATE, RODELETE, RODELETE2]
-    with pytest.raises(MosContainerBadInit):
-        MosContainer(mos_files)
+    with pytest.raises(InvalidMosCollection):
+        MosCollection.from_files(mos_files)
 
-def test_mos_container_bad_init_mixed_ids():
-    "Test MosContainer cannot be created with messages with mixed IDs"
+def test_mos_collection_bad_init_mixed_ids():
+    "Test MosCollection cannot be created with messages with mixed RO IDs"
     mos_files = [ROCREATE, RODELETE2]
-    with pytest.raises(MosContainerBadInit):
-        MosContainer(mos_files)
+    with pytest.raises(InvalidMosCollection):
+        MosCollection.from_files(mos_files)
 
-def test_mos_container_init_files_after_rodelete():
+def test_mos_collection_init_files_after_rodelete():
     """
     GIVEN: A list of MOS files with messages following roDelete
-    EXPECT: MosContainer object with 2 file, plus warning on merge
+    EXPECT: MosCollection object with 2 files, plus warning on merge
     """
     mos_files = [ROCREATE, RODELETE, ROSTORYSEND4]
-    mc = MosContainer(mos_files)
-    assert repr(mc) == "<MosContainer RO SLUG>"
+    mc = MosCollection.from_files(mos_files)
+    assert repr(mc) == "<MosCollection RO SLUG>"
     assert isinstance(mc.ro, RunningOrder)
     assert isinstance(mc.mos_readers, list)
     assert len(mc.mos_readers) == 2
     with warnings.catch_warnings(record=True) as w:
         mc.merge()
     assert len(w) == 1
-    assert w[0].category == MergeAfterDeleteWarning
+    assert w[0].category == MosMergeWarning
 
 @patch('mosromgr.utils.s3.boto3')
 @patch('mosromgr.utils.s3.get_file_contents')
-def test_mos_container_init_s3(get_file_contents, boto3):
+def test_mos_collection_init_s3(get_file_contents, boto3):
     """
     GIVEN: A list containing the contents of a roCreate as a string
-    EXPECT: MosContainer object
+    EXPECT: MosCollection object
     """
     with open(ROCREATE) as f:
         rocreate = f.read()
@@ -93,24 +93,24 @@ def test_mos_container_init_s3(get_file_contents, boto3):
 
     bucket_name = 'bucket_name'
     mos_file_keys = ['key', 'key']
-    mc = MosContainer(bucket_name=bucket_name, mos_file_keys=mos_file_keys)
-    assert repr(mc) == "<MosContainer RO SLUG>"
+    mc = MosCollection.from_s3(bucket_name=bucket_name, mos_file_keys=mos_file_keys)
+    assert repr(mc) == "<MosCollection RO SLUG>"
     assert isinstance(mc.ro, RunningOrder)
     assert isinstance(mc.mos_readers, list)
     assert len(mc.mos_readers) == 1
 
-def test_mos_container_init_multiple_files():
-    "Test container can be created from multiple files"
-    mc = MosContainer(RO_ALL)
-    assert repr(mc) == "<MosContainer RO SLUG>"
+def test_mos_collection_init_multiple_files():
+    "Test collection can be created from multiple files"
+    mc = MosCollection.from_files(RO_ALL)
+    assert repr(mc) == "<MosCollection RO SLUG>"
     assert isinstance(mc.ro, RunningOrder)
     assert isinstance(mc.mos_readers, list)
     assert len(mc.mos_readers) == len(RO_ALL) - 1
 
-def test_mos_container_init_multiple_files_sorted():
-    "Test container can sort input files by messageID field"
+def test_mos_collection_init_multiple_files_sorted():
+    "Test collection can sort input files by messageID field"
     mos_files = [ROSTORYSEND2, ROCREATE, ROSTORYSEND1, RODELETE]
-    mc = MosContainer(mos_files)
+    mc = MosCollection.from_files(mos_files)
     assert isinstance(mc.ro, RunningOrder)
     assert isinstance(mc.mos_readers, list)
     assert len(mc.mos_readers) == 3
@@ -118,27 +118,27 @@ def test_mos_container_init_multiple_files_sorted():
     assert mf1.message_id == 1001
     assert mf2.message_id == 1002
 
-def test_mos_container_unsupported_mos_type():
+def test_mos_collection_unsupported_mos_type():
     """
     GIVEN: Running order and invalid mos message, in list form
-    EXPECT: MosContainer object with running order and no other files
+    EXPECT: MosCollection object with running order and no other files
     """
     mos_files = [ROCREATE, ROINVALID, RODELETE]
     with warnings.catch_warnings(record=True) as w:
-        mc = MosContainer(mos_files)
+        mc = MosCollection.from_files(mos_files)
     assert len(w) == 1
     assert w[0].category == UnknownMosFileTypeWarning
     assert isinstance(mc.ro, RunningOrder)
     assert isinstance(mc.mos_readers, list)
     assert len(mc.mos_readers) == 1
 
-def test_mos_container_merge():
+def test_mos_collection_merge():
     """
     GIVEN: Running order and EAStoryInsert paths
     EXPECT: Running order summary, with story from EAStoryInsert added
     """
     mos_files = [ROCREATE, ROELEMENTACTIONINSERTSTORY, RODELETE]
-    mc = MosContainer(mos_files)
+    mc = MosCollection.from_files(mos_files)
     assert len(mc.mos_readers) == 2
     d = mc.ro.to_dict()
     assert len(d['mos']['roCreate']['story']) == 3
@@ -149,7 +149,7 @@ def test_mos_container_merge():
 
 @patch('mosromgr.utils.s3.boto3')
 @patch('mosromgr.utils.s3.get_file_contents')
-def test_mos_container_s3_merge(get_file_contents, boto3):
+def test_mos_collection_s3_merge(get_file_contents, boto3):
     """
     GIVEN: Running order and EAStoryInsert s3 keys
     EXPECT: Running order summary, with story from EAStoryInsert added
@@ -167,7 +167,7 @@ def test_mos_container_s3_merge(get_file_contents, boto3):
     # but len of mos_file_keys needs to be correct
     bucket_name = 'bucket_name'
     mos_file_keys = ['rc', 'ea', 'rd']
-    mc = MosContainer(bucket_name=bucket_name, mos_file_keys=mos_file_keys)
+    mc = MosCollection.from_s3(bucket_name=bucket_name, mos_file_keys=mos_file_keys)
     assert len(mc.mos_readers) == 2
     d = mc.ro.to_dict()
     assert len(d['mos']['roCreate']['story']) == 3
@@ -176,13 +176,13 @@ def test_mos_container_s3_merge(get_file_contents, boto3):
     d = mc.ro.to_dict()
     assert len(d['mos']['roCreate']['story']) == 4
 
-def test_mos_container_merge_warning():
+def test_mos_collection_merge_warning():
     """
     GIVEN: Running order and invalid StorySend, in list form
     EXPECT: MosMergeError
     """
     mos_files = [ROCREATE, ROSTORYSEND3, RODELETE]
-    mc = MosContainer(mos_files)
+    mc = MosCollection.from_files(mos_files)
     with warnings.catch_warnings(record=True) as w:
         mc.merge()
     assert len(w) == 1
