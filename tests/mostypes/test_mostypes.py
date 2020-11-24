@@ -1,4 +1,5 @@
 from xml.etree.ElementTree import Element
+import warnings
 
 import pytest
 
@@ -9,7 +10,7 @@ from const import *
 
 def test_running_order_init():
     "Test we can create a RunningOrder object from a roCreate file"
-    ro = RunningOrder(ROCREATE)
+    ro = RunningOrder.from_file(ROCREATE)
     assert repr(ro) == '<RunningOrder 1000>'
     assert ro.ro_id == 'RO ID'
     assert ro.ro_slug == 'RO SLUG'
@@ -20,8 +21,8 @@ def test_running_order_init():
 def test_running_order_init_str():
     "Test we can create a RunningOrder object from a string representation of a roCreate file"
     with open(ROCREATE) as f:
-        rocreate_str = f.read()
-    ro = RunningOrder(mos_file_contents=rocreate_str)
+        xml = f.read()
+    ro = RunningOrder.from_string(xml)
     assert repr(ro) == '<RunningOrder 1000>'
     assert ro.ro_id == 'RO ID'
     assert ro.ro_slug == 'RO SLUG'
@@ -31,7 +32,7 @@ def test_running_order_init_str():
 
 def test_story_send_init():
     "Test we can create a StorySend object from a roStorySend file"
-    ss = StorySend(ROSTORYSEND1)
+    ss = StorySend.from_file(ROSTORYSEND1)
     assert repr(ss) == '<StorySend 1001>'
     assert ss.ro_id == 'RO ID'
     assert isinstance(ss.xml, Element)
@@ -43,8 +44,8 @@ def test_story_send():
     GIVEN: Running order and StorySend message (Add contents to STORY 1)
     EXPECT: Running order with storyBody present in STORY 1
     """
-    ro = RunningOrder(ROCREATE)
-    ss = StorySend(ROSTORYSEND1)
+    ro = RunningOrder.from_file(ROCREATE)
+    ss = StorySend.from_file(ROSTORYSEND1)
     d = ro.to_dict()
     assert len(d['mos']['roCreate']['story']) == 3
     ro += ss
@@ -57,7 +58,7 @@ def test_story_send():
 
 def test_element_action_replace_story_init():
     "Test we can create an EAStoryReplace object from a roElementAction file"
-    ea = EAStoryReplace(ROELEMENTACTIONREPSTORY)
+    ea = EAStoryReplace.from_file(ROELEMENTACTIONREPSTORY)
     assert repr(ea) == '<EAStoryReplace 1003>'
     assert ea.ro_id == 'RO ID'
 
@@ -66,8 +67,8 @@ def test_element_action_replace_story():
     GIVEN: Running order and EAStoryReplace message (STORY 1 for STORY ONE)
     EXPECT: Running order with STORY ONE and no STORY 1
     """
-    ro = RunningOrder(ROCREATE)
-    ea = EAStoryReplace(ROELEMENTACTIONREPSTORY)
+    ro = RunningOrder.from_file(ROCREATE)
+    ea = EAStoryReplace.from_file(ROELEMENTACTIONREPSTORY)
     d = ro.to_dict()
     assert len(d['mos']['roCreate']['story']) == 3
     story_slug = d['mos']['roCreate']['story'][0]['storySlug']
@@ -87,7 +88,7 @@ def test_element_action_replace_story():
 
 def test_element_action_replace_item_init():
     "Test we can create an EAItemReplace object from a roElementAction file"
-    ea = EAItemReplace(ROELEMENTACTIONREPITEM)
+    ea = EAItemReplace.from_file(ROELEMENTACTIONREPITEM)
     assert repr(ea) == '<EAItemReplace 1004>'
     assert ea.ro_id == 'RO ID'
 
@@ -96,8 +97,8 @@ def test_element_action_replace_item():
     GIVEN: Running order and EAItemReplace message (ITEM 21 for NEW ITEM 21)
     EXPECT: Running order with NEW ITEM 21 in STORY 2
     """
-    ro = RunningOrder(ROCREATE)
-    ea = EAItemReplace(ROELEMENTACTIONREPITEM)
+    ro = RunningOrder.from_file(ROCREATE)
+    ea = EAItemReplace.from_file(ROELEMENTACTIONREPITEM)
     ro += ea
     d = ro.to_dict()
     assert len(d['mos']['roCreate']['story']) == 3
@@ -110,7 +111,7 @@ def test_element_action_replace_item():
 
 def test_element_action_delete_story_init():
     "Test we can create an EAStoryDelete object from a roElementAction file"
-    ea = EAStoryDelete(ROELEMENTACTIONDELSTORY)
+    ea = EAStoryDelete.from_file(ROELEMENTACTIONDELSTORY)
     assert repr(ea) == '<EAStoryDelete 1005>'
     assert ea.ro_id == 'RO ID'
 
@@ -119,8 +120,8 @@ def test_element_action_delete_story():
     GIVEN: Running order and EAStoryDelete message (delete STORY 1)
     EXPECT: Running order with no STORY 1
     """
-    ro = RunningOrder(ROCREATE)
-    ea = EAStoryDelete(ROELEMENTACTIONDELSTORY)
+    ro = RunningOrder.from_file(ROCREATE)
+    ea = EAStoryDelete.from_file(ROELEMENTACTIONDELSTORY)
     d = ro.to_dict()
     assert len(d['mos']['roCreate']['story']) == 3
     story_slug1 = d['mos']['roCreate']['story'][0]['storySlug']
@@ -138,7 +139,7 @@ def test_element_action_delete_story():
 
 def test_element_action_delete_item_init():
     "Test we can create an EAItemDelete object from a roElementAction file"
-    ea = EAItemDelete(ROELEMENTACTIONDELITEM)
+    ea = EAItemDelete.from_file(ROELEMENTACTIONDELITEM)
     assert repr(ea) == '<EAItemDelete 1006>'
     assert ea.ro_id == 'RO ID'
 
@@ -147,8 +148,8 @@ def test_element_action_delete_item():
     GIVEN: Running order and EAItemDelete message (delete ITEM 1 in STORY 1)
     EXPECT: Running order with no ITEM 1 in STORY 1
     """
-    ro = RunningOrder(ROCREATE)
-    ea = EAItemDelete(ROELEMENTACTIONDELITEM)
+    ro = RunningOrder.from_file(ROCREATE)
+    ea = EAItemDelete.from_file(ROELEMENTACTIONDELITEM)
     d = ro.to_dict()
     assert len(d['mos']['roCreate']['story'][0]['item']) == 3
 
@@ -164,7 +165,7 @@ def test_element_action_delete_item():
 
 def test_element_action_insert_story_init():
     "Test we can create an EAStoryInsert object from a roElementAction file"
-    ea = EAStoryInsert(ROELEMENTACTIONINSERTSTORY)
+    ea = EAStoryInsert.from_file(ROELEMENTACTIONINSERTSTORY)
     assert repr(ea) == '<EAStoryInsert 1007>'
     assert ea.ro_id == 'RO ID'
 
@@ -173,8 +174,8 @@ def test_element_action_insert_story():
     GIVEN: Running order and EAStoryInsert message (insert STORY NEW)
     EXPECT: Running order with STORY NEW between STORY 1 and 2
     """
-    ro = RunningOrder(ROCREATE)
-    ea = EAStoryInsert(ROELEMENTACTIONINSERTSTORY)
+    ro = RunningOrder.from_file(ROCREATE)
+    ea = EAStoryInsert.from_file(ROELEMENTACTIONINSERTSTORY)
     d = ro.to_dict()
     assert len(d['mos']['roCreate']['story']) == 3
     story_slug1 = d['mos']['roCreate']['story'][0]['storySlug']
@@ -196,7 +197,7 @@ def test_element_action_insert_story():
 
 def test_element_action_insert_item_init():
     "Test we can create an EAItemInsert object from a roElementAction file"
-    ea = EAItemInsert(ROELEMENTACTIONINSERTITEM)
+    ea = EAItemInsert.from_file(ROELEMENTACTIONINSERTITEM)
     assert repr(ea) == '<EAItemInsert 1008>'
     assert ea.ro_id == 'RO ID'
 
@@ -205,8 +206,8 @@ def test_element_action_insert_item():
     GIVEN: Running order and EAItemInsert message (insert ITEM NEW in STORY 1)
     EXPECT: Running order with ITEM NEW between ITEM 1 and 2 in STORY 1
     """
-    ro = RunningOrder(ROCREATE)
-    ea = EAItemInsert(ROELEMENTACTIONINSERTITEM)
+    ro = RunningOrder.from_file(ROCREATE)
+    ea = EAItemInsert.from_file(ROELEMENTACTIONINSERTITEM)
     d = ro.to_dict()
     assert len(d['mos']['roCreate']['story'][0]['item']) == 3
     item_slug1 = d['mos']['roCreate']['story'][0]['item'][0]['itemSlug']
@@ -228,7 +229,7 @@ def test_element_action_insert_item():
 
 def test_element_action_swap_story_init():
     "Test we can create an EAStorySwap object from a roElementAction file"
-    ea = EAStorySwap(ROELEMENTACTIONSWAPSTORY)
+    ea = EAStorySwap.from_file(ROELEMENTACTIONSWAPSTORY)
     assert repr(ea) == '<EAStorySwap 1009>'
     assert ea.ro_id == 'RO ID'
 
@@ -237,8 +238,8 @@ def test_element_action_swap_story():
     GIVEN: Running order and EAStorySwap message (swap STORY 1 STORY 2)
     EXPECT: Running order with positions of STORY 1 and 2 swapped
     """
-    ro = RunningOrder(ROCREATE)
-    ea = EAStorySwap(ROELEMENTACTIONSWAPSTORY)
+    ro = RunningOrder.from_file(ROCREATE)
+    ea = EAStorySwap.from_file(ROELEMENTACTIONSWAPSTORY)
     d = ro.to_dict()
     assert len(d['mos']['roCreate']['story'][0]['item']) == 3
     story_slug1 = d['mos']['roCreate']['story'][0]['storySlug']
@@ -258,7 +259,7 @@ def test_element_action_swap_story():
 
 def test_element_action_swap_item_init():
     "Test we can create an EAItemSwap object from a roElementAction file"
-    ea = EAItemSwap(ROELEMENTACTIONSWAPITEM)
+    ea = EAItemSwap.from_file(ROELEMENTACTIONSWAPITEM)
     assert repr(ea) == '<EAItemSwap 1010>'
     assert ea.ro_id == 'RO ID'
 
@@ -267,8 +268,8 @@ def test_element_action_swap_item():
     GIVEN: Running order and EAItemSwap message (swap ITEM 1 and ITEM 2)
     EXPECT: Running order with positions of ITEM 1 and 2 swapped in STORY 1
     """
-    ro = RunningOrder(ROCREATE)
-    ea = EAItemSwap(ROELEMENTACTIONSWAPITEM)
+    ro = RunningOrder.from_file(ROCREATE)
+    ea = EAItemSwap.from_file(ROELEMENTACTIONSWAPITEM)
     d = ro.to_dict()
     assert len(d['mos']['roCreate']['story'][0]['item']) == 3
     item_slug1 = d['mos']['roCreate']['story'][0]['item'][0]['itemSlug']
@@ -288,7 +289,7 @@ def test_element_action_swap_item():
 
 def test_element_action_move_story_init():
     "Test we can create an EAStoryMove object from a roElementAction file"
-    ea = EAStoryMove(ROELEMENTACTIONMOVESTORY)
+    ea = EAStoryMove.from_file(ROELEMENTACTIONMOVESTORY)
     assert repr(ea) == '<EAStoryMove 1011>'
     assert ea.ro_id == 'RO ID'
 
@@ -297,8 +298,8 @@ def test_element_action_move_story():
     GIVEN: Running order and EAStoryMove message (move STORY 3 to top)
     EXPECT: Running order with STORY 3 at top, above STORY 1
     """
-    ro = RunningOrder(ROCREATE)
-    ea = EAStoryMove(ROELEMENTACTIONMOVESTORY)
+    ro = RunningOrder.from_file(ROCREATE)
+    ea = EAStoryMove.from_file(ROELEMENTACTIONMOVESTORY)
     d = ro.to_dict()
     assert len(d['mos']['roCreate']['story']) == 3
     story_slug1 = d['mos']['roCreate']['story'][0]['storySlug']
@@ -322,7 +323,7 @@ def test_element_action_move_story():
 
 def test_element_action_move_item_init():
     "Test we can create an EAItemMove object from a roElementAction file"
-    ea = EAItemMove(ROELEMENTACTIONMOVEITEM)
+    ea = EAItemMove.from_file(ROELEMENTACTIONMOVEITEM)
     assert repr(ea) == '<EAItemMove 1012>'
     assert ea.ro_id == 'RO ID'
 
@@ -331,8 +332,8 @@ def test_element_action_move_item():
     GIVEN: Running order and EAItemMove message (move ITEM 3 to top)
     EXPECT: Running order with ITEM 3 at top of STORY 1
     """
-    ro = RunningOrder(ROCREATE)
-    ea = EAItemMove(ROELEMENTACTIONMOVEITEM)
+    ro = RunningOrder.from_file(ROCREATE)
+    ea = EAItemMove.from_file(ROELEMENTACTIONMOVEITEM)
     d = ro.to_dict()
     assert len(d['mos']['roCreate']['story'][0]['item']) == 3
     story_slug1 = d['mos']['roCreate']['story'][0]['item'][0]['itemSlug']
@@ -356,7 +357,7 @@ def test_element_action_move_item():
 
 def test_metadata_replace_init():
     "Test we can create a MetaDataReplace object from a roMetaDataReplace file"
-    mdr = MetaDataReplace(ROMETADATAREPLACE)
+    mdr = MetaDataReplace.from_file(ROMETADATAREPLACE)
     assert repr(mdr) == '<MetaDataReplace 1013>'
     assert mdr.ro_id == 'RO ID'
 
@@ -365,8 +366,8 @@ def test_metadata_replace():
     GIVEN: Running order and MetadataReplace message (with updated roSlug field)
     EXPECT: Running order with roSlug field: RO SLUG NEW
     """
-    ro = RunningOrder(ROCREATE)
-    mdr = MetaDataReplace(ROMETADATAREPLACE)
+    ro = RunningOrder.from_file(ROCREATE)
+    mdr = MetaDataReplace.from_file(ROMETADATAREPLACE)
     d = ro.to_dict()
     assert len(d['mos']['roCreate']['story'][0]['item']) == 3
     ro_id = d['mos']['roCreate']['roID']
@@ -386,7 +387,7 @@ def test_metadata_replace():
 
 def test_story_append_init():
     "Test we can create a StoryAppend object from a StoryAppend file"
-    sa = StoryAppend(ROAPPENDSTORY)
+    sa = StoryAppend.from_file(ROAPPENDSTORY)
     assert repr(sa) == '<StoryAppend 1014>'
     assert sa.ro_id == 'RO ID'
 
@@ -395,8 +396,8 @@ def test_story_append_item():
     GIVEN: Running order and storyAppend message (add STORYNEW1 and STORYNEW2)
     EXPECT: Running order with STORYNEW1 and STORYNEW2 added to the end
     """
-    ro = RunningOrder(ROCREATE)
-    sa = StoryAppend(ROAPPENDSTORY)
+    ro = RunningOrder.from_file(ROCREATE)
+    sa = StoryAppend.from_file(ROAPPENDSTORY)
     d = ro.to_dict()
     assert len(d['mos']['roCreate']['story']) == 3
 
@@ -410,7 +411,7 @@ def test_story_append_item():
 
 def test_story_delete_init():
     "Test we can create a StoryDelete object from a StoryDelete file"
-    sd = StoryDelete(RODELSTORY)
+    sd = StoryDelete.from_file(RODELSTORY)
     assert repr(sd) == '<StoryDelete 1015>'
     assert sd.ro_id == 'RO ID'
 
@@ -419,8 +420,8 @@ def test_story_delete():
     GIVEN: Running order and storyDelete message (delete STORY1 and STORY2)
     EXPECT: Running order with just STORY3 in
     """
-    ro = RunningOrder(ROCREATE)
-    sd = StoryDelete(RODELSTORY)
+    ro = RunningOrder.from_file(ROCREATE)
+    sd = StoryDelete.from_file(RODELSTORY)
     d = ro.to_dict()
     assert isinstance(d['mos']['roCreate']['story'], list)
     assert len(d['mos']['roCreate']['story']) == 3
@@ -434,7 +435,7 @@ def test_story_delete():
 
 def test_story_insert_init():
     "Test we can create a StoryInsert object from a StoryInsert file"
-    si = StoryInsert(ROINSERTSTORY)
+    si = StoryInsert.from_file(ROINSERTSTORY)
     assert repr(si) == '<StoryInsert 1016>'
     assert si.ro_id == 'RO ID'
 
@@ -443,8 +444,8 @@ def test_story_insert():
     GIVEN: Running order and storyDelete message (delete STORY1 and STORY2)
     EXPECT: Running order with just STORY3 in
     """
-    ro = RunningOrder(ROCREATE)
-    si = StoryInsert(ROINSERTSTORY)
+    ro = RunningOrder.from_file(ROCREATE)
+    si = StoryInsert.from_file(ROINSERTSTORY)
     d = ro.to_dict()
     assert len(d['mos']['roCreate']['story']) == 3
 
@@ -461,7 +462,7 @@ def test_story_insert():
 
 def test_story_move_init():
     "Test we can create a StoryMove object from a StoryMove file"
-    sm = StoryMove(ROMOVESTORY)
+    sm = StoryMove.from_file(ROMOVESTORY)
     assert repr(sm) == '<StoryMove 1017>'
     assert sm.ro_id == 'RO ID'
 
@@ -470,8 +471,8 @@ def test_story_move():
     GIVEN: Running order and storyDelete message (delete STORY1 and STORY2)
     EXPECT: Running order with just STORY3 in
     """
-    ro = RunningOrder(ROCREATE)
-    sm = StoryMove(ROMOVESTORY)
+    ro = RunningOrder.from_file(ROCREATE)
+    sm = StoryMove.from_file(ROMOVESTORY)
     d = ro.to_dict()
     assert d['mos']['roCreate']['story'][0]['storyID'] == 'STORY1'
     assert d['mos']['roCreate']['story'][2]['storyID'] == 'STORY3'
@@ -485,7 +486,7 @@ def test_story_move():
 
 def test_story_replace_init():
     "Test we can create a StoryReplace object from a StoryReplace file"
-    sr = StoryReplace(ROREPSTORY)
+    sr = StoryReplace.from_file(ROREPSTORY)
     assert repr(sr) == '<StoryReplace 1018>'
     assert sr.ro_id == 'RO ID'
 
@@ -494,8 +495,8 @@ def test_story_replace():
     GIVEN: Running order and roStoryReplace message (STORY 1 for STORY ONE)
     EXPECT: Running order with STORY ONE and no STORY 1
     """
-    ro = RunningOrder(ROCREATE)
-    sr = StoryReplace(ROREPSTORY)
+    ro = RunningOrder.from_file(ROCREATE)
+    sr = StoryReplace.from_file(ROREPSTORY)
     d = ro.to_dict()
     assert len(d['mos']['roCreate']['story']) == 3
     story_slug = d['mos']['roCreate']['story'][0]['storySlug']
@@ -515,7 +516,7 @@ def test_story_replace():
 
 def test_item_delete_init():
     "Test we can create a ItemDelete object from a roItemDelete file"
-    id = ItemDelete(RODELITEM)
+    id = ItemDelete.from_file(RODELITEM)
     assert repr(id) == '<ItemDelete 1019>'
     assert id.ro_id == 'RO ID'
 
@@ -524,8 +525,8 @@ def test_item_delete():
     GIVEN: Running order and roItemDelete message (STORY 1 for STORY ONE)
     EXPECT: Running order with STORY ONE and no STORY 1
     """
-    ro = RunningOrder(ROCREATE)
-    id = ItemDelete(RODELITEM)
+    ro = RunningOrder.from_file(ROCREATE)
+    id = ItemDelete.from_file(RODELITEM)
     d = ro.to_dict()
     assert len(d['mos']['roCreate']['story'][0]['item']) == 3
 
@@ -538,7 +539,7 @@ def test_item_delete():
 
 def test_item_insert_init():
     "Test we can create a ItemInsert object from a roItemInsert file"
-    ii = ItemInsert(ROINSERTITEM)
+    ii = ItemInsert.from_file(ROINSERTITEM)
     assert repr(ii) == '<ItemInsert 1020>'
     assert ii.ro_id == 'RO ID'
 
@@ -547,8 +548,8 @@ def test_item_insert():
     GIVEN: Running order and roItemInsert message (ITEMNEW1 and ITEMNEW2)
     EXPECT: Running order with ITEMNEW1 and ITEMNEW2 above ITEM2
     """
-    ro = RunningOrder(ROCREATE)
-    ii = ItemInsert(ROINSERTITEM)
+    ro = RunningOrder.from_file(ROCREATE)
+    ii = ItemInsert.from_file(ROINSERTITEM)
     d = ro.to_dict()
     assert len(d['mos']['roCreate']['story'][0]['item']) == 3
 
@@ -564,7 +565,7 @@ def test_item_insert():
 
 def test_item_move_multiple_init():
     "Test we can create a ItemMoveMultiple object from a roItemMoveMultiple file"
-    imm = ItemMoveMultiple(ROMOVEMULTIPLEITEM)
+    imm = ItemMoveMultiple.from_file(ROMOVEMULTIPLEITEM)
     assert repr(imm) == '<ItemMoveMultiple 1021>'
     assert imm.ro_id == 'RO ID'
 
@@ -573,8 +574,8 @@ def test_item_move_multiple():
     GIVEN: Running order and roItemMoveMultiple message (ITEM2, ITEM3 above ITEM1 in STORY1)
     EXPECT: Running order with STORY1 items in order (ITEM2, ITEM3, ITEM1)
     """
-    ro = RunningOrder(ROCREATE)
-    imm = ItemMoveMultiple(ROMOVEMULTIPLEITEM)
+    ro = RunningOrder.from_file(ROCREATE)
+    imm = ItemMoveMultiple.from_file(ROMOVEMULTIPLEITEM)
     d = ro.to_dict()
     assert len(d['mos']['roCreate']['story'][0]['item']) == 3
     assert d['mos']['roCreate']['story'][0]['item'][0]['itemID'] == 'ITEM1'
@@ -592,7 +593,7 @@ def test_item_move_multiple():
 
 def test_item_replace_init():
     "Test we can create a ItemReplace object from a roItemReplace file"
-    ir = ItemReplace(ROREPITEM)
+    ir = ItemReplace.from_file(ROREPITEM)
     assert repr(ir) == '<ItemReplace 1022>'
     assert ir.ro_id == 'RO ID'
 
@@ -601,8 +602,8 @@ def test_item_replace():
     GIVEN: Running order and roItemReplace message (add NEW to ITEM21 slug)
     EXPECT: Running order with STORY2 ITEM21 slug as 'NEW ITEM 21'
     """
-    ro = RunningOrder(ROCREATE)
-    ir = ItemReplace(ROREPITEM)
+    ro = RunningOrder.from_file(ROCREATE)
+    ir = ItemReplace.from_file(ROREPITEM)
     d = ro.to_dict()
     assert len(d['mos']['roCreate']['story'][1]['item']) == 3
     assert d['mos']['roCreate']['story'][1]['item'][0]['itemSlug'] == 'ITEM 21'
@@ -616,7 +617,7 @@ def test_item_replace():
 
 def test_ro_replace_init():
     "Test we can create a roReplace object from a roReplace file"
-    rr = RunningOrderReplace(ROREPLACE)
+    rr = RunningOrderReplace.from_file(ROREPLACE)
     assert repr(rr) == '<RunningOrderReplace 1023>'
     assert rr.ro_id == 'RO ID'
 
@@ -625,8 +626,8 @@ def test_ro_replace():
     GIVEN: Running order and roReplace message (replace roID's contents)
     EXPECT: Running order with roSlug 'RO SLUG NEW'
     """
-    ro = RunningOrder(ROCREATE)
-    ror = RunningOrderReplace(ROREPLACE)
+    ro = RunningOrder.from_file(ROCREATE)
+    ror = RunningOrderReplace.from_file(ROREPLACE)
     d = ro.to_dict()
     assert d['mos']['roCreate']['roSlug'] == 'RO SLUG'
 
@@ -638,7 +639,7 @@ def test_ro_replace():
 
 def test_running_order_end_init():
     "Test we can create a RunningOrderEnd object from a roDelete file"
-    rd = RunningOrderEnd(RODELETE)
+    rd = RunningOrderEnd.from_file(RODELETE)
     assert repr(rd) == '<RunningOrderEnd 9999>'
     assert rd.ro_id == 'RO ID'
 
@@ -647,8 +648,8 @@ def test_running_order_end():
     GIVEN: Running order and RunningOrderEnd message
     EXPECT: Running order with roDelete tag
     """
-    ro = RunningOrder(ROCREATE)
-    rd = RunningOrderEnd(RODELETE)
+    ro = RunningOrder.from_file(ROCREATE)
+    rd = RunningOrderEnd.from_file(RODELETE)
     d = ro.to_dict()
     ro_id = d['mos']['roCreate']['roID']
     assert ro_id == 'RO ID'
@@ -669,9 +670,9 @@ def test_merge_after_delete():
     GIVEN: A completed RunningOrder and a StorySend
     EXPECT: The RunningOrder should refuse the merge
     """
-    ro = RunningOrder(ROCREATE)
-    rd = RunningOrderEnd(RODELETE)
-    ss = StorySend(ROSTORYSEND1)
+    ro = RunningOrder.from_file(ROCREATE)
+    rd = RunningOrderEnd.from_file(RODELETE)
+    ss = StorySend.from_file(ROSTORYSEND1)
     ro += rd
     with pytest.raises(MosClosedMergeError):
         ro += ss
@@ -681,8 +682,8 @@ def test_sort_two():
     GIVEN: Two MOS objects
     EXPECT: The MOS objects sorted by their MOS ID
     """
-    ro = RunningOrder(ROCREATE)
-    rd = RunningOrderEnd(RODELETE)
+    ro = RunningOrder.from_file(ROCREATE)
+    rd = RunningOrderEnd.from_file(RODELETE)
     assert sorted([ro, rd]) == [ro, rd]
     assert sorted([rd, ro]) == [ro, rd]
 
@@ -691,21 +692,21 @@ def test_sort_all():
     GIVEN: A list of MOS objects
     EXPECT: The MOS objects sorted by their MOS ID
     """
-    ro = RunningOrder(ROCREATE)
-    ss1 = StorySend(ROSTORYSEND1)
-    ss2 = StorySend(ROSTORYSEND2)
-    ea1 = EAStoryReplace(ROELEMENTACTIONREPSTORY)
-    ea2 = EAItemReplace(ROELEMENTACTIONREPITEM)
-    ea3 = EAStoryDelete(ROELEMENTACTIONDELSTORY)
-    ea4 = EAItemDelete(ROELEMENTACTIONDELITEM)
-    ea5 = EAStoryInsert(ROELEMENTACTIONINSERTSTORY)
-    ea6 = EAItemInsert(ROELEMENTACTIONINSERTITEM)
-    ea7 = EAStorySwap(ROELEMENTACTIONSWAPSTORY)
-    ea8 = EAItemSwap(ROELEMENTACTIONSWAPITEM)
-    ea9 = EAStoryMove(ROELEMENTACTIONMOVESTORY)
-    ea10 = EAItemMove(ROELEMENTACTIONMOVEITEM)
-    mdr = MetaDataReplace(ROMETADATAREPLACE)
-    rd = RunningOrderEnd(RODELETE)
+    ro = RunningOrder.from_file(ROCREATE)
+    ss1 = StorySend.from_file(ROSTORYSEND1)
+    ss2 = StorySend.from_file(ROSTORYSEND2)
+    ea1 = EAStoryReplace.from_file(ROELEMENTACTIONREPSTORY)
+    ea2 = EAItemReplace.from_file(ROELEMENTACTIONREPITEM)
+    ea3 = EAStoryDelete.from_file(ROELEMENTACTIONDELSTORY)
+    ea4 = EAItemDelete.from_file(ROELEMENTACTIONDELITEM)
+    ea5 = EAStoryInsert.from_file(ROELEMENTACTIONINSERTSTORY)
+    ea6 = EAItemInsert.from_file(ROELEMENTACTIONINSERTITEM)
+    ea7 = EAStorySwap.from_file(ROELEMENTACTIONSWAPSTORY)
+    ea8 = EAItemSwap.from_file(ROELEMENTACTIONSWAPITEM)
+    ea9 = EAStoryMove.from_file(ROELEMENTACTIONMOVESTORY)
+    ea10 = EAItemMove.from_file(ROELEMENTACTIONMOVEITEM)
+    mdr = MetaDataReplace.from_file(ROMETADATAREPLACE)
+    rd = RunningOrderEnd.from_file(RODELETE)
 
     all_objs_rand = [ss1, ea1, ea4, mdr, ss2, ea9, ea8, ea2, rd, ea7, ea5, ro, ea3, ea6, ea10]
     all_objs_in_order = [ro, ss1, ss2, ea1, ea2, ea3, ea4, ea5, ea6, ea7, ea8, ea9, ea10, mdr, rd]
@@ -717,8 +718,8 @@ def test_merge_failure():
     GIVEN: A RunningOrder and an invalid StorySend
     EXPECT: The RunningOrder should fail to merge
     """
-    ro = RunningOrder(ROCREATE)
-    ss3 = StorySend(ROSTORYSEND3)
+    ro = RunningOrder.from_file(ROCREATE)
+    ss3 = StorySend.from_file(ROSTORYSEND3)
     with warnings.catch_warnings(record=True) as w:
         ro += ss3
     assert len(w) == 1

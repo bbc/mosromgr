@@ -5,7 +5,7 @@ from pathlib import Path
 import logging
 
 from ..utils import s3
-from ..moscontainer import MosContainer
+from ..moscollection import MosCollection
 from ..exc import MosRoMgrException
 
 
@@ -58,25 +58,25 @@ class Runner:
                 files = glob(f'{args.directory}/*.mos.xml')
                 mos_files = [Path(f) for f in files]
                 self.logger.info('found %s mos files', len(mos_files))
-                mc = MosContainer(mos_files)
-                self.logger.info('created mos container')
+                mc = MosCollection.from_files(mos_files)
+                self.logger.info('Created MosCollection')
             elif args.bucket_name and args.bucket_prefix:
                 mos_file_keys = s3.get_mos_files(args.bucket_name, args.bucket_prefix)
-                self.logger.info('got %s mos files from s3', len(mos_file_keys))
-                mc = MosContainer(
+                self.logger.info('Got %s mos files from s3', len(mos_file_keys))
+                mc = MosCollection.from_s3(
                     bucket_name=args.bucket_name,
                     mos_file_keys=mos_file_keys
                 )
-                self.logger.info('done containerising')
+                self.logger.info('Created MosCollection')
             else:
-                print('Invalid arguments')
-                return 1
+                print("Invalid arguments")
+                return 2
             mc.merge()
             print(mc)
             return 0
         except MosRoMgrException as e:
             print(e)
-            return 1
+            return 2
 
 
 main = Runner()

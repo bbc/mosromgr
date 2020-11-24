@@ -4,13 +4,8 @@ MOS Types
 
 .. module:: mosromgr.mostypes
 
-This part of the module provides the classes required for managing MOS files.
-
-.. note::
-
-    Note that no detection or validation is applied when using a MOS message
-    class directly. To detect the class required for a particular MOS file, the
-    :func:`~mosromgr.mosfactory.get_mos_object` function should be used.
+This part of the module provides the classes required for classifying and
+managing MOS files.
 
 MOS message objects provide access to certain elements within the message, such
 as the list of :attr:`~RunningOrder.stories` within a :class:`RunningOrder`.
@@ -21,16 +16,48 @@ MOS message classes are typically imported like so::
 
     from mosromgr.mostypes import RunningOrder
 
-MOS objects can either be initialised from a file path::
+MOS objects are initialised using one of three classmethods. Either from a file
+path::
 
-    ro = RunningOrder('roCreate.mos.xml')
+    ro = RunningOrder.from_file('roCreate.mos.xml')
 
-or from an XML string, using the ``mos_file_contents`` keyword argument::
+from an XML string::
 
     with open('roCreate.mos.xml') as f:
         xml = f.read()
 
-    ro = RunningOrder(mos_file_contents=xml)
+    ro = RunningOrder.from_string(xml)
+
+or from an S3 file key::
+
+    ro = RunningOrder.from_s3(bucket_name, file_key)
+
+Similarly, objects initialised using these classmethods on the :class:`MosFile`
+base class will be automatically classified and an instance of the relevant
+class will be created::
+
+    >>> ro = MosFile.from_file('roCreate.mos.xml')
+    >>> ro
+    <RunningOrder 1000>
+    >>> ss = MosFile.from_file('roStorySend.mos.xml')
+    >>> ss
+    <StorySend 1001>
+    >>> ro = MosFile.from_string(xml1)
+    >>> ro
+    <RunningOrder 1000>
+    >>> ss = MosFile.from_string(xml2)
+    >>> ss
+    <StorySend 1001>
+
+Even ``roElementAction`` files, which require a number of different subclasses,
+can be classified this way::
+
+    >>> ea1 = MosFile.from_file('roElementAction1.mos.xml')
+    >>> ea1
+    <EAStorySwap 1012>
+    >>> ea2 = MosFile.from_string(xml)
+    >>> ea2
+    <EAItemMove 1013>
 
 MOS message classes
 ===================
@@ -41,19 +68,17 @@ messages.
 RunningOrder
 ------------
 
-.. autoclass:: RunningOrder
+.. autoclass:: RunningOrder()
     :members:
     :inherited-members:
-    :show-inheritance:
     :special-members: __add__, __lt__, __gt__, __str__
 
 StorySend
 ---------
 
-.. autoclass:: StorySend
+.. autoclass:: StorySend()
     :members:
     :inherited-members:
-    :show-inheritance:
     :special-members: __add__, __lt__, __gt__, __str__
 
 StoryReplace
@@ -62,196 +87,174 @@ StoryReplace
 .. autoclass:: StoryReplace
     :members:
     :inherited-members:
-    :show-inheritance:
     :special-members: __add__, __lt__, __gt__, __str__
 
 StoryInsert
 -----------
 
-.. autoclass:: StoryInsert
+.. autoclass:: StoryInsert()
     :members:
     :inherited-members:
-    :show-inheritance:
     :special-members: __add__, __lt__, __gt__, __str__
 
 StoryAppend
 -----------
 
-.. autoclass:: StoryAppend
+.. autoclass:: StoryAppend()
     :members:
     :inherited-members:
-    :show-inheritance:
     :special-members: __add__, __lt__, __gt__, __str__
 
 StoryMove
 ---------
 
-.. autoclass:: StoryMove
+.. autoclass:: StoryMove()
     :members:
     :inherited-members:
-    :show-inheritance:
     :special-members: __add__, __lt__, __gt__, __str__
 
 StoryDelete
 -----------
 
-.. autoclass:: StoryDelete
+.. autoclass:: StoryDelete()
     :members:
     :inherited-members:
-    :show-inheritance:
     :special-members: __add__, __lt__, __gt__, __str__
 
 MetaDataReplace
 ---------------
 
-.. autoclass:: MetaDataReplace
+.. autoclass:: MetaDataReplace()
     :members:
     :inherited-members:
-    :show-inheritance:
     :special-members: __add__, __lt__, __gt__, __str__
 
 ItemDelete
 ----------
 
-.. autoclass:: ItemDelete
+.. autoclass:: ItemDelete()
     :members:
     :inherited-members:
-    :show-inheritance:
     :special-members: __add__, __lt__, __gt__, __str__
 
 ItemInsert
 ----------
 
-.. autoclass:: ItemInsert
+.. autoclass:: ItemInsert()
     :members:
     :inherited-members:
-    :show-inheritance:
     :special-members: __add__, __lt__, __gt__, __str__
 
 ItemMoveMultiple
 ----------------
 
-.. autoclass:: ItemMoveMultiple
+.. autoclass:: ItemMoveMultiple()
     :members:
     :inherited-members:
-    :show-inheritance:
     :special-members: __add__, __lt__, __gt__, __str__
 
 ItemReplace
 -----------
 
-.. autoclass:: ItemReplace
+.. autoclass:: ItemReplace()
     :members:
     :inherited-members:
-    :show-inheritance:
     :special-members: __add__, __lt__, __gt__, __str__
 
 EAStoryReplace
 --------------
 
-.. autoclass:: EAStoryReplace
+.. autoclass:: EAStoryReplace()
     :members:
     :inherited-members:
-    :show-inheritance:
     :special-members: __add__, __lt__, __gt__, __str__
 
 EAItemReplace
 -------------
 
-.. autoclass:: EAItemReplace
+.. autoclass:: EAItemReplace()
     :members:
     :inherited-members:
-    :show-inheritance:
     :special-members: __add__, __lt__, __gt__, __str__
 
 EAStoryDelete
 -------------
 
-.. autoclass:: EAStoryDelete
+.. autoclass:: EAStoryDelete()
     :members:
     :inherited-members:
-    :show-inheritance:
     :special-members: __add__, __lt__, __gt__, __str__
 
 EAItemDelete
 ------------
 
-.. autoclass:: EAItemDelete
+.. autoclass:: EAItemDelete()
     :members:
     :inherited-members:
-    :show-inheritance:
     :special-members: __add__, __lt__, __gt__, __str__
 
 EAStoryInsert
 -------------
 
-.. autoclass:: EAStoryInsert
+.. autoclass:: EAStoryInsert()
     :members:
     :inherited-members:
-    :show-inheritance:
     :special-members: __add__, __lt__, __gt__, __str__
 
 EAItemInsert
 ------------
 
-.. autoclass:: EAItemInsert
+.. autoclass:: EAItemInsert()
     :members:
     :inherited-members:
-    :show-inheritance:
     :special-members: __add__, __lt__, __gt__, __str__
 
 EAStorySwap
 -----------
 
-.. autoclass:: EAStorySwap
+.. autoclass:: EAStorySwap()
     :members:
     :inherited-members:
-    :show-inheritance:
     :special-members: __add__, __lt__, __gt__, __str__
 
 EAItemSwap
 ----------
 
-.. autoclass:: EAItemSwap
+.. autoclass:: EAItemSwap()
     :members:
     :inherited-members:
-    :show-inheritance:
     :special-members: __add__, __lt__, __gt__, __str__
 
 EAStoryMove
 -----------
 
-.. autoclass:: EAStoryMove
+.. autoclass:: EAStoryMove()
     :members:
     :inherited-members:
-    :show-inheritance:
     :special-members: __add__, __lt__, __gt__, __str__
 
 EAItemMove
 ----------
 
-.. autoclass:: EAItemMove
+.. autoclass:: EAItemMove()
     :members:
     :inherited-members:
-    :show-inheritance:
     :special-members: __add__, __lt__, __gt__, __str__
 
 RunningOrderReplace
 -------------------
 
-.. autoclass:: RunningOrderReplace
+.. autoclass:: RunningOrderReplace()
     :members:
     :inherited-members:
-    :show-inheritance:
     :special-members: __add__, __lt__, __gt__, __str__
 
 RunningOrderEnd
 ---------------
 
-.. autoclass:: RunningOrderEnd
+.. autoclass:: RunningOrderEnd()
     :members:
     :inherited-members:
-    :show-inheritance:
     :special-members: __add__, __lt__, __gt__, __str__
 
 Base classes
@@ -268,13 +271,13 @@ The following classes are abstract and should not be used directly.
 MosFile
 -------
 
-.. autoclass:: MosFile
+.. autoclass:: MosFile()
     :members:
     :inherited-members:
 
 ElementAction
 -------------
 
-.. autoclass:: ElementAction
+.. autoclass:: ElementAction()
     :members:
     :inherited-members:
