@@ -57,18 +57,24 @@ MOS files into the running order::
 
     mc.merge()
 
-To access the final XML, simply print the
-:class:`~mosromgr.moscollection.MosCollection` object or access the :attr:``
+To access the final XML, simply print the :class:`MosCollection` object or
+access the :attr:`__str__`
 
     >>> print(mc)
     <mos>
       <mosID>"MOS ID"</mosID>
       <messageID>1234567</messageID>
       ...
-
+    >>> s = str(mc)
+    >>> s
+    <mos>
+      <mosID>"MOS ID"</mosID>
+      <messageID>1234567</messageID>
+      ...
 
 MosCollection
 =============
 
 .. autoclass:: MosCollection
     :members:
+    :special-members: __str__
