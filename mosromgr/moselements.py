@@ -4,8 +4,6 @@ from datetime import timedelta
 
 def _get_story_times(all_stories, prog_tx_time):
     "Create a dict of {story_id: story_tx_time}"
-    print(all_stories)
-    print(prog_tx_time)
     story_times = {}
     if all_stories and prog_tx_time:
         tx_time = prog_tx_time
