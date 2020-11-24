@@ -14,20 +14,22 @@ logging.basicConfig(level=logging.INFO)
 
 
 class MosReader:
-    def __init__(self, mo, *, restore_fn):
+    def __init__(self, mo, *, restore_fn, restore_args):
         self.message_id = mo.message_id
         self.ro_id = mo.ro_id
         self.mos_type = mo.__class__
         self._restore_fn = restore_fn
-        del mo
+        self._restore_args = restore_args
 
     @classmethod
     def from_file(cls, mos_file_path):
         try:
             mo = MosFile.from_file(mos_file_path)
             # store a method of restoring the mos object from the determined class
-            restore = lambda: mo.__class__.from_file(mos_file_path)
-            return cls(mo, restore_fn=restore)
+            return cls(mo,
+                       restore_fn=mo.__class__.from_file,
+                       restore_args=(mos_file_path, )
+            )
         except MosInvalidXML as e:
             warnings.warn(str(e), MosInvalidXMLWarning)
         except UnknownMosFileType as e:
@@ -38,8 +40,10 @@ class MosReader:
         try:
             mo = MosFile.from_string(mos_file_contents)
             # store a method of restoring the mos object from the determined class
-            restore = lambda: mo.__class__.from_string(mos_file_contents)
-            return cls(mo, restore_fn=restore)
+            return cls(mo,
+                        restore_fn=mo.__class__.from_string,
+                        restore_args=(mos_file_contents, )
+            )
         except MosInvalidXML as e:
             warnings.warn(e, MosInvalidXMLWarning)
         except UnknownMosFileType as e:
@@ -50,8 +54,10 @@ class MosReader:
         try:
             mo = MosFile.from_s3(bucket_name, file_key)
             # store a method of restoring the mos object from the determined class
-            restore = lambda: mo.__class__.from_s3(bucket_name, file_key)
-            return cls(mo, restore_fn=restore)
+            return cls(mo,
+                       restore_fn=mo.__class__.from_s3,
+                       restore_args=(bucket_name, file_key)
+            )
         except MosInvalidXML as e:
             warnings.warn(e, MosInvalidXMLWarning)
         except UnknownMosFileType as e:
@@ -68,7 +74,7 @@ class MosReader:
 
     @property
     def mos_object(self):
-        return self._restore_fn()
+        return self._restore_fn(*self._restore_args)
 
 
 class MosCollection:
@@ -173,6 +179,5 @@ class MosCollection:
             except MosMergeError as e:
                 errors += 1
                 warnings.warn(str(e), MosMergeWarning)
-            del mo
         logger.info("Completed merging %s mos files with %s errors",
                     len(self.mos_readers), errors)
