@@ -12,9 +12,9 @@ from ..exc import MosRoMgrException
 "mosromgr command line tool"
 
 
-class Runner:
+class CLI:
     def __init__(self):
-        self.logger = logging.getLogger('mos_runner')
+        self.logger = logging.getLogger('mosromgr.cli.mosromgr')
         self.parser = argparse.ArgumentParser(
             description=__doc__
         )
@@ -47,9 +47,8 @@ class Runner:
             # exit with code 2
             raise e
         except Exception as e:
-            raise
             # Output anything else nicely formatted on stderr and exit code 1
-            self.parser.exit(1, '{prog}: error: {message}\n'.format(
+            self.parser.exit(1, "{prog}: error: {message}\n".format(
                 prog=self.parser.prog, message=e))
 
     def main(self, args):
@@ -57,26 +56,25 @@ class Runner:
             if args.directory:
                 files = glob(f'{args.directory}/*.mos.xml')
                 mos_files = [Path(f) for f in files]
-                self.logger.info('found %s mos files', len(mos_files))
+                self.logger.info("Found %s mos files", len(mos_files))
                 mc = MosCollection.from_files(mos_files)
-                self.logger.info('Created MosCollection')
+                self.logger.info("Created MosCollection")
             elif args.bucket_name and args.bucket_prefix:
                 mos_file_keys = s3.get_mos_files(args.bucket_name, args.bucket_prefix)
-                self.logger.info('Got %s mos files from s3', len(mos_file_keys))
+                self.logger.info("Got %s mos files from s3", len(mos_file_keys))
                 mc = MosCollection.from_s3(
                     bucket_name=args.bucket_name,
                     mos_file_keys=mos_file_keys
                 )
-                self.logger.info('Created MosCollection')
+                self.logger.info("Created MosCollection")
             else:
                 print("Invalid arguments")
                 return 2
             mc.merge()
             print(mc)
-            return 0
         except MosRoMgrException as e:
-            print(e)
+            sys.stderr.write(f"{e}\n")
             return 2
 
 
-main = Runner()
+main = CLI()

@@ -225,4 +225,4 @@ def test_get_mos_object_with_delete():
 
 def test_get_mos_object_invalid_mos_type():
     with pytest.raises(UnknownMosFileType):
-        im = MosFile.from_file(ROINVALID)
+        MosFile.from_file(ROINVALID)
