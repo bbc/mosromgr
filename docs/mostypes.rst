@@ -16,7 +16,7 @@ MOS message classes are typically imported like so::
 
     from mosromgr.mostypes import RunningOrder
 
-MOS objects are initialised using one of three classmethods. Either from a file
+MOS objects are constructed using one of three classmethods. Either from a file
 path::
 
     ro = RunningOrder.from_file('roCreate.mos.xml')
@@ -30,9 +30,9 @@ from an XML string::
 
 or from an S3 file key::
 
-    ro = RunningOrder.from_s3(bucket_name, file_key)
+    ro = RunningOrder.from_s3(bucket_name='newsnight', mos_file_key='20200101/roCreate.mos.xml')
 
-Similarly, objects initialised using these classmethods on the :class:`MosFile`
+Similarly, objects constructed using these classmethods on the :class:`MosFile`
 base class will be automatically classified and an instance of the relevant
 class will be created::
 

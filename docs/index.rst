@@ -67,8 +67,22 @@ new file::
     with open('final.mos.xml', 'w') as f:
         f.write(ro)
 
-Alternatively, use :class:`~mosromgr.moscollection.MosCollection` which will
-sort and classify MOS types of all given files::
+If you're automating this process you won't necessarily know which MOS Type to
+use, so you can construct an object from the base class
+:class:`~mosromgr.mostypes.MosFile` which will automatically classify your
+file::
+
+    >>> from mosromgr.mostypes import MosFile
+    >>> mf1 = MosFile.from_file('roCreate.mos.xml')
+    >>> mf1
+    <RunningOrder 1000>
+    >>> mf2 = MosFile.from_file('roStorySend.mos.xml')
+    >>> mf2
+    <StorySend 1001>
+
+Using :class:`~mosromgr.moscollection.MosCollection` will sort and classify
+multiple MOS types of all given files, allowing you to process a collection of
+MOS files within a complete or partially complete programme::
 
     from mosromgr.moscollection import MosCollection
 

@@ -8,10 +8,6 @@ The various utilities are typically imported like so::
 
     from mosromgr.utils import s3
 
-or::
-
-    from mosromgr.utils.sns import SNS
-
 S3
 ==
 

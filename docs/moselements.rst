@@ -55,7 +55,7 @@ accessible in the :class:`~mosromgr.mostypes.RunningOrder`
 
 .. note::
 
-    Note that these classes should not normally be initialised by the user, but
+    Note that these classes should not normally be constructed by the user, but
     instances of them can be found within :class:`~mosromgr.mostypes.MosFile`
     objects, so the following documentation is provided as a reference to how
     they can be used.

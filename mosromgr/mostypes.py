@@ -27,7 +27,14 @@ class MosFile:
 
     @classmethod
     def from_file(cls, mos_file_path):
-        "Initialise from a path to a MOS file"
+        """
+        Construct from a path to a MOS file
+
+        :type mos_file_path:
+            str
+        :param mos_file_path:
+            The MOS file path
+        """
         try:
             xml = ET.parse(mos_file_path).getroot()
         except ET.ParseError as e:
@@ -38,7 +45,14 @@ class MosFile:
 
     @classmethod
     def from_string(cls, mos_xml_string):
-        "Initialise from an XML string of a MOS document"
+        """
+        Construct from an XML string of a MOS document
+
+        :type mos_xml_string:
+            str
+        :param mos_xml_string:
+            The XML string of the MOS document
+        """
         try:
             xml = ET.fromstring(mos_xml_string)
         except ET.ParseError as e:
@@ -48,14 +62,26 @@ class MosFile:
         return cls(xml)
 
     @classmethod
-    def from_s3(cls, bucket_name, file_key):
-        "Initialise from a MOS file in an S3 bucket"
-        xml = s3.get_file_contents(bucket_name, file_key)
+    def from_s3(cls, bucket_name, mos_file_key):
+        """
+        Construct from a MOS file in an S3 bucket
+
+        :type bucket_name:
+            str
+        :param bucket_name:
+            The name of the S3 bucket
+
+        :type mos_file_key:
+            str
+        :param mos_file_key:
+            A MOS file key within the S3 bucket
+        """
+        xml = s3.get_file_contents(bucket_name, mos_file_key)
         return cls.from_string(xml)
 
     @classmethod
     def _classify(cls, xml):
-        "classify the MOS type and return an instance of the relevant class"
+        "Classify the MOS type and return an instance of the relevant class"
         for tag, SubClass in TAG_CLASS_MAP.items():
             if xml.find(tag):
                 if SubClass == ElementAction:
@@ -69,7 +95,7 @@ class MosFile:
         return f'<{self.__class__.__name__} {self.message_id} ended>'
 
     def __str__(self):
-        "The XML string"
+        "The XML string of the MOS file"
         return ET.tostring(self.xml, encoding='unicode')
 
     def __lt__(self, other):
@@ -130,7 +156,7 @@ class MosFile:
 class RunningOrder(MosFile):
     """
     A ``RunningOrder`` object is created from a ``roCreate`` MOS file and can be
-    initialised using classmethods :meth:`from_file` or :meth:`from_string`.
+    constructed using classmethods :meth:`from_file` or :meth:`from_string`.
     """
     def __add__(self, other):
         """
@@ -183,7 +209,7 @@ class RunningOrder(MosFile):
 class StorySend(MosFile):
     """
     A ``StorySend`` object is created from a ``roStorySend`` MOS file and can be
-    initialised using classmethods :meth:`from_file` or :meth:`from_string`.
+    constructed using classmethods :meth:`from_file` or :meth:`from_string`.
 
     ``StorySend`` objects can be merged with a :class:`RunningOrder` by using
     the ``+`` operator. This behaviour is defined in the :meth:`merge` method in
@@ -239,7 +265,7 @@ class StorySend(MosFile):
 class MetaDataReplace(MosFile):
     """
     A ``MetaDataReplace`` object is created from a ``roMetadataReplace`` MOS
-    file and can be initialised using classmethods :meth:`from_file`
+    file and can be constructed using classmethods :meth:`from_file`
     or :meth:`from_string`.
 
     ``MetaDataReplace`` objects can be merged with a :class:`RunningOrder` by
@@ -271,7 +297,7 @@ class MetaDataReplace(MosFile):
 class StoryAppend(MosFile):
     """
     A ``StoryAppend`` object is created from a ``roStoryAppend`` MOS file and
-    can be initialised using classmethods :meth:`from_file` or
+    can be constructed using classmethods :meth:`from_file` or
     :meth:`from_string`.
 
     ``StoryAppend`` objects can be merged with a :class:`RunningOrder` by using
@@ -306,7 +332,7 @@ class StoryAppend(MosFile):
 class StoryDelete(MosFile):
     """
     A ``StoryDelete`` object is created from a ``roStoryDelete`` MOS file and
-    can be initialised using classmethods :meth:`from_file` or
+    can be constructed using classmethods :meth:`from_file` or
     :meth:`from_string`.
 
     ``StoryDelete`` objects can be merged with a :class:`RunningOrder` by using
@@ -347,7 +373,7 @@ class StoryDelete(MosFile):
 class ItemDelete(MosFile):
     """
     An ``ItemDelete`` object is created from a ``roItemDelete`` MOS file and
-    can be initialised using classmethods :meth:`from_file` or
+    can be constructed using classmethods :meth:`from_file` or
     :meth:`from_string`.
 
     ``ItemDelete`` objects can be merged with a :class:`RunningOrder` by using
@@ -407,7 +433,7 @@ class ItemDelete(MosFile):
 class StoryInsert(MosFile):
     """
     A ``StoryInsert`` object is created from a ``roStoryInsert`` MOS file and
-    can be initialised using classmethods :meth:`from_file` or
+    can be constructed using classmethods :meth:`from_file` or
     :meth:`from_string`.
 
     ``StoryInsert`` objects can be merged with a :class:`RunningOrder` by using
@@ -457,7 +483,7 @@ class StoryInsert(MosFile):
 class ItemInsert(MosFile):
     """
     An ``ItemInsert`` object is created from a ``roItemInsert`` MOS file and
-    can be initialised using classmethods :meth:`from_file` or
+    can be constructed using classmethods :meth:`from_file` or
     :meth:`from_string`.
 
     ``ItemInsert`` objects can be merged with a :class:`RunningOrder` by using
@@ -524,7 +550,7 @@ class ItemInsert(MosFile):
 class StoryMove(MosFile):
     """
     A ``StoryMove`` object is created from a ``roStoryMove`` MOS file and can be
-    initialised using classmethods :meth:`from_file` or :meth:`from_string`.
+    constructed using classmethods :meth:`from_file` or :meth:`from_string`.
 
     ``StoryMove`` objects can be merged with a :class:`RunningOrder` by using
     the ``+`` operator. This behaviour is defined in the :meth:`merge` method in
@@ -579,7 +605,7 @@ class StoryMove(MosFile):
 class ItemMoveMultiple(MosFile):
     """
     An ``ItemMoveMultiple`` object is created from a ``roItemMoveMultiple`` MOS
-    file and can be initialised using classmethods :meth:`from_file` or
+    file and can be constructed using classmethods :meth:`from_file` or
     :meth:`from_string`.
 
     ``ItemMoveMultiple`` objects can be merged with a :class:`RunningOrder` by
@@ -643,7 +669,7 @@ class ItemMoveMultiple(MosFile):
 class StoryReplace(MosFile):
     """
     A ``StoryReplace`` object is created from a ``roStoryReplace`` MOS file and
-    can be initialised using classmethods :meth:`from_file` or
+    can be constructed using classmethods :meth:`from_file` or
     :meth:`from_string`.
 
     ``StoryReplace`` objects can be merged with a :class:`RunningOrder` by using
@@ -688,7 +714,7 @@ class StoryReplace(MosFile):
 class ItemReplace(MosFile):
     """
     An ``ItemReplace`` object is created from a ``roItemReplace`` MOS file and
-    can be initialised using classmethods :meth:`from_file` or
+    can be constructed using classmethods :meth:`from_file` or
     :meth:`from_string`.
 
     ``ItemReplace`` objects can be merged with a :class:`RunningOrder` by using
@@ -753,7 +779,7 @@ class ItemReplace(MosFile):
 class RunningOrderReplace(RunningOrder):
     """
     An ``RunningOrderReplace`` object is created from a ``roReplace`` MOS file
-    and can be initialised using classmethods :meth:`from_file` or
+    and can be constructed using classmethods :meth:`from_file` or
     :meth:`from_string`.
 
     ``RunningOrderReplace`` objects can be merged with a :class:`RunningOrder`
@@ -778,7 +804,7 @@ class RunningOrderReplace(RunningOrder):
 class RunningOrderEnd(MosFile):
     """
     A ``RunningOrderEnd`` object is created from a ``roDelete`` MOS file and can
-    be initialised using classmethods :meth:`from_file` or :meth:`from_string`.
+    be constructed using classmethods :meth:`from_file` or :meth:`from_string`.
 
     ``RunningOrderEnd`` objects can be merged with a :class:`RunningOrder` by
     using the ``+`` operator. This behaviour is defined in the :meth:`merge`
@@ -800,7 +826,7 @@ class ElementAction(MosFile):
     "Base class for various ``roElementAction`` MOS files."
     @classmethod
     def _classify(cls, xml):
-        "classify the MOS type and return an instance of the relevant class"
+        "Classify the MOS type and return an instance of the relevant class"
         ea = xml.find('roElementAction')
         SubClass = EA_CLASS_MAP[ea.attrib['operation']](ea)
         return SubClass(xml)
@@ -814,7 +840,7 @@ class ElementAction(MosFile):
 class EAStoryReplace(ElementAction):
     """
     An ``EAStoryReplace`` object is created from a ``roElementAction`` MOS file
-    containing a story replacement, and can be initialised using classmethods
+    containing a story replacement, and can be constructed using classmethods
     :meth:`from_file` or :meth:`from_string`.
 
     ``EAStoryReplace`` objects can be merged with a :class:`RunningOrder` by
@@ -856,7 +882,7 @@ class EAStoryReplace(ElementAction):
 class EAItemReplace(ElementAction):
     """
     An ``EAItemReplace`` object is created from a ``roElementAction`` MOS file
-    containing an item replacement, and can be initialised using classmethods
+    containing an item replacement, and can be constructed using classmethods
     :meth:`from_file` or :meth:`from_string`.
 
     ``EAItemReplace`` objects can be merged with a :class:`RunningOrder` by
@@ -914,7 +940,7 @@ class EAItemReplace(ElementAction):
 class EAStoryDelete(ElementAction):
     """
     An ``EAStoryDelete`` object is created from a ``roElementAction`` MOS file
-    containing a story deletion, and can be initialised using classmethods
+    containing a story deletion, and can be constructed using classmethods
     :meth:`from_file` or :meth:`from_string`.
 
     ``EAStoryDelete`` objects can be merged with a :class:`RunningOrder` by
@@ -945,7 +971,7 @@ class EAStoryDelete(ElementAction):
 class EAItemDelete(ElementAction):
     """
     An ``EAItemDelete`` object is created from a ``roElementAction`` MOS file
-    containing an item deletion, and can be initialised using classmethods
+    containing an item deletion, and can be constructed using classmethods
     :meth:`from_file` or :meth:`from_string`.
 
     ``EAItemDelete`` objects can be merged with a :class:`RunningOrder` by using
@@ -990,7 +1016,7 @@ class EAItemDelete(ElementAction):
 class EAStoryInsert(ElementAction):
     """
     An ``EAStoryInsert`` object is created from a ``roElementAction`` MOS file
-    containing a story insertion, and can be initialised using classmethods
+    containing a story insertion, and can be constructed using classmethods
     :meth:`from_file` or :meth:`from_string`.
 
     ``EAStoryInsert`` objects can be merged with a :class:`RunningOrder` by
@@ -1034,7 +1060,7 @@ class EAStoryInsert(ElementAction):
 class EAItemInsert(ElementAction):
     """
     An ``EAItemInsert`` object is created from a ``roElementAction`` MOS file
-    containing an item insertion, and can be initialised using classmethods
+    containing an item insertion, and can be constructed using classmethods
     :meth:`from_file` or :meth:`from_string`.
 
     ``EAItemInsert`` objects can be merged with a :class:`RunningOrder` by using
@@ -1088,7 +1114,7 @@ class EAItemInsert(ElementAction):
 class EAStorySwap(ElementAction):
     """
     An ``EAStorySwap`` object is created from a ``roElementAction`` MOS file
-    containing a story swap, and can be initialised using classmethods
+    containing a story swap, and can be constructed using classmethods
     :meth:`from_file` or :meth:`from_string`.
 
     ``EAStorySwap`` objects can be merged with a :class:`RunningOrder` by using
@@ -1132,7 +1158,7 @@ class EAStorySwap(ElementAction):
 class EAItemSwap(ElementAction):
     """
     An ``EAItemSwap`` object is created from a ``roElementAction`` MOS file
-    containing an item swap, and can be initialised using classmethods
+    containing an item swap, and can be constructed using classmethods
     :meth:`from_file` or :meth:`from_string`.
 
     ``EAItemSwap`` objects can be merged with a :class:`RunningOrder` by using
@@ -1187,7 +1213,7 @@ class EAItemSwap(ElementAction):
 class EAStoryMove(ElementAction):
     """
     An ``EAStoryMove`` object is created from a ``roElementAction`` MOS file
-    containing a story move, and can be initialised using classmethods
+    containing a story move, and can be constructed using classmethods
     :meth:`from_file` or :meth:`from_string`.
 
     ``EAStoryMove`` objects can be merged with a :class:`RunningOrder` by using
@@ -1230,7 +1256,7 @@ class EAStoryMove(ElementAction):
 class EAItemMove(ElementAction):
     """
     An ``EAItemMove`` object is created from a ``roElementAction`` MOS file
-    containing an item move, and can be initialised using classmethods
+    containing an item move, and can be constructed using classmethods
     :meth:`from_file` or :meth:`from_string`.
 
     ``EAItemMove`` objects can be merged with a :class:`RunningOrder` by using
