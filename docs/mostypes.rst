@@ -247,7 +247,7 @@ RunningOrderReplace
 .. autoclass:: RunningOrderReplace()
     :members:
     :inherited-members:
-    :excluded-members: completed
+    :exclude-members: completed
     :special-members: __add__, __lt__, __gt__, __str__
 
 RunningOrderEnd
