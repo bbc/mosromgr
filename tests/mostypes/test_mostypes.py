@@ -46,10 +46,10 @@ def test_story_send():
     """
     ro = RunningOrder.from_file(ROCREATE)
     ss = StorySend.from_file(ROSTORYSEND1)
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story']) == 3
     ro += ss
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story']) == 3
     body1 = d['mos']['roCreate']['story'][0]['p']
     assert body1 == '(BONG+PRES)'
@@ -69,7 +69,7 @@ def test_element_action_replace_story():
     """
     ro = RunningOrder.from_file(ROCREATE)
     ea = EAStoryReplace.from_file(ROELEMENTACTIONREPSTORY)
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story']) == 3
     story_slug = d['mos']['roCreate']['story'][0]['storySlug']
     assert story_slug == 'STORY 1'
@@ -77,7 +77,7 @@ def test_element_action_replace_story():
     assert item_slug == 'ITEM 1'
 
     ro += ea
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story']) == 3
     story_slug = d['mos']['roCreate']['story'][0]['storySlug']
     assert story_slug == 'STORY ONE'
@@ -100,7 +100,7 @@ def test_element_action_replace_item():
     ro = RunningOrder.from_file(ROCREATE)
     ea = EAItemReplace.from_file(ROELEMENTACTIONREPITEM)
     ro += ea
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story']) == 3
     story_slug = d['mos']['roCreate']['story'][1]['storySlug']
     assert story_slug == 'STORY 2'
@@ -122,7 +122,7 @@ def test_element_action_delete_story():
     """
     ro = RunningOrder.from_file(ROCREATE)
     ea = EAStoryDelete.from_file(ROELEMENTACTIONDELSTORY)
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story']) == 3
     story_slug1 = d['mos']['roCreate']['story'][0]['storySlug']
     assert story_slug1 == 'STORY 1'
@@ -130,7 +130,7 @@ def test_element_action_delete_story():
     assert story_slug2 == 'STORY 2'
 
     ro += ea
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story']) == 2
     story_slug = d['mos']['roCreate']['story'][0]['storySlug']
     assert story_slug == 'STORY 2'
@@ -150,11 +150,11 @@ def test_element_action_delete_item():
     """
     ro = RunningOrder.from_file(ROCREATE)
     ea = EAItemDelete.from_file(ROELEMENTACTIONDELITEM)
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story'][0]['item']) == 3
 
     ro += ea
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story'][0]['item']) == 2
     item_slug_1 = d['mos']['roCreate']['story'][0]['item'][0]['itemSlug']
     assert item_slug_1 == "ITEM 2"
@@ -176,7 +176,7 @@ def test_element_action_insert_story():
     """
     ro = RunningOrder.from_file(ROCREATE)
     ea = EAStoryInsert.from_file(ROELEMENTACTIONINSERTSTORY)
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story']) == 3
     story_slug1 = d['mos']['roCreate']['story'][0]['storySlug']
     assert story_slug1 == 'STORY 1'
@@ -186,7 +186,7 @@ def test_element_action_insert_story():
     assert ea.base_tag.tag == 'roElementAction'
 
     ro += ea
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story']) == 4
     story_slug1 = d['mos']['roCreate']['story'][0]['storySlug']
     assert story_slug1 == 'STORY 1'
@@ -208,7 +208,7 @@ def test_element_action_insert_item():
     """
     ro = RunningOrder.from_file(ROCREATE)
     ea = EAItemInsert.from_file(ROELEMENTACTIONINSERTITEM)
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story'][0]['item']) == 3
     item_slug1 = d['mos']['roCreate']['story'][0]['item'][0]['itemSlug']
     assert item_slug1 == 'ITEM 1'
@@ -216,7 +216,7 @@ def test_element_action_insert_item():
     assert item_slug2 == 'ITEM 2'
 
     ro += ea
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story'][0]['item']) == 4
     item_slug1 = d['mos']['roCreate']['story'][0]['item'][0]['itemSlug']
     assert item_slug1 == 'ITEM 1'
@@ -240,7 +240,7 @@ def test_element_action_swap_story():
     """
     ro = RunningOrder.from_file(ROCREATE)
     ea = EAStorySwap.from_file(ROELEMENTACTIONSWAPSTORY)
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story'][0]['item']) == 3
     story_slug1 = d['mos']['roCreate']['story'][0]['storySlug']
     assert story_slug1 == 'STORY 1'
@@ -248,7 +248,7 @@ def test_element_action_swap_story():
     assert story_slug2 == 'STORY 2'
 
     ro += ea
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story'][0]['item']) == 3
     story_slug1 = d['mos']['roCreate']['story'][0]['storySlug']
     assert story_slug1 == 'STORY 2'
@@ -270,7 +270,7 @@ def test_element_action_swap_item():
     """
     ro = RunningOrder.from_file(ROCREATE)
     ea = EAItemSwap.from_file(ROELEMENTACTIONSWAPITEM)
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story'][0]['item']) == 3
     item_slug1 = d['mos']['roCreate']['story'][0]['item'][0]['itemSlug']
     assert item_slug1 == 'ITEM 1'
@@ -278,7 +278,7 @@ def test_element_action_swap_item():
     assert item_slug2 == 'ITEM 2'
 
     ro += ea
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story'][0]['item']) == 3
     item_slug1 = d['mos']['roCreate']['story'][0]['item'][0]['itemSlug']
     assert item_slug1 == 'ITEM 2'
@@ -300,7 +300,7 @@ def test_element_action_move_story():
     """
     ro = RunningOrder.from_file(ROCREATE)
     ea = EAStoryMove.from_file(ROELEMENTACTIONMOVESTORY)
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story']) == 3
     story_slug1 = d['mos']['roCreate']['story'][0]['storySlug']
     assert story_slug1 == 'STORY 1'
@@ -310,7 +310,7 @@ def test_element_action_move_story():
     assert story_slug3 == 'STORY 3'
 
     ro += ea
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story']) == 3
     story_slug1 = d['mos']['roCreate']['story'][0]['storySlug']
     assert story_slug1 == 'STORY 3'
@@ -334,7 +334,7 @@ def test_element_action_move_item():
     """
     ro = RunningOrder.from_file(ROCREATE)
     ea = EAItemMove.from_file(ROELEMENTACTIONMOVEITEM)
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story'][0]['item']) == 3
     story_slug1 = d['mos']['roCreate']['story'][0]['item'][0]['itemSlug']
     assert story_slug1 == 'ITEM 1'
@@ -344,7 +344,7 @@ def test_element_action_move_item():
     assert story_slug3 == 'ITEM 3'
 
     ro += ea
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story']) == 3
     story_slug1 = d['mos']['roCreate']['story'][0]['item'][0]['itemSlug']
     assert story_slug1 == 'ITEM 3'
@@ -368,7 +368,7 @@ def test_metadata_replace():
     """
     ro = RunningOrder.from_file(ROCREATE)
     mdr = MetaDataReplace.from_file(ROMETADATAREPLACE)
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story'][0]['item']) == 3
     ro_id = d['mos']['roCreate']['roID']
     assert ro_id == "RO ID"
@@ -376,7 +376,7 @@ def test_metadata_replace():
     assert ro_id == "RO SLUG"
 
     ro += mdr
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story'][0]['item']) == 3
     ro_id = d['mos']['roCreate']['roID']
     assert ro_id == "RO ID"
@@ -398,11 +398,11 @@ def test_story_append_item():
     """
     ro = RunningOrder.from_file(ROCREATE)
     sa = StoryAppend.from_file(ROAPPENDSTORY)
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story']) == 3
 
     ro += sa
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story']) == 5
     assert d['mos']['roCreate']['story'][3]['storyID'] == 'STORYNEW1'
     assert d['mos']['roCreate']['story'][4]['storyID'] == 'STORYNEW2'
@@ -422,12 +422,12 @@ def test_story_delete():
     """
     ro = RunningOrder.from_file(ROCREATE)
     sd = StoryDelete.from_file(RODELSTORY)
-    d = ro.to_dict()
+    d = ro.dict
     assert isinstance(d['mos']['roCreate']['story'], list)
     assert len(d['mos']['roCreate']['story']) == 3
 
     ro += sd
-    d = ro.to_dict()
+    d = ro.dict
     assert isinstance(d['mos']['roCreate']['story'], dict)
     assert d['mos']['roCreate']['story']['storyID'] == 'STORY3'
     assert ro.base_tag.tag == 'roCreate'
@@ -446,11 +446,11 @@ def test_story_insert():
     """
     ro = RunningOrder.from_file(ROCREATE)
     si = StoryInsert.from_file(ROINSERTSTORY)
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story']) == 3
 
     ro += si
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story']) == 5
     assert d['mos']['roCreate']['story'][0]['storyID'] == 'STORY1'
     assert d['mos']['roCreate']['story'][1]['storyID'] == 'STORYNEW1'
@@ -473,12 +473,12 @@ def test_story_move():
     """
     ro = RunningOrder.from_file(ROCREATE)
     sm = StoryMove.from_file(ROMOVESTORY)
-    d = ro.to_dict()
+    d = ro.dict
     assert d['mos']['roCreate']['story'][0]['storyID'] == 'STORY1'
     assert d['mos']['roCreate']['story'][2]['storyID'] == 'STORY3'
 
     ro += sm
-    d = ro.to_dict()
+    d = ro.dict
     assert d['mos']['roCreate']['story'][0]['storyID'] == 'STORY3'
     assert d['mos']['roCreate']['story'][1]['storyID'] == 'STORY1'
     assert ro.base_tag.tag == 'roCreate'
@@ -497,7 +497,7 @@ def test_story_replace():
     """
     ro = RunningOrder.from_file(ROCREATE)
     sr = StoryReplace.from_file(ROREPSTORY)
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story']) == 3
     story_slug = d['mos']['roCreate']['story'][0]['storySlug']
     assert story_slug == 'STORY 1'
@@ -505,7 +505,7 @@ def test_story_replace():
     assert item_slug == 'ITEM 1'
 
     ro += sr
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story']) == 3
     story_slug = d['mos']['roCreate']['story'][0]['storySlug']
     assert story_slug == 'STORY ONE'
@@ -527,11 +527,11 @@ def test_item_delete():
     """
     ro = RunningOrder.from_file(ROCREATE)
     id = ItemDelete.from_file(RODELITEM)
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story'][0]['item']) == 3
 
     ro += id
-    d = ro.to_dict()
+    d = ro.dict
     assert isinstance(d['mos']['roCreate']['story'][0]['item'], dict)
     assert d['mos']['roCreate']['story'][0]['item']['itemID'] == 'ITEM3'
     assert ro.base_tag.tag == 'roCreate'
@@ -550,11 +550,11 @@ def test_item_insert():
     """
     ro = RunningOrder.from_file(ROCREATE)
     ii = ItemInsert.from_file(ROINSERTITEM)
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story'][0]['item']) == 3
 
     ro += ii
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story'][0]['item']) == 5
     item_id1 = d['mos']['roCreate']['story'][0]['item'][1]['itemID']
     assert item_id1 == 'ITEMNEW1'
@@ -576,14 +576,14 @@ def test_item_move_multiple():
     """
     ro = RunningOrder.from_file(ROCREATE)
     imm = ItemMoveMultiple.from_file(ROMOVEMULTIPLEITEM)
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story'][0]['item']) == 3
     assert d['mos']['roCreate']['story'][0]['item'][0]['itemID'] == 'ITEM1'
     assert d['mos']['roCreate']['story'][0]['item'][1]['itemID'] == 'ITEM2'
     assert d['mos']['roCreate']['story'][0]['item'][2]['itemID'] == 'ITEM3'
 
     ro += imm
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story'][0]['item']) == 3
     assert d['mos']['roCreate']['story'][0]['item'][0]['itemID'] == 'ITEM2'
     assert d['mos']['roCreate']['story'][0]['item'][1]['itemID'] == 'ITEM3'
@@ -604,12 +604,12 @@ def test_item_replace():
     """
     ro = RunningOrder.from_file(ROCREATE)
     ir = ItemReplace.from_file(ROREPITEM)
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story'][1]['item']) == 3
     assert d['mos']['roCreate']['story'][1]['item'][0]['itemSlug'] == 'ITEM 21'
 
     ro += ir
-    d = ro.to_dict()
+    d = ro.dict
     assert len(d['mos']['roCreate']['story'][1]['item']) == 3
     assert d['mos']['roCreate']['story'][1]['item'][0]['itemSlug'] == 'NEW ITEM 21'
     assert ro.base_tag.tag == 'roCreate'
@@ -628,11 +628,11 @@ def test_ro_replace():
     """
     ro = RunningOrder.from_file(ROCREATE)
     ror = RunningOrderReplace.from_file(ROREPLACE)
-    d = ro.to_dict()
+    d = ro.dict
     assert d['mos']['roCreate']['roSlug'] == 'RO SLUG'
 
     ro += ror
-    d = ro.to_dict()
+    d = ro.dict
     assert d['mos']['roCreate']['roSlug'] == 'RO SLUG NEW'
     assert ro.base_tag.tag == 'roCreate'
     assert ror.base_tag.tag == 'roReplace'
@@ -650,14 +650,14 @@ def test_running_order_end():
     """
     ro = RunningOrder.from_file(ROCREATE)
     rd = RunningOrderEnd.from_file(RODELETE)
-    d = ro.to_dict()
+    d = ro.dict
     ro_id = d['mos']['roCreate']['roID']
     assert ro_id == 'RO ID'
     assert 'mosromgrmeta' not in d['mos']
 
     ro += rd
     assert repr(ro) == '<RunningOrder 1000 ended>'
-    d = ro.to_dict()
+    d = ro.dict
     assert 'mosromgrmeta' in d['mos']
     assert 'roDelete' in d['mos']['mosromgrmeta']
     assert d['mos']['roCreate']['roID'] == ro_id

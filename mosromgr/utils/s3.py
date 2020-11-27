@@ -43,7 +43,7 @@ def get_mos_files(bucket_name, prefix, *, suffix='.mos.xml'):
 
 
 def get_file_contents(bucket_name, file_key):
-    "Open the S3 file and return its contents as a string."
+    "Open the S3 file and return its contents as a string"
     o = s3.resource.Object(bucket_name, file_key).get()
     b = o['Body']
     return b.read()

@@ -3,6 +3,7 @@ import logging
 import warnings
 
 from .mostypes import MosFile, RunningOrder, RunningOrderEnd
+from .utils import s3
 from .exc import (
     InvalidMosCollection, MosMergeError, MosInvalidXML, UnknownMosFileType,
     UnknownMosFileTypeWarning, MosInvalidXMLWarning, MosMergeWarning
@@ -14,10 +15,16 @@ logging.basicConfig(level=logging.INFO)
 
 
 class MosReader:
+    """
+    Internal construct for opening and inspecting a MOS file for the purposes of
+    classifying, sorting and validating a :class:`MosCollection`. Provides the
+    means to reconstruct the :class:`~mosromgr.mostypes.MosFile` instance when
+    needed in order to preserve memory usage.
+    """
     def __init__(self, mo, *, restore_fn, restore_args):
-        self.message_id = mo.message_id
-        self.ro_id = mo.ro_id
-        self.mos_type = mo.__class__
+        self._message_id = mo.message_id
+        self._ro_id = mo.ro_id
+        self._mos_type = mo.__class__
         self._restore_fn = restore_fn
         self._restore_args = restore_args
 
@@ -73,7 +80,29 @@ class MosReader:
         return self.message_id > other.message_id
 
     @property
+    def message_id(self):
+        "The message ID of the MOS file (:class:`str`)"
+        return self._message_id
+
+    @property
+    def ro_id(self):
+        "The MOS file's running order ID (:class:`str`)"
+        return self._ro_id
+
+    @property
+    def mos_type(self):
+        """
+        The :class:`~mosromgr.mostypes.MosFile` subclass this object was
+        classified as (returns the class object, not an instance or a string)
+        """
+        return self._mos_type
+
+    @property
     def mos_object(self):
+        """
+        Restore the MOS object and return it
+        (:class:`~mosromgr.mostypes.MosFile`)
+        """
         return self._restore_fn(*self._restore_args)
 
 
@@ -84,7 +113,7 @@ class MosCollection:
     """
     def __init__(self, mos_readers, *, allow_incomplete=False):
         logger.info("Making MosCollection from %s MosReaders", len(mos_readers))
-        self.mos_readers = mos_readers
+        self._mos_readers = mos_readers
         self._ro = None
         try:
             self._validate(allow_incomplete=allow_incomplete)
@@ -144,7 +173,7 @@ class MosCollection:
         return cls(mos_readers, allow_incomplete=allow_incomplete)
 
     @classmethod
-    def from_s3(cls, *, bucket_name, mos_file_keys, allow_incomplete=False):
+    def from_s3(cls, *, bucket_name, prefix, allow_incomplete=False):
         """
         Construct from a list of MOS files in an S3 bucket
 
@@ -153,19 +182,20 @@ class MosCollection:
         :param bucket_name:
             The name of the S3 bucket (keyword-only argument)
 
-        :type mos_file_keys:
-            list
-        :param mos_file_keys:
-            A list of file keys within the S3 bucket (keyword-only argument)
+        :type prefix:
+            str
+        :param prefix:
+            The prefix of the file keys in the S3 bucket (keyword-only argument)
 
         :type allow_incomplete:
             bool
         :param allow_incomplete:
-            If ``False`` (the default), the collection is permitted to be
-            constructed without a ``roDelete``. If ``True``, a
+            If ``True``, the collection is permitted to be constructed without a
+            ``roDelete``. If ``False`` (the default), a
             :class:`~mosromgr.exc.InvalidMosCollection` will be raised if one is
             not present. (keyword-only argument)
         """
+        mos_file_keys = s3.get_mos_files(bucket_name=bucket_name, prefix=prefix)
         logger.info("Making MosCollection from %s S3 files", len(mos_file_keys))
         mos_readers = sorted([
             mr
@@ -182,6 +212,15 @@ class MosCollection:
     def __str__(self):
         "The XML string of the collection's running order"
         return str(self.ro)
+
+    @property
+    def mos_readers(self):
+        """
+        A list of :class:`MosReader` objects representing all MOS files in the
+        collection, except the :class:`~mosromgr.mostypes.RunningOrder`
+        (``roCreate``) which is held in :attr:`ro`
+        """
+        return self._mos_readers
 
     @property
     def ro(self):
@@ -216,7 +255,7 @@ class MosCollection:
         assert len(ro_deletes) < 2
         if not allow_incomplete:
             assert len(ro_deletes) == 1, len(ro_deletes)
-        self.mos_readers = [
+        self._mos_readers = [
             mr for mr in self.mos_readers if mr.mos_type != RunningOrder
         ]
 
@@ -226,7 +265,7 @@ class MosCollection:
         errors = 0
         for mr in self.mos_readers:
             mo = mr.mos_object
-            logger.info("Merging %s %s", mr.mos_type, mr.message_id)
+            logger.info("Merging %s %s", mo.__class__.__name__, mr.message_id)
             try:
                 self._ro += mo
             except MosMergeError as e:

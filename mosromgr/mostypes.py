@@ -20,7 +20,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 class MosFile:
-    "Base class for all MOS files."
+    "Base class for all MOS files"
     def __init__(self, xml):
         self._xml = xml
         self._base_tag = None
@@ -142,10 +142,11 @@ class MosFile:
         "The running order ID (:class:`str`)"
         return self.base_tag.find('roID').text
 
-    def to_dict(self):
+    @property
+    def dict(self):
         """
         Convert XML to dictionary using ``xmltodict`` library. Useful for
-        testing.
+        testing. (:class:`dict`)
         """
         return xmltodict.parse(str(self))
 
@@ -823,7 +824,7 @@ class RunningOrderEnd(MosFile):
 
 
 class ElementAction(MosFile):
-    "Base class for various ``roElementAction`` MOS files."
+    "Base class for various ``roElementAction`` MOS files"
     @classmethod
     def _classify(cls, xml):
         "Classify the MOS type and return an instance of the relevant class"

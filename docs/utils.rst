@@ -4,6 +4,9 @@ Utilities
 
 .. module:: mosromgr.utils
 
+This part of the module provides a collection of generic utilities which are
+largely for internal use.
+
 The various utilities are typically imported like so::
 
     from mosromgr.utils import s3

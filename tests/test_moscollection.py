@@ -79,21 +79,21 @@ def test_mos_collection_init_files_after_rodelete():
 
 @patch('mosromgr.utils.s3.boto3')
 @patch('mosromgr.utils.s3.get_file_contents')
-def test_mos_collection_init_s3(get_file_contents, boto3):
+@patch('mosromgr.utils.s3.get_mos_files')
+def test_mos_collection_init_s3(get_mos_files, get_file_contents, boto3):
     """
-    GIVEN: A list containing the contents of a roCreate as a string
-    EXPECT: MosCollection object
+    GIVEN: A bucket name and prefix (mocked to contain two files)
+    EXPECT: MosCollection object with 1 reader
     """
     with open(ROCREATE) as f:
         rocreate = f.read()
     with open(RODELETE) as f:
         rodelete = f.read()
 
+    get_mos_files.return_value = ['roCreate.mos.xml', 'roDelete.mos.xml']
     get_file_contents.side_effect = [rocreate, rodelete, rocreate, rodelete]
 
-    bucket_name = 'bucket_name'
-    mos_file_keys = ['key', 'key']
-    mc = MosCollection.from_s3(bucket_name=bucket_name, mos_file_keys=mos_file_keys)
+    mc = MosCollection.from_s3(bucket_name='bucket_name', prefix='newsnight')
     assert repr(mc) == "<MosCollection RO SLUG>"
     assert isinstance(mc.ro, RunningOrder)
     assert isinstance(mc.mos_readers, list)
@@ -140,18 +140,19 @@ def test_mos_collection_merge():
     mos_files = [ROCREATE, ROELEMENTACTIONINSERTSTORY, RODELETE]
     mc = MosCollection.from_files(mos_files)
     assert len(mc.mos_readers) == 2
-    d = mc.ro.to_dict()
+    d = mc.ro.dict
     assert len(d['mos']['roCreate']['story']) == 3
 
     mc.merge()
-    d = mc.ro.to_dict()
+    d = mc.ro.dict
     assert len(d['mos']['roCreate']['story']) == 4
 
 @patch('mosromgr.utils.s3.boto3')
 @patch('mosromgr.utils.s3.get_file_contents')
-def test_mos_collection_s3_merge(get_file_contents, boto3):
+@patch('mosromgr.utils.s3.get_mos_files')
+def test_mos_collection_s3_merge(get_mos_files, get_file_contents, boto3):
     """
-    GIVEN: Running order and EAStoryInsert s3 keys
+    GIVEN: Bucket prefix matching a roCreate and ElementAction (StoryInsert)
     EXPECT: Running order summary, with story from EAStoryInsert added
     """
     with open(ROCREATE) as f:
@@ -160,20 +161,18 @@ def test_mos_collection_s3_merge(get_file_contents, boto3):
         ea = f.read()
     with open(RODELETE) as f:
         rd = f.read()
+
+    get_mos_files.return_value = [rc, ea, rd]
     get_file_contents.side_effect = [rc, ea, rd, rc, ea, rd]
 
-    # contents of these vars are ignored
-    # but len of mos_file_keys needs to be correct
-    bucket_name = 'bucket_name'
-    mos_file_keys = ['rc', 'ea', 'rd']
-    mc = MosCollection.from_s3(bucket_name=bucket_name, mos_file_keys=mos_file_keys)
+    mc = MosCollection.from_s3(bucket_name='bucket_name', prefix='newsnight')
     assert len(mc.mos_readers) == 2
-    d = mc.ro.to_dict()
+    d = mc.ro.dict
     print(d['mos'].keys())
     assert len(d['mos']['roCreate']['story']) == 3
 
     mc.merge()
-    d = mc.ro.to_dict()
+    d = mc.ro.dict
     assert len(d['mos']['roCreate']['story']) == 4
 
 def test_mos_collection_merge_warning():

@@ -42,11 +42,9 @@ from a list of strings::
     mos_strings = [roCreate, roStorySend, roDelete]
     mc = MosCollection.from_strings(mos_files)
 
-or (using :func:`~mosromgr.utils.s3.get_mos_files`) from a list of S3 file
-keys::
+or from an S3 bucket::
 
-    mos_file_keys = s3.get_mos_files(bucket_name, bucket_prefix)
-    mc = MosCollection.from_s3(bucket_name=bucket_name, mos_file_keys=mos_file_keys)
+    mc = MosCollection.from_s3(bucket_name=bucket_name, prefix=prefix)
 
 Whichever way the collection was constructed, you can then proceed to merge all
 MOS files into the running order::
@@ -81,3 +79,14 @@ MosCollection
 .. autoclass:: MosCollection()
     :members:
     :special-members: __str__
+
+MosReader
+=========
+
+The :class:`MosReader` class is internal and is not intended to be constructed
+by the user. A :class:`MosCollection` object will contain a list of
+:class:`MosReader` instances, so users may find it useful to refer to its
+members.
+
+.. autoclass:: MosReader()
+    :members:

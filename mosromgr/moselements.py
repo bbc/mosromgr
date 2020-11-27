@@ -29,7 +29,7 @@ def _get_story_duration(story_tag):
 
 
 class MosElement:
-    "Abstract base class for MOS elements."
+    "Abstract base class for MOS elements"
     def __init__(self, xml, *, id=None, slug=None):
         self._xml = xml
         self._id = id
@@ -50,7 +50,7 @@ class MosElement:
 
     @property
     def xml(self):
-        "The parent XML element (:class:`xml.etree.ElementTree.Element`)."
+        "The parent XML element (:class:`xml.etree.ElementTree.Element`)"
         return self._xml
 
     @property
@@ -64,7 +64,7 @@ class MosElement:
     def slug(self):
         """
         The element slug (:class:`str` or ``None`` if not available in the
-        XML).
+        XML)
         """
         try:
             self._slug = self.xml.find(self._slug_tag).text
@@ -98,14 +98,14 @@ class Story(MosElement):
 
     @property
     def slug(self):
-        "The Story slug (:class:`str` or ``None`` if not available in the XML)."
+        "The Story slug (:class:`str` or ``None`` if not available in the XML)"
         return super().slug
 
     @property
     def items(self):
         """
         List of :class:`Item` elements found within the story (can be ``None``
-        if not available in the XML).
+        if not available in the XML)
         """
         if self._unknown_items:
             return
@@ -118,7 +118,7 @@ class Story(MosElement):
     def duration(self):
         """
         The story duration (the sum of the text time and media time found
-        within ``mosExternalMetadata->mosPayload``), in seconds (:class:`int`).
+        within ``mosExternalMetadata->mosPayload``), in seconds (:class:`int`)
         """
         return _get_story_duration(self.xml)
 
@@ -126,7 +126,7 @@ class Story(MosElement):
     def tx_time(self):
         """
         The transmission time of the story (:class:`datetime.datetime` or
-        ``None`` if not available in the XML).
+        ``None`` if not available in the XML)
         """
         return self._story_times.get(self.id)
 
@@ -146,12 +146,12 @@ class Item(MosElement):
 
     @property
     def id(self):
-        "The Item ID (:class:`str`)."
+        "The Item ID (:class:`str`)"
         return super().id
 
     @property
     def slug(self):
-        "The Item slug (:class:`str` or ``None`` if not available in the XML)."
+        "The Item slug (:class:`str` or ``None`` if not available in the XML)"
         return super().slug
 
     @property
