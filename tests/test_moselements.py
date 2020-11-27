@@ -33,6 +33,7 @@ def test_running_order():
     assert str(story1).strip().endswith('</story>')
     assert story1.id == 'STORY1'
     assert story1.slug == 'STORY 1'
+    assert story1.offset == 0
     assert story1.duration == 3
     assert isinstance(story1.tx_time, datetime)
     assert story1.tx_time == ro.tx_time
@@ -57,6 +58,7 @@ def test_running_order():
     story2 = ro.stories[1]
     assert story2.id == 'STORY2'
     assert story2.slug == 'STORY 2'
+    assert story2.offset == 3
     assert story2.duration == 8
     assert isinstance(story2.tx_time, datetime)
     assert story2.tx_time > story1.tx_time

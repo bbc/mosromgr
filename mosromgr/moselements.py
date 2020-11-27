@@ -2,16 +2,15 @@ import xml.etree.ElementTree as ET
 from datetime import timedelta
 
 
-def _get_story_times(all_stories, prog_tx_time):
-    "Create a dict of {story_id: story_tx_time}"
-    story_times = {}
-    if all_stories and prog_tx_time:
-        tx_time = prog_tx_time
+def _get_story_offsets(all_stories):
+    "Create a dict of {story_id: story_offset}"
+    story_offsets = {}
+    if all_stories:
+        t = 0
         for story in all_stories:
-            story_times[story.find('storyID').text] = tx_time
-            story_duration = _get_story_duration(story)
-            tx_time += timedelta(seconds=story_duration)
-    return story_times
+            story_offsets[story.find('storyID').text] = t
+            t += _get_story_duration(story)
+        return story_offsets
 
 
 def _get_story_duration(story_tag):
@@ -87,7 +86,8 @@ class Story(MosElement):
         self._slug_tag = 'storySlug'
         self._duration = duration
         self._unknown_items = unknown_items
-        self._story_times = _get_story_times(all_stories, prog_tx_time)
+        self._prog_tx_time = prog_tx_time
+        self._story_offsets = _get_story_offsets(all_stories)
 
     @property
     def id(self):
@@ -123,12 +123,20 @@ class Story(MosElement):
         return _get_story_duration(self.xml)
 
     @property
+    def offset(self):
+        """
+        The time offset of the story in seconds (:class:`int` or ``None`` if not
+        available in the XML)
+        """
+        return self._story_offsets.get(self.id)
+
+    @property
     def tx_time(self):
         """
         The transmission time of the story (:class:`datetime.datetime` or
         ``None`` if not available in the XML)
         """
-        return self._story_times.get(self.id)
+        return self._prog_tx_time + timedelta(seconds=self.offset)
 
 
 class Item(MosElement):
