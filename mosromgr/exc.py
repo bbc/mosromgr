@@ -26,18 +26,6 @@ class MosRoMgrWarning(Warning):
     "Base class for all warnings in mosromgr"
 
 
-class UnknownMosFileTypeWarning(MosRoMgrWarning):
-    "Warning raised when :class:`~mosromgr.mostypes.MosFile` cannot classify MOS file type"
-
-
-class MosInvalidXMLWarning(MosRoMgrWarning):
-    "Exception raised when :class:`~mosromgr.mostypes.MosFile` cannot parse given XML"
-
-
-class MosMergeWarning(MosRoMgrWarning):
-    "Warning raised when MOS merge fails in :class:`~mosromgr.moscollection.MosCollection`"
-
-
 class ItemNotFoundWarning(MosRoMgrWarning):
     "Warning raised when an item cannot be found during a :class:`~mosromgr.mostypes.MosFile` merge"
 

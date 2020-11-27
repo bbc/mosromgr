@@ -5,8 +5,7 @@ import warnings
 from .mostypes import MosFile, RunningOrder, RunningOrderEnd
 from .utils import s3
 from .exc import (
-    InvalidMosCollection, MosMergeError, MosInvalidXML, UnknownMosFileType,
-    UnknownMosFileTypeWarning, MosInvalidXMLWarning, MosMergeWarning
+    InvalidMosCollection, MosMergeError, MosInvalidXML, UnknownMosFileType
 )
 
 
@@ -30,45 +29,27 @@ class MosReader:
 
     @classmethod
     def from_file(cls, mos_file_path):
-        try:
-            mo = MosFile.from_file(mos_file_path)
-            # store a method of restoring the mos object from the determined class
-            return cls(mo,
-                       restore_fn=mo.__class__.from_file,
-                       restore_args=(mos_file_path, )
-            )
-        except MosInvalidXML as e:
-            warnings.warn(str(e), MosInvalidXMLWarning)
-        except UnknownMosFileType as e:
-            warnings.warn(str(e), UnknownMosFileTypeWarning)
+        mo = MosFile.from_file(mos_file_path)
+        # store a method of restoring the mos object from the determined class
+        return cls(mo,
+                   restore_fn=mo.__class__.from_file,
+                   restore_args=(mos_file_path, ))
 
     @classmethod
     def from_string(cls, mos_file_contents):
-        try:
-            mo = MosFile.from_string(mos_file_contents)
-            # store a method of restoring the mos object from the determined class
-            return cls(mo,
-                        restore_fn=mo.__class__.from_string,
-                        restore_args=(mos_file_contents, )
-            )
-        except MosInvalidXML as e:
-            warnings.warn(e, MosInvalidXMLWarning)
-        except UnknownMosFileType as e:
-            warnings.warn(e, UnknownMosFileTypeWarning)
+        mo = MosFile.from_string(mos_file_contents)
+        # store a method of restoring the mos object from the determined class
+        return cls(mo,
+                   restore_fn=mo.__class__.from_string,
+                   restore_args=(mos_file_contents, ))
 
     @classmethod
     def from_s3(cls, bucket_name, mos_file_key):
-        try:
-            mo = MosFile.from_s3(bucket_name=bucket_name, mos_file_key=mos_file_key)
-            # store a method of restoring the mos object from the determined class
-            return cls(mo,
-                       restore_fn=mo.__class__.from_s3,
-                       restore_args=(bucket_name, mos_file_key)
-            )
-        except MosInvalidXML as e:
-            warnings.warn(e, MosInvalidXMLWarning)
-        except UnknownMosFileType as e:
-            warnings.warn(e, UnknownMosFileTypeWarning)
+        mo = MosFile.from_s3(bucket_name=bucket_name, mos_file_key=mos_file_key)
+        # store a method of restoring the mos object from the determined class
+        return cls(mo,
+                   restore_fn=mo.__class__.from_s3,
+                   restore_args=(bucket_name, mos_file_key))
 
     def __repr__(self):
         return f'<{self.__class__.__name__} type {self.mos_type.__name__}>'
@@ -262,14 +243,8 @@ class MosCollection:
     def merge(self):
         "Merge all MOS files into the collection's running order (:attr:`ro`)"
         logger.info("Merging %s MosReaders into RunningOrder", len(self.mos_readers))
-        errors = 0
         for mr in self.mos_readers:
             mo = mr.mos_object
             logger.info("Merging %s %s", mo.__class__.__name__, mr.message_id)
-            try:
-                self._ro += mo
-            except MosMergeError as e:
-                errors += 1
-                warnings.warn(str(e), MosMergeWarning)
-        logger.info("Completed merging %s mos files with %s errors",
-                    len(self.mos_readers), errors)
+            self._ro += mo
+        logger.info("Completed merging %s mos files", len(self.mos_readers))

@@ -83,24 +83,6 @@ MosRoMgrWarning
 .. autoexception:: mosromgr.exc.MosRoMgrWarning
     :show-inheritance:
 
-UnknownMosFileTypeWarning
--------------------------
-
-.. autoexception:: mosromgr.exc.UnknownMosFileTypeWarning
-    :show-inheritance:
-
-MosInvalidXMLWarning
---------------------
-
-.. autoexception:: mosromgr.exc.MosInvalidXMLWarning
-    :show-inheritance:
-
-MosMergeWarning
----------------
-
-.. autoexception:: mosromgr.exc.MosMergeWarning
-    :show-inheritance:
-
 ItemNotFoundWarning
 -------------------
 

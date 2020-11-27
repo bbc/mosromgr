@@ -72,10 +72,8 @@ def test_mos_collection_init_files_after_rodelete():
     assert isinstance(mc.ro, RunningOrder)
     assert isinstance(mc.mos_readers, list)
     assert len(mc.mos_readers) == 2
-    with warnings.catch_warnings(record=True) as w:
+    with pytest.raises(MosMergeError):
         mc.merge()
-    assert len(w) == 1
-    assert w[0].category == MosMergeWarning
 
 @patch('mosromgr.utils.s3.boto3')
 @patch('mosromgr.utils.s3.get_file_contents')
@@ -124,13 +122,8 @@ def test_mos_collection_unsupported_mos_type():
     EXPECT: MosCollection object with running order and no other files
     """
     mos_files = [ROCREATE, ROINVALID, RODELETE]
-    with warnings.catch_warnings(record=True) as w:
-        mc = MosCollection.from_files(mos_files)
-    assert len(w) == 1
-    assert w[0].category == UnknownMosFileTypeWarning
-    assert isinstance(mc.ro, RunningOrder)
-    assert isinstance(mc.mos_readers, list)
-    assert len(mc.mos_readers) == 1
+    with pytest.raises(UnknownMosFileType):
+        MosCollection.from_files(mos_files)
 
 def test_mos_collection_merge():
     """
