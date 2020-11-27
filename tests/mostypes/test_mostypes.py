@@ -656,7 +656,7 @@ def test_running_order_end():
     assert 'mosromgrmeta' not in d['mos']
 
     ro += rd
-    assert repr(ro) == '<RunningOrder 1000 ended>'
+    assert repr(ro) == '<RunningOrder 1000 completed>'
     d = ro.dict
     assert 'mosromgrmeta' in d['mos']
     assert 'roDelete' in d['mos']['mosromgrmeta']

@@ -218,6 +218,14 @@ class MosCollection:
         "The running order slug"
         return self.ro.ro_slug
 
+    @property
+    def completed(self):
+        """
+        Whether or not the running order has had a
+        :class:`~mosromgr.mostypes.RunningOrderEnd` merged (:class:`bool`)
+        """
+        return self.ro.completed
+
     def _validate(self, allow_incomplete=False):
         """
         Check a single roCreate is present, and if *allow_incomplete* is True,
