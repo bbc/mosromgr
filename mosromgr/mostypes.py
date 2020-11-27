@@ -90,9 +90,9 @@ class MosFile:
         raise UnknownMosFileType("Unable to determine MOS file type")
 
     def __repr__(self):
-        if self.xml.find('mosromgrmeta') is None:
-            return f'<{self.__class__.__name__} {self.message_id}>'
-        return f'<{self.__class__.__name__} {self.message_id} ended>'
+        if self.completed:
+            return f'<{self.__class__.__name__} {self.message_id} completed>'
+        return f'<{self.__class__.__name__} {self.message_id}>'
 
     def __str__(self):
         "The XML string of the MOS file"
@@ -150,6 +150,10 @@ class MosFile:
         """
         return xmltodict.parse(str(self))
 
+    @property
+    def completed(self):
+        return False
+
     def merge(self, ro):
         raise NotImplementedError("merge method not implemented")
 
@@ -205,6 +209,14 @@ class RunningOrder(MosFile):
     def duration(self):
         "Total running order duration in seconds (:class:`int`)"
         return sum(story.duration for story in self.stories)
+
+    @property
+    def completed(self):
+        """
+        Whether or not the running order has had a :class:`RunningOrderEnd`
+        merged (:class:`bool`)
+        """
+        return self.xml.find('mosromgrmeta') is not None
 
 
 class StorySend(MosFile):
@@ -815,6 +827,10 @@ class RunningOrderEnd(MosFile):
     def base_tag_name(self):
         "The name of the base XML tag for this file type (:class:`str`)"
         return 'roDelete'
+
+    @property
+    def completed(self):
+        return False
 
     def merge(self, ro):
         "Merge into the :class:`RunningOrder` object provided"
