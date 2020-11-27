@@ -16,8 +16,8 @@ and providing a "completed" programme including all additions and changes made
 between the first message (``roCreate``) and the last (``roDelete``).
 
 This can be used as a library, using the utilities provided in the *mosromgr*
-module, and the command line command ``cli-mosromgr`` can be used to process
-either a directory of MOS files, or a folder within an S3 bucket.
+module, and the command line command ``mosromgr`` can be used to process either
+a directory of MOS files, or a folder within an S3 bucket.
 
 This library was developed by the `BBC News Labs`_ team.
 
@@ -62,9 +62,8 @@ Load a ``roCreate`` file and view its stories::
     for story in ro.stories:
         print(story.slug)
 
-Merge a single ``roStorySend`` (:class:`~mosromgr.mostypes.StorySend`) into a
-``roCreate`` (:class:`~mosromgr.mostypes.RunningOrder`) and output the file to a
-new file::
+Merge a single ``roStorySend`` into a ``roCreate`` and output the file to a new
+file::
 
     from mosromgr.mostypes import RunningOrder, StorySend
 
@@ -78,8 +77,7 @@ new file::
 
 If you're automating this process you won't necessarily know which MOS Type to
 use, so you can construct an object from the base class
-:class:`~mosromgr.mostypes.MosFile` which will automatically classify your
-file::
+``mosromgr.mostypes.MosFile`` which will automatically classify your file::
 
     >>> from mosromgr.mostypes import MosFile
     >>> mf1 = MosFile.from_file('roCreate.mos.xml')
@@ -89,9 +87,9 @@ file::
     >>> mf2
     <StorySend 1001>
 
-Using :class:`~mosromgr.moscollection.MosCollection` will sort and classify
-multiple MOS types of all given files, allowing you to process a collection of
-MOS files within a complete or partially complete programme::
+Using ``MosCollection`` will sort and classify multiple MOS types of all given
+files, allowing you to process a collection of MOS files within a complete or
+partially complete programme::
 
     from mosromgr.moscollection import MosCollection
 
