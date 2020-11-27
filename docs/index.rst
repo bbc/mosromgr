@@ -29,17 +29,26 @@ Usage
 Command line
 ------------
 
-Merge all MOS files in directory `dirname`::
+List the stories within a running order:
 
-    mosromgr -d dirname
+.. code-block:: console
 
-Merge all MOS files in S3 folder `prefix` in bucket `bucketname`::
+    $ mosromgr inspect -f roCreate.mos.xml --stories
+    0828 MIDLANDS TODAY Wed, 11.11.2020
 
-    mosromgr -b bucketname -p prefix
+    INTRODUCTION-READ
 
-The final running order is output to stdout, so to save to a file use `>` e.g::
+    TESTING-OOV
 
-    mosromgr -d dirname > FINAL.xml
+    WEATHER-SHORT
+
+    END OF PROGRAMME
+
+Merge all MOS files in directory `newsnight` and save in ``FINAL.xml``:
+
+.. code-block:: console
+
+    $ mosromgr merge -f newsnight/* -o FINAL.xml
 
 Library
 -------
@@ -65,7 +74,7 @@ new file::
     ro += ss
 
     with open('final.mos.xml', 'w') as f:
-        f.write(ro)
+        f.write(str(ro))
 
 If you're automating this process you won't necessarily know which MOS Type to
 use, so you can construct an object from the base class
@@ -91,7 +100,7 @@ MOS files within a complete or partially complete programme::
 
     mc.merge()
     with open('final.mos.xml', 'w') as f:
-        f.write(mc)
+        f.write(str(mc))
 
 Table of Contents
 =================

@@ -10,7 +10,7 @@ Python client for managing `MOS`_ running orders. Pronounced *mos-ro-manager*.
     :target: http://mosprotocol.com/
     :align: center
 
-The library provides functionality for detecting MOS file types, processing and
+The library provides functionality for classifying MOS file types, processing and
 inspecting MOS message files, as well as merging MOS files into a running order,
 and providing a "completed" programme including all additions and changes made
 between the first message (``roCreate``) and the last (``roDelete``).
@@ -29,17 +29,26 @@ Usage
 Command line
 ------------
 
-Merge all MOS files in directory `dirname`::
+List the stories within a running order:
 
-    mosromgr -d dirname
+.. code-block:: console
 
-Merge all MOS files in S3 folder `prefix` in bucket `bucketname`::
+    $ mosromgr inspect -f roCreate.mos.xml --stories
+    0828 MIDLANDS TODAY Wed, 11.11.2020
 
-    mosromgr -b bucketname -p prefix
+    INTRODUCTION-READ
 
-The final running order is output to stdout, so to save to a file use `>` e.g::
+    TESTING-OOV
 
-    mosromgr -d dirname > FINAL.xml
+    WEATHER-SHORT
+
+    END OF PROGRAMME
+
+Merge all MOS files in directory `newsnight` and save in ``FINAL.xml``:
+
+.. code-block:: console
+
+    $ mosromgr merge -f newsnight/* -o FINAL.xml
 
 Library
 -------
@@ -59,16 +68,30 @@ new file::
 
     from mosromgr.mostypes import RunningOrder, StorySend
 
-    ro = RunningOrder('roCreate.mos.xml')
-    ss = StorySend('roStorySend.mos.xml')
+    ro = RunningOrder.from_file('roCreate.mos.xml')
+    ss = StorySend.from_file('roStorySend.mos.xml')
 
     ro += ss
 
     with open('final.mos.xml', 'w') as f:
-        f.write(ro)
+        f.write(str(ro))
 
-Alternatively, use :class:`~mosromgr.moscollection.MosCollection` which will
-sort and classify MOS types of all given files::
+If you're automating this process you won't necessarily know which MOS Type to
+use, so you can construct an object from the base class
+:class:`~mosromgr.mostypes.MosFile` which will automatically classify your
+file::
+
+    >>> from mosromgr.mostypes import MosFile
+    >>> mf1 = MosFile.from_file('roCreate.mos.xml')
+    >>> mf1
+    <RunningOrder 1000>
+    >>> mf2 = MosFile.from_file('roStorySend.mos.xml')
+    >>> mf2
+    <StorySend 1001>
+
+Using :class:`~mosromgr.moscollection.MosCollection` will sort and classify
+multiple MOS types of all given files, allowing you to process a collection of
+MOS files within a complete or partially complete programme::
 
     from mosromgr.moscollection import MosCollection
 
@@ -77,7 +100,7 @@ sort and classify MOS types of all given files::
 
     mc.merge()
     with open('final.mos.xml', 'w') as f:
-        f.write(mc)
+        f.write(str(mc))
 
 Contributing
 ============
@@ -94,10 +117,12 @@ Contributors
 - `Ben Nuttall`_
 - `Owen Tourlamain`_
 - `Rob French`_
+- `Lucy MacGlashan`_
 
 .. _Ben Nuttall: https://github.com/bennuttall
 .. _Owen Tourlamain: https://github.com/OwenTourlamain
 .. _Rob French: https://github.com/FrencR
+.. _Lucy MacGlashan: https://github.com/lannem
 
 Licence
 =======

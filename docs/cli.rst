@@ -1,73 +1,74 @@
-==================
-Command line tools
-==================
-
-Command line utilities provided by this module
+======================
+Command line interface
+======================
 
 .. _cli-mosromgr:
 
 mosromgr
 ========
 
-Synopsis
---------
+.. code-block:: text
 
-::
+    optional arguments:
+      -h, --help            show this help message and exit
+      --version             show program's version number and exit
 
-    mosromgr [-h] [-d DIRECTORY] [-b BUCKET_NAME] [-p BUCKET_PREFIX]
+    commands:
+      {help,detect,inspect,merge}
+        help                Displays help about the specified command
+        detect              Detect the MOS type of one or more files
+        inspect             Inspect the contents of one or more MOS files
+        merge               Merge the given MOS files
 
+mosromgr detect
+===============
 
-Description
------------
+.. code-block:: text
 
-A utility for processing MOS messages from a folder or S3 bucket. Running
-:program:`mosromgr` providing either a directory or the combination of an S3
-bucket name and prefix will read in and process all available MOS files, merge
-them and output a "completed" version of the programme running order.
+    Detect the MOS type of one or more files
 
-Options
--------
+    positional arguments:
+      files       The MOS file to detect
 
-.. program:: mosromgr
+    optional arguments:
+      -h, --help  show this help message and exit
 
-.. option:: -h, --help
+mosromgr inspect
+================
 
-    show this help message and exit
+.. code-block:: text
 
-.. option:: -d DIRECTORY
+    Inspect the contents of one or more MOS files
 
-    The local directory containing MOS files
+    optional arguments:
+      -h, --help            show this help message and exit
+      -f file, --file file  The roCreate file to inspect
+      -b bucket, --bucket-name bucket
+                            S3 bucket name containing the roCreate file
+      -p prefix, --prefix prefix
+                            The file prefix for the roCreate file in the S3 bucket
+      -k key, --key key     The file key for the roCreate file in the S3 bucket
+      -t, --tx-time         Show programme transmission time
+      -d, --duration        Show total running order duration
+      -s, --stories         Show stories within the running order in the running order
+      -i, --items           Show items within stories in the running order
+      -n, --notes           Show notes within story items in the running order
 
-.. option:: -b BUCKET_NAME
+mosromgr merge
+==============
 
-    The name of the S3 bucket containing MOS files
+.. code-block:: text
 
-.. option:: -p BUCKET_PREFIX
+    Merge the provided MOS files
 
-    The prefix of the location in the S3 bucket which contains the MOS files
-
-
-Examples
---------
-
-To merge MOS messages in a local directory, and save the output into a new file:
-
-.. code-block:: console
-
-    $ ls newsnight/
-    roCreate.mos.xml    roStorySend.mos.xml     roDelete.mos.xml
-    $ mosromgr -d newsnight > newsnight/FINAL.xml
-
-To merge MOS messages in a folder within an S3 bucket, and save the output into
-a new file:
-
-.. code-block:: console
-
-    $ aws s3 ls s3://news-programmes/
-    PRE     newscast/
-    PRE     newsnight/
-    $ aws s3 ls s3://news-programmes/newsnight/
-    roCreate.mos.xml
-    roDelete.mos.xml
-    roStorySend.mos.xml
-    $ mosromgr -b news-programmes -p newsnight > newsnight_FINAL.xml
+    optional arguments:
+      -h, --help            show this help message and exit
+      -f [files [files ...]], --files [files [files ...]]
+                            The MOS file to inspect
+      -b bucket, --bucket-name bucket
+                            S3 bucket name containing MOS files
+      -p prefix, --prefix prefix
+                            The file prefix for MOS files in the S3 bucket
+      -o outfile, --outfile outfile
+                            Output to a file
+      -i, --incomplete      Allow an incomplete collection
