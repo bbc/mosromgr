@@ -76,8 +76,8 @@ file::
         f.write(str(ro))
 
 If you're automating this process you won't necessarily know which MOS Type to
-use, so you can construct an object from the base class
-``mosromgr.mostypes.MosFile`` which will automatically classify your file::
+use, so you can construct an object from the base class ``MosFile`` which will
+automatically classify your file::
 
     >>> from mosromgr.mostypes import MosFile
     >>> mf1 = MosFile.from_file('roCreate.mos.xml')
