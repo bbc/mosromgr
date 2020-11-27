@@ -6,7 +6,7 @@ Python client for managing `MOS`_ running orders. Pronounced *mos-ro-manager*.
 
 .. _MOS: http://mosprotocol.com/
 
-.. image:: images/mos.*
+.. image:: docs/images/mos.*
     :target: http://mosprotocol.com/
     :align: center
 
