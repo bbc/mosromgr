@@ -28,6 +28,7 @@ digraph classes {
     ItemMoveMultiple->MosFile;
     ItemReplace->MosFile;
     MetaDataReplace->MosFile;
+    ReadyToAir->MosFile;
     RunningOrder->MosFile;
     RunningOrderEnd->MosFile;
     RunningOrderReplace->RunningOrder;

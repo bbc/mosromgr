@@ -5,15 +5,14 @@ import warnings
 from mosromgr.moscollection import *
 from mosromgr.mostypes import *
 from mosromgr.exc import *
-from const import *
 
 
-def test_mos_collection_init_path():
+def test_mos_collection_init_path(rocreate, rodelete):
     """
     GIVEN: A list containing a filepath to a roCreate and roDelete message
     EXPECT: MosCollection object with 1 file
     """
-    mos_files = [ROCREATE, RODELETE]
+    mos_files = [rocreate, rodelete]
     mc = MosCollection.from_files(mos_files)
     assert repr(mc) == "<MosCollection RO SLUG>"
     assert isinstance(mc.ro, RunningOrder)
@@ -29,44 +28,44 @@ def test_mos_collection_bad_init_params():
     with pytest.raises(TypeError):
         MosCollection.from_files(mos_file_keys=['a', 'b', 'c'])
 
-def test_mos_collection_bad_init():
+def test_mos_collection_bad_init(rostorysend1, rocreate, rodelete, rocreate2, rodelete2):
     "Test MosCollection cannot be created without a roCreate message"
-    mos_files = [ROSTORYSEND1]
+    mos_files = [rostorysend1]
     with pytest.raises(InvalidMosCollection):
         MosCollection.from_files(mos_files)
 
-    mos_files = [ROCREATE]
+    mos_files = [rocreate]
     with pytest.raises(InvalidMosCollection):
         MosCollection.from_files(mos_files)
 
-    mos_files = [RODELETE]
+    mos_files = [rodelete]
     with pytest.raises(InvalidMosCollection):
         MosCollection.from_files(mos_files)
 
-    mos_files = [ROCREATE, ROSTORYSEND1]
+    mos_files = [rocreate, rostorysend1]
     with pytest.raises(InvalidMosCollection):
         MosCollection.from_files(mos_files)
 
-    mos_files = [ROCREATE, ROCREATE2, RODELETE]
+    mos_files = [rocreate, rocreate2, rodelete]
     with pytest.raises(InvalidMosCollection):
         MosCollection.from_files(mos_files)
 
-    mos_files = [ROCREATE, RODELETE, RODELETE2]
+    mos_files = [rocreate, rodelete, rodelete2]
     with pytest.raises(InvalidMosCollection):
         MosCollection.from_files(mos_files)
 
-def test_mos_collection_bad_init_mixed_ids():
+def test_mos_collection_bad_init_mixed_ids(rocreate, rodelete2):
     "Test MosCollection cannot be created with messages with mixed RO IDs"
-    mos_files = [ROCREATE, RODELETE2]
+    mos_files = [rocreate, rodelete2]
     with pytest.raises(InvalidMosCollection):
         MosCollection.from_files(mos_files)
 
-def test_mos_collection_init_files_after_rodelete():
+def test_mos_collection_init_files_after_rodelete(rocreate, rodelete, rodelete2, rostorysend4):
     """
     GIVEN: A list of MOS files with messages following roDelete
     EXPECT: MosCollection object with 2 files, plus warning on merge
     """
-    mos_files = [ROCREATE, RODELETE, ROSTORYSEND4]
+    mos_files = [rocreate, rodelete, rostorysend4]
     mc = MosCollection.from_files(mos_files)
     assert repr(mc) == "<MosCollection RO SLUG>"
     assert isinstance(mc.ro, RunningOrder)
@@ -78,14 +77,14 @@ def test_mos_collection_init_files_after_rodelete():
 @patch('mosromgr.utils.s3.boto3')
 @patch('mosromgr.utils.s3.get_file_contents')
 @patch('mosromgr.utils.s3.get_mos_files')
-def test_mos_collection_init_s3(get_mos_files, get_file_contents, boto3):
+def test_mos_collection_init_s3(get_mos_files, get_file_contents, boto3, rocreate, rodelete, ro_all):
     """
     GIVEN: A bucket name and prefix (mocked to contain two files)
     EXPECT: MosCollection object with 1 reader
     """
-    with open(ROCREATE) as f:
+    with open(rocreate) as f:
         rocreate = f.read()
-    with open(RODELETE) as f:
+    with open(rodelete) as f:
         rodelete = f.read()
 
     get_mos_files.return_value = ['roCreate.mos.xml', 'roDelete.mos.xml']
@@ -97,17 +96,17 @@ def test_mos_collection_init_s3(get_mos_files, get_file_contents, boto3):
     assert isinstance(mc.mos_readers, list)
     assert len(mc.mos_readers) == 1
 
-def test_mos_collection_init_multiple_files():
+def test_mos_collection_init_multiple_files(ro_all):
     "Test collection can be created from multiple files"
-    mc = MosCollection.from_files(RO_ALL)
+    mc = MosCollection.from_files(ro_all)
     assert repr(mc) == "<MosCollection RO SLUG>"
     assert isinstance(mc.ro, RunningOrder)
     assert isinstance(mc.mos_readers, list)
-    assert len(mc.mos_readers) == len(RO_ALL) - 1
+    assert len(mc.mos_readers) == len(ro_all) - 1
 
-def test_mos_collection_init_multiple_files_sorted():
+def test_mos_collection_init_multiple_files_sorted(rostorysend2, rocreate, rostorysend1, rodelete):
     "Test collection can sort input files by messageID field"
-    mos_files = [ROSTORYSEND2, ROCREATE, ROSTORYSEND1, RODELETE]
+    mos_files = [rostorysend2, rocreate, rostorysend1, rodelete]
     mc = MosCollection.from_files(mos_files)
     assert isinstance(mc.ro, RunningOrder)
     assert isinstance(mc.mos_readers, list)
@@ -116,21 +115,21 @@ def test_mos_collection_init_multiple_files_sorted():
     assert mf1.message_id == 1001
     assert mf2.message_id == 1002
 
-def test_mos_collection_unsupported_mos_type():
+def test_mos_collection_unsupported_mos_type(rocreate, roinvalid, rodelete):
     """
     GIVEN: Running order and invalid mos message, in list form
     EXPECT: MosCollection object with running order and no other files
     """
-    mos_files = [ROCREATE, ROINVALID, RODELETE]
+    mos_files = [rocreate, roinvalid, rodelete]
     with pytest.raises(UnknownMosFileType):
         MosCollection.from_files(mos_files)
 
-def test_mos_collection_merge():
+def test_mos_collection_merge(rocreate, roelementactionstoryinsert, rodelete):
     """
     GIVEN: Running order and EAStoryInsert paths
     EXPECT: Running order summary, with story from EAStoryInsert added
     """
-    mos_files = [ROCREATE, ROELEMENTACTIONINSERTSTORY, RODELETE]
+    mos_files = [rocreate, roelementactionstoryinsert, rodelete]
     mc = MosCollection.from_files(mos_files)
     assert len(mc.mos_readers) == 2
     d = mc.ro.dict
@@ -143,16 +142,17 @@ def test_mos_collection_merge():
 @patch('mosromgr.utils.s3.boto3')
 @patch('mosromgr.utils.s3.get_file_contents')
 @patch('mosromgr.utils.s3.get_mos_files')
-def test_mos_collection_s3_merge(get_mos_files, get_file_contents, boto3):
+def test_mos_collection_s3_merge(get_mos_files, get_file_contents, boto3,
+    rocreate, roelementactionstoryinsert, rodelete):
     """
     GIVEN: Bucket prefix matching a roCreate and ElementAction (StoryInsert)
     EXPECT: Running order summary, with story from EAStoryInsert added
     """
-    with open(ROCREATE) as f:
+    with open(rocreate) as f:
         rc = f.read()
-    with open(ROELEMENTACTIONINSERTSTORY) as f:
+    with open(roelementactionstoryinsert) as f:
         ea = f.read()
-    with open(RODELETE) as f:
+    with open(rodelete) as f:
         rd = f.read()
 
     get_mos_files.return_value = [rc, ea, rd]
@@ -168,12 +168,12 @@ def test_mos_collection_s3_merge(get_mos_files, get_file_contents, boto3):
     d = mc.ro.dict
     assert len(d['mos']['roCreate']['story']) == 4
 
-def test_mos_collection_merge_warning():
+def test_mos_collection_merge_warning(rocreate, rostorysend3, rodelete):
     """
     GIVEN: Running order and invalid StorySend, in list form
     EXPECT: MosMergeError
     """
-    mos_files = [ROCREATE, ROSTORYSEND3, RODELETE]
+    mos_files = [rocreate, rostorysend3, rodelete]
     mc = MosCollection.from_files(mos_files)
     with warnings.catch_warnings(record=True) as w:
         mc.merge()

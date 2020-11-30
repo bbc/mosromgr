@@ -1,0 +1,9 @@
+<mos>
+  <mosID>MOS ID</mosID>
+  <ncsID>BIGTED.W1STE.BBC.MOS</ncsID>
+  <messageID>1024</messageID>
+  <roReadyToAir>
+    <roID>RO ID</roID>
+    <roAir>READY</roAir>
+  </roReadyToAir>
+</mos>

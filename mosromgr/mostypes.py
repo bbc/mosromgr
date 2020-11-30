@@ -789,6 +789,25 @@ class ItemReplace(MosFile):
         return ro
 
 
+class ReadyToAir(MosFile):
+    """
+    A ``ReadyToAir`` object is created from a ``roReadyToAir`` MOS file and can
+    be constructed using classmethods :meth:`from_file` or :meth:`from_string`.
+
+    ``ReadyToAir`` objects can be merged with a :class:`RunningOrder` by using
+    the ``+`` operator. This behaviour is defined in the :meth:`merge` method in
+    this class.
+    """
+    @property
+    def base_tag_name(self):
+        "The name of the base XML tag for this file type (:class:`str`)"
+        return 'roReadyToAir'
+
+    def merge(self, ro):
+        "Merge into the :class:`RunningOrder` object provided"
+        return ro
+
+
 class RunningOrderReplace(RunningOrder):
     """
     An ``RunningOrderReplace`` object is created from a ``roReplace`` MOS file
@@ -1343,6 +1362,7 @@ TAG_CLASS_MAP = {
     'roItemReplace': ItemReplace,
     'roReplace': RunningOrderReplace,
     'roMetadataReplace': MetaDataReplace,
+    'roReadyToAir': ReadyToAir,
     'roDelete': RunningOrderEnd,
     'roElementAction': ElementAction,
 }

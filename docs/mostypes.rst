@@ -161,6 +161,14 @@ ItemReplace
     :inherited-members:
     :special-members: __add__, __lt__, __gt__, __str__
 
+ReadyToAir
+----------
+
+.. autoclass:: ReadyToAir()
+    :members:
+    :inherited-members:
+    :special-members: __add__, __lt__, __gt__, __str__
+
 EAStoryReplace
 --------------
 
