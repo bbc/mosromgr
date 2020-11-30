@@ -181,7 +181,10 @@ class CLI:
         for mos_file_path in self._args.files:
             mo = self.get_mos_object_from_file(mos_file_path)
             if mo:
-                print(f"{mos_file_path}: {mo.__class__.__name__} {mo.closed}")
+                if mo.completed:
+                    print(f"{mos_file_path}: {mo.__class__.__name__} (completed)")
+                else:
+                    print(f"{mos_file_path}: {mo.__class__.__name__}")
 
     def do_inspect(self):
         if self._args.file:

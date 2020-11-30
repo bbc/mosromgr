@@ -10,8 +10,8 @@ class MosMergeError(MosRoMgrException):
     "Exception raised when MOS merge fails"
 
 
-class MosClosedMergeError(MosMergeError):
-    "Exception raised when MOS merge is attempted on a closed :class:`~mosromgr.mostypes.RunningOrder`"
+class MosCompletedMergeError(MosMergeError):
+    "Exception raised when MOS merge is attempted on a completed :class:`~mosromgr.mostypes.RunningOrder`"
 
 
 class InvalidMosCollection(MosRoMgrException):

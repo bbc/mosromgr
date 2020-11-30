@@ -56,10 +56,10 @@ MosMergeError
 .. autoexception:: mosromgr.exc.MosMergeError
     :show-inheritance:
 
-MosClosedMergeError
--------------------
+MosCompletedMergeError
+----------------------
 
-.. autoexception:: mosromgr.exc.MosClosedMergeError
+.. autoexception:: mosromgr.exc.MosCompletedMergeError
     :show-inheritance:
 
 InvalidMosCollection

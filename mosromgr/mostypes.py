@@ -10,7 +10,7 @@ from .utils.xml import remove_node, replace_node, insert_node, find_child
 from .utils import s3
 from .moselements import Story, Item
 from .exc import (
-    MosInvalidXML, UnknownMosFileType, MosClosedMergeError, MosMergeError,
+    MosInvalidXML, UnknownMosFileType, MosCompletedMergeError, MosMergeError,
     ItemNotFoundWarning, StoryNotFoundWarning
 )
 
@@ -174,7 +174,7 @@ class RunningOrder(MosFile):
         """
         if self.xml.find('mosromgrmeta') is None:
             return other.merge(self)
-        raise MosClosedMergeError("Cannot merge closed MOS file")
+        raise MosCompletedMergeError("Cannot merge completed MOS file")
 
     @property
     def base_tag_name(self):

@@ -674,7 +674,7 @@ def test_merge_after_delete():
     rd = RunningOrderEnd.from_file(RODELETE)
     ss = StorySend.from_file(ROSTORYSEND1)
     ro += rd
-    with pytest.raises(MosClosedMergeError):
+    with pytest.raises(MosCompletedMergeError):
         ro += ss
 
 def test_sort_two():
