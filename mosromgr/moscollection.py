@@ -232,18 +232,18 @@ class MosCollection:
         also check a single roDelete is present.
         """
         ro_id = self.mos_readers[0].ro_id
-        assert all(mr.ro_id == ro_id for mr in self.mos_readers)
+        assert all(mr.ro_id == ro_id for mr in self.mos_readers), "Mixed RO IDs found"
         ro_creates = [
             mr for mr in self.mos_readers if mr.mos_type == RunningOrder
         ]
-        assert len(ro_creates) == 1, len(ro_creates)
+        assert len(ro_creates) == 1, f"{len(ro_creates)} roCreates found"
         self._ro = ro_creates[0].mos_object
         ro_deletes = [
             mr for mr in self.mos_readers if mr.mos_type == RunningOrderEnd
         ]
-        assert len(ro_deletes) < 2
+        assert len(ro_deletes) < 2, f"{len(ro_deletes)} roDeletes found"
         if not allow_incomplete:
-            assert len(ro_deletes) == 1, len(ro_deletes)
+            assert len(ro_deletes) == 1, f"{len(ro_deletes)} roDeletes found"
         self._mos_readers = [
             mr for mr in self.mos_readers if mr.mos_type != RunningOrder
         ]
