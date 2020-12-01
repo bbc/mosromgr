@@ -22,10 +22,12 @@ def _get_story_duration(story_tag):
         payload = metadata.find('mosPayload')
     except AttributeError:
         return
-    text_time = int(payload.find('TextTime').text)
-    media_time = int(payload.find('MediaTime').text)
-    return text_time + media_time
-
+    try:
+        text_time = int(payload.find('TextTime').text)
+        media_time = int(payload.find('MediaTime').text)
+        return text_time + media_time
+    except AttributeError:
+        return int(payload.find('StoryDuration').text)
 
 class MosElement:
     "Abstract base class for MOS elements"

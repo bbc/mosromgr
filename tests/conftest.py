@@ -145,6 +145,10 @@ def rostorysend4():
     return MOCK_MOS / 'roStorySend4.mos'
 
 @pytest.fixture()
+def rostorysend5():
+    return MOCK_MOS / 'roStorySend5.mos'
+
+@pytest.fixture()
 def roinvalid():
     return MOCK_MOS / 'roInvalidMos.mos'
 

@@ -100,6 +100,28 @@ def test_story_send(rostorysend1):
     assert item1.id == 'ITEM1'
     assert item1.slug == 'ITEM 1'
 
+def test_story_send_with_storyduration(rostorysend5):
+    """
+    Test we can access the elements of a StorySend object created from a
+    roStorySend file with a <StoryDuration> tag instead of MediaTime and
+    TextTime
+    """
+    ss = StorySend.from_file(rostorysend5)
+    assert isinstance(ss.xml, Element)
+    assert isinstance(ss.story, Story)
+    assert isinstance(ss.story.xml, Element)
+    assert ss.story.id == 'STORY1'
+    assert ss.story.slug == 'STORY 1'
+    assert ss.story.duration == 45
+
+    assert isinstance(ss.story.items, list)
+    assert len(ss.story.items) == 1
+    item1 = ss.story.items[0]
+    assert isinstance(item1, Item)
+    assert isinstance(item1.xml, Element)
+    assert item1.id == 'ITEM1'
+    assert item1.slug == 'ITEM 1'
+
 def test_story_append(rostoryappend):
     """
     Test we can access the elements of a StoryAppend object created from a
