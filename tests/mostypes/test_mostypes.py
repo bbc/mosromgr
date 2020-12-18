@@ -743,3 +743,15 @@ def test_merge_failure(rocreate, rostorysend3):
         ro += ss3
     assert len(w) == 1
     assert w[0].category == StoryNotFoundWarning
+
+def test_storysend_merge_failure(rocreate, rostorysend6):
+    """
+    GIVEN: A RunningOrder and a StorySend with an unknown Story ID
+    EXPECT: The RunningOrder should fail to merge
+    """
+    ro = RunningOrder.from_file(rocreate)
+    ss6 = StorySend.from_file(rostorysend6)
+    with warnings.catch_warnings(record=True) as w:
+        ro += ss6
+    assert len(w) == 1
+    assert w[0].category == StoryNotFoundWarning

@@ -155,7 +155,7 @@ class MosFile:
         return False
 
     def merge(self, ro):
-        raise NotImplementedError("merge method not implemented")
+        raise NotImplementedError("Merge method not implemented")
 
 
 class RunningOrder(MosFile):
@@ -218,6 +218,13 @@ class RunningOrder(MosFile):
         """
         return self.xml.find('mosromgrmeta') is not None
 
+    def find_story(self, story_id):
+        return [
+            (story.xml, i)
+            for i, story in enumerate(self.stories)
+            if story.id == story_id
+        ][0]
+
 
 class StorySend(MosFile):
     """
@@ -263,15 +270,17 @@ class StorySend(MosFile):
 
     def merge(self, ro):
         "Merge into the :class:`RunningOrder` object provided"
-        story, story_index = find_child(parent=ro.base_tag, child_tag='story', id=self.story.id)
-        if not story:
-            msg = f'{self.__class__.__name__} error in {self.message_id} - story not found'
+        try:
+            story, story_index = ro.find_story(self.story.id)
+        except IndexError:
+            msg = f"{self.__class__.__name__} error in {self.message_id} - story not found"
             logger.warning(msg)
             warnings.warn(msg, StoryNotFoundWarning)
-        else:
-            new_story = self._convert_story_send_to_story_tag(self.base_tag)
-            remove_node(parent=ro.base_tag, node=story)
-            insert_node(parent=ro.base_tag, node=new_story, index=story_index)
+            return ro
+
+        new_story = self._convert_story_send_to_story_tag(self.base_tag)
+        remove_node(parent=ro.base_tag, node=story)
+        insert_node(parent=ro.base_tag, node=new_story, index=story_index)
         return ro
 
 
@@ -600,7 +609,7 @@ class StoryMove(MosFile):
         target_node, target_index = find_child(parent=ro.base_tag, child_tag='story', id=target_id)
         if not target_node:
             raise MosMergeError(
-                f'{self.__class__.__name__} error in {self.message_id} - traget storyID not found'
+                f'{self.__class__.__name__} error in {self.message_id} - target storyID not found'
             )
         source_id = story_ids[0].text
         source_node, source_index = find_child(parent=ro.base_tag, child_tag='story', id=source_id)
@@ -664,6 +673,10 @@ class ItemMoveMultiple(MosFile):
                 f'{self.__class__.__name__} error in {self.message_id} - no target storyID'
             )
         target_story, story_index = find_child(parent=ro.base_tag, child_tag='story', id=target_story_id)
+        if target_story is None:
+            raise MosMergeError(
+                f'{self.__class__.__name__} error in {self.message_id} - target story not found'
+            )
 
         item_ids = self.base_tag.findall('itemID')
         target_item_id = item_ids[-1].text
@@ -826,6 +839,10 @@ class RunningOrderReplace(RunningOrder):
     def merge(self, ro):
         "Merge into the :class:`RunningOrder` object provided"
         rc, rc_index = find_child(parent=ro.xml, child_tag='roCreate')
+        if rc is None:
+            raise MosMergeError(
+                f'{self.__class__.__name__} error in {self.message_id} - roCreate not found'
+            )
         rr = copy.deepcopy(self.xml.find('roReplace'))
         rr.tag = 'roCreate'
         remove_node(parent=ro.xml, node=ro.base_tag)
