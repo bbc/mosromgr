@@ -4,5 +4,6 @@
   <roMetadataReplace>
     <roID>RO ID</roID>
     <roSlug>RO SLUG NEW</roSlug>
+    <roEdStart/>
   </roMetadataReplace>
 </mos>

@@ -368,6 +368,7 @@ def test_metadata_replace(rocreate, rometadatareplace):
     ro = RunningOrder.from_file(rocreate)
     mdr = MetaDataReplace.from_file(rometadatareplace)
     d = ro.dict
+    assert d['mos']['roCreate']['roEdStart'] == '2020-01-01T12:30:00'
     assert len(d['mos']['roCreate']['story'][0]['item']) == 3
     ro_id = d['mos']['roCreate']['roID']
     assert ro_id == "RO ID"
@@ -376,6 +377,7 @@ def test_metadata_replace(rocreate, rometadatareplace):
 
     ro += mdr
     d = ro.dict
+    assert d['mos']['roCreate']['roEdStart'] == '2020-01-01T12:30:00'
     assert len(d['mos']['roCreate']['story'][0]['item']) == 3
     ro_id = d['mos']['roCreate']['roID']
     assert ro_id == "RO ID"

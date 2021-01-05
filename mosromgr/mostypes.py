@@ -306,7 +306,7 @@ class MetaDataReplace(MosFile):
 
     def merge(self, ro):
         "Merge into the :class:`RunningOrder` object provided"
-        for source in list(self.base_tag):
+        for source in [tag for tag in list(self.base_tag) if tag.text is not None]:
             target, target_index = find_child(parent=ro.base_tag, child_tag=source.tag)
             if target is None:
                 raise MosMergeError(
@@ -551,7 +551,7 @@ class ItemInsert(MosFile):
         target_story, story_index = find_child(parent=ro.base_tag, child_tag='story', id=target_story_id)
         if not target_story:
             raise MosMergeError(
-                f'{self.__class__.__name__} error in {self.message_id} - no target story not found'
+                f'{self.__class__.__name__} error in {self.message_id} - target story not found'
             )
         target_item_id = self.base_tag.find('itemID').text
         if target_item_id:
