@@ -729,6 +729,10 @@ class StoryReplace(MosFile):
                 f'{self.__class__.__name__} error in {self.message_id} - no target storyID'
             )
         target_node, target_index = find_child(parent=ro.base_tag, child_tag='story', id=target_id)
+        if not target_node:
+            raise MosMergeError(
+                f'{self.__class__.__name__} error in {self.message_id} - target story not found'
+            )
         remove_node(parent=ro.base_tag, node=target_node)
         stories = self.base_tag.findall('story')
         if not stories:
