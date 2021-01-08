@@ -52,7 +52,6 @@ doc-serve:
 	cd $(DOC_HTML) && python -m http.server
 
 doc-deploy:
-	aws s3 rm $(DOC_S3)* --recursive
-	aws s3 cp $(DOC_HTML) $(DOC_S3) --recursive
+	aws s3 sync --delete $(DOC_HTML) $(DOC_S3)
 
 .PHONY: all install develop build clean lint test doc-graphs doc doc-serve doc-deploy
