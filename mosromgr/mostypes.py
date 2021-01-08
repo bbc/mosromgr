@@ -1,12 +1,12 @@
 import xml.etree.ElementTree as ET
 import logging
 import warnings
-from datetime import datetime
 import copy
 
 import xmltodict
+from dateutil.parser import parse
 
-from .utils.xml import remove_node, replace_node, insert_node, find_child
+from .utils.xml import remove_node, replace_node, insert_node, find_child, append_node
 from .utils import s3
 from .moselements import Story, Item
 from .exc import (
@@ -172,7 +172,7 @@ class RunningOrder(MosFile):
             ss = StorySend.from_file('roStorySend.mos.xml')
             ro += ss
         """
-        if self.xml.find('mosromgrmeta') is None:
+        if self.xml.find('mosromgrmeta') is None or isinstance(other, RunningOrderControl):
             return other.merge(self)
         raise MosCompletedMergeError("Cannot merge completed MOS file")
 
@@ -195,15 +195,22 @@ class RunningOrder(MosFile):
         story_tags = list(self.base_tag.findall('story'))
 
         return [
-            Story(story_tag, all_stories=story_tags, prog_tx_time=self.tx_time)
+            Story(story_tag, all_stories=story_tags, prog_start_time=self.start_time)
             for story_tag in story_tags
         ]
 
     @property
-    def tx_time(self):
-        "Transmission time (:class:`datetime.datetime`)"
+    def start_time(self):
+        "Transmission start time (:class:`datetime.datetime`)"
         ro_ed_start = self.base_tag.find('roEdStart').text
-        return datetime.strptime(ro_ed_start, '%Y-%m-%dT%H:%M:%S')
+        return parse(ro_ed_start)
+
+    @property
+    def end_time(self):
+        "Transmission end time (:class:`datetime.datetime`)"
+        final_story = self.stories[-1]
+        return final_story.end_time
+
 
     @property
     def duration(self):
@@ -1373,6 +1380,34 @@ class EAItemMove(ElementAction):
         return ro
 
 
+class RunningOrderControl(MosFile):
+    @property
+    def base_tag_name(self):
+        "The name of the base XML tag for this file type (:class:`str`)"
+        return 'roCtrl'
+
+    @property
+    def story(self):
+        return Story(xml=self.base_tag)
+
+    def merge(self, ro):
+        story, story_index = find_child(parent=ro.base_tag, child_tag='story', id=self.story.id)
+        if story is None:
+            msg = f'{self.__class__.__name__} error in {self.message_id} - story not found'
+            logger.warning(msg)
+            warnings.warn(msg, StoryNotFoundWarning)
+        else:
+            ro_story_payload = story.find('mosExternalMetadata').find('mosPayload')
+            for new_tag in self.story.xml.find('mosExternalMetadata').find('mosPayload'):
+                if new_tag.text:
+                    old_tag, old_tag_index = find_child(parent=ro_story_payload, child_tag=new_tag.tag, id=None)
+                    if old_tag is None:
+                        append_node(parent=ro_story_payload, node=new_tag)
+                    else:
+                        replace_node(parent=ro_story_payload, old_node=old_tag, new_node=new_tag, index=old_tag_index)
+        return ro
+
+
 TAG_CLASS_MAP = {
     'roCreate': RunningOrder,
     'roStorySend': StorySend,
@@ -1390,6 +1425,7 @@ TAG_CLASS_MAP = {
     'roReadyToAir': ReadyToAir,
     'roDelete': RunningOrderEnd,
     'roElementAction': ElementAction,
+    'roCtrl': RunningOrderControl,
 }
 
 EA_CLASS_MAP = {

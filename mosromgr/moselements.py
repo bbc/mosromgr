@@ -1,6 +1,8 @@
 import xml.etree.ElementTree as ET
 from datetime import timedelta
 
+from dateutil.parser import parse
+
 
 def _get_story_offsets(all_stories):
     "Create a dict of {story_id: story_offset}"
@@ -21,13 +23,20 @@ def _get_story_duration(story_tag):
         metadata = story_tag.find('mosExternalMetadata')
         payload = metadata.find('mosPayload')
     except AttributeError:
-        return
+        return 0
+
     try:
-        text_time = int(payload.find('TextTime').text)
-        media_time = int(payload.find('MediaTime').text)
+        return float(payload.find('StoryDuration').text)
+    except AttributeError:
+        pass
+
+    try:
+        text_time = float(payload.find('TextTime').text)
+        media_time = float(payload.find('MediaTime').text)
         return text_time + media_time
     except AttributeError:
-        return int(payload.find('StoryDuration').text)
+        return 0
+
 
 class MosElement:
     "Abstract base class for MOS elements"
@@ -78,17 +87,18 @@ class Story(MosElement):
     """
     This class represents a Story element within any
     :class:`~mosromgr.mostypes.MosFile` object, providing data relating to the
-    story. The Story ID, Story slug and duration are exposed as properties, and
-    the parent XML element is provided for further introspection.
+    story. The Story ID, Story slug, duration and more are exposed as
+    properties, and the parent XML element is provided for further
+    introspection.
     """
     def __init__(self, xml, *, id=None, slug=None, duration=None,
-                 unknown_items=False, all_stories=None, prog_tx_time=None):
+                 unknown_items=False, all_stories=None, prog_start_time=None):
         super().__init__(xml, id=id, slug=slug)
         self._id_tag = 'storyID'
         self._slug_tag = 'storySlug'
         self._duration = duration
         self._unknown_items = unknown_items
-        self._prog_tx_time = prog_tx_time
+        self._prog_start_time = prog_start_time
         self._story_offsets = _get_story_offsets(all_stories)
 
     @property
@@ -120,25 +130,45 @@ class Story(MosElement):
     def duration(self):
         """
         The story duration (the sum of the text time and media time found
-        within ``mosExternalMetadata->mosPayload``), in seconds (:class:`int`)
+        within ``mosExternalMetadata->mosPayload``), in seconds (:class:`float`)
         """
         return _get_story_duration(self.xml)
 
     @property
     def offset(self):
         """
-        The time offset of the story in seconds (:class:`int` or ``None`` if not
-        available in the XML)
+        The time offset of the story in seconds (:class:`float` or ``None`` if
+        not available in the XML)
         """
         return self._story_offsets.get(self.id)
 
     @property
-    def tx_time(self):
+    def start_time(self):
         """
-        The transmission time of the story (:class:`datetime.datetime` or
+        The transmission start time of the story (:class:`datetime.datetime` or
         ``None`` if not available in the XML)
         """
-        return self._prog_tx_time + timedelta(seconds=self.offset)
+        try:
+            metadata = self.xml.find('mosExternalMetadata')
+            mos_payload = metadata.find('mosPayload')
+            start_time = mos_payload.find('StoryStarted').text
+            return parse(start_time)
+        except AttributeError:
+            return self._prog_start_time + timedelta(seconds=self.offset)
+
+    @property
+    def end_time(self):
+        """
+        The transmission end time of the story (:class:`datetime.datetime` or
+        ``None`` if not available in the XML)
+        """
+        try:
+            metadata = self.xml.find('mosExternalMetadata')
+            mos_payload = metadata.find('mosPayload')
+            end_time = mos_payload.find('StoryEnded').text
+            return parse(end_time)
+        except AttributeError:
+            return self.start_time + timedelta(seconds=self.duration)
 
 
 class Item(MosElement):

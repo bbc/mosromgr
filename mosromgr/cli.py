@@ -100,9 +100,14 @@ class CLI:
             help=("The file key for the roCreate file in the S3 bucket")
         )
         inspect_cmd.add_argument(
-            "-t", "--tx-time",
+            "-t", "--start-time",
             action='store_true',
-            help=("Show programme transmission time")
+            help=("Show programme start time")
+        )
+        inspect_cmd.add_argument(
+            "-e", "--end-time",
+            action='store_true',
+            help=("Show programme end time")
         )
         inspect_cmd.add_argument(
             "-d", "--duration",
@@ -209,8 +214,10 @@ class CLI:
             return 2
 
         print(mo.ro_slug)
-        if self._args.tx_time:
-            print(f"Transmission time: {mo.tx_time.strftime('%Y-%m-%d %H:%M')}")
+        if self._args.start_time:
+            print(f"Start time: {mo.start_time.strftime('%Y-%m-%d %H:%M')}")
+        if self._args.end_time:
+            print(f"End time: {mo.end_time.strftime('%Y-%m-%d %H:%M')}")
         if self._args.duration:
             mins, secs = divmod(mo.duration, 60)
             hrs, mins = divmod(mins, 60)

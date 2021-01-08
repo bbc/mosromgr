@@ -14,6 +14,11 @@ def insert_node(parent, node, index):
     parent.insert(index, node)
 
 
+def append_node(parent, node):
+    "Append *node* to *parent*."
+    parent.append(node)
+
+
 def find_child(parent, child_tag, id=None):
     """
     Find an element with *child_tag* in *parent* and return ``(child, index)``
@@ -27,6 +32,6 @@ def find_child(parent, child_tag, id=None):
             child_id = child.find(f'{child_tag}ID').text
             if child_id == id:
                 return (child, i)
-            elif child_id.split(',')[-1] == id.split(',')[-1]:
+            if child_id.split(',')[-1] == id.split(',')[-1]:
                 return (child, i)
     return (None, None)

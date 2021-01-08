@@ -44,11 +44,12 @@ mosromgr inspect
       -h, --help            show this help message and exit
       -f file, --file file  The roCreate file to inspect
       -b bucket, --bucket-name bucket
-                            S3 bucket name containing the roCreate file
+                          S3 bucket name containing the roCreate file
       -p prefix, --prefix prefix
-                            The file prefix for the roCreate file in the S3 bucket
+                          The file prefix for the roCreate file in the S3 bucket
       -k key, --key key     The file key for the roCreate file in the S3 bucket
-      -t, --tx-time         Show programme transmission time
+      -t, --start-time      Show programme start time
+      -e, --end-time        Show programme end time
       -d, --duration        Show total running order duration
       -s, --stories         Show stories within the running order in the running order
       -i, --items           Show items within stories in the running order

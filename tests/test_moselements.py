@@ -22,7 +22,7 @@ def test_running_order(rocreate):
     assert isinstance(ro.stories, list)
     assert len(ro.stories) == 3
     assert ro.duration == 31
-    assert isinstance(ro.tx_time, datetime)
+    assert isinstance(ro.start_time, datetime)
 
     story1 = ro.stories[0]
     assert repr(story1) == '<Story STORY1>'
@@ -34,8 +34,8 @@ def test_running_order(rocreate):
     assert story1.slug == 'STORY 1'
     assert story1.offset == 0
     assert story1.duration == 3
-    assert isinstance(story1.tx_time, datetime)
-    assert story1.tx_time == ro.tx_time
+    assert isinstance(story1.start_time, datetime)
+    assert story1.start_time == ro.start_time
 
     assert isinstance(story1.items, list)
     assert len(story1.items) == 3
@@ -59,8 +59,8 @@ def test_running_order(rocreate):
     assert story2.slug == 'STORY 2'
     assert story2.offset == 3
     assert story2.duration == 8
-    assert isinstance(story2.tx_time, datetime)
-    assert story2.tx_time > story1.tx_time
+    assert isinstance(story2.start_time, datetime)
+    assert story2.start_time > story1.start_time
 
     assert isinstance(story2.items, list)
     assert len(story2.items) == 3
@@ -171,7 +171,7 @@ def test_story_delete(rostorydelete):
     assert isinstance(story1.xml, Element)
     assert story1.id == 'STORY1'
     assert story1.slug is None
-    assert story1.duration is None
+    assert story1.duration == 0
     assert isinstance(story1.items, list)
     assert len(story1.items) == 0
 
@@ -179,7 +179,7 @@ def test_story_delete(rostorydelete):
     assert isinstance(story2.xml, Element)
     assert story2.id == 'STORY2'
     assert story2.slug is None
-    assert story2.duration is None
+    assert story2.duration == 0
     assert isinstance(story2.items, list)
     assert len(story2.items) == 0
 
@@ -193,7 +193,7 @@ def test_story_insert(rostoryinsert):
     assert isinstance(si.target_story, Story)
     assert si.target_story.id == 'STORY2'
     assert si.target_story.slug is None
-    assert si.target_story.duration is None
+    assert si.target_story.duration == 0
     assert isinstance(si.source_stories, list)
     assert len(si.source_stories) == 2
     story1, story2 = si.source_stories
@@ -311,7 +311,7 @@ def test_item_insert(roiteminsert):
     assert isinstance(ii.target_story, Story)
     assert ii.target_story.id == 'STORY1'
     assert ii.target_story.slug is None
-    assert ii.target_story.duration is None
+    assert ii.target_story.duration == 0
     assert ii.target_story.items is None
 
     assert isinstance(ii.target_item, Item)
@@ -336,7 +336,7 @@ def test_item_delete(roitemdelete):
     assert isinstance(id.target_story, Story)
     assert id.target_story.id == 'STORY1'
     assert id.target_story.slug is None
-    assert id.target_story.duration is None
+    assert id.target_story.duration == 0
     assert id.target_story.items is None
 
     assert isinstance(id.target_items, set)
@@ -353,7 +353,7 @@ def test_item_move_multiple(roitemmovemultiple):
     assert isinstance(imm.target_story, Story)
     assert imm.target_story.id == 'STORY1'
     assert imm.target_story.slug is None
-    assert imm.target_story.duration is None
+    assert imm.target_story.duration == 0
     assert imm.target_story.items is None
 
     assert isinstance(imm.target_item, Item)
@@ -378,7 +378,7 @@ def test_item_replace(roitemreplace):
     assert isinstance(ir.target_story, Story)
     assert ir.target_story.id == 'STORY2'
     assert ir.target_story.slug is None
-    assert ir.target_story.duration is None
+    assert ir.target_story.duration == 0
     assert ir.target_story.items is None
 
     assert isinstance(ir.target_item, Item)
@@ -401,7 +401,7 @@ def test_element_action_replace_story(roelementactionstoryreplace):
     assert isinstance(ea.target_story.xml, Element)
     assert ea.target_story.id == 'STORY1'
     assert ea.target_story.slug is None
-    assert ea.target_story.duration is None
+    assert ea.target_story.duration == 0
     assert ea.target_story.items is None
 
     assert isinstance(ea.source_story, Story)
@@ -426,7 +426,7 @@ def test_element_action_delete_story(roelementactionstorydelete):
     assert isinstance(ea.story.xml, Element)
     assert ea.story.id == 'STORY1'
     assert ea.story.slug is None
-    assert ea.story.duration is None
+    assert ea.story.duration == 0
     assert isinstance(ea.story.items, list)
     assert len(ea.story.items) == 0
 
@@ -442,14 +442,14 @@ def test_element_action_insert_story(roelementactionstoryinsert):
     assert isinstance(ea.target_story.xml, Element)
     assert ea.target_story.id == 'STORY2'
     assert ea.target_story.slug is None
-    assert ea.target_story.duration is None
+    assert ea.target_story.duration == 0
     assert ea.target_story.items is None
 
     assert isinstance(ea.source_story, Story)
     assert isinstance(ea.source_story.xml, Element)
     assert ea.source_story.id == 'STORYNEW'
     assert ea.source_story.slug == 'STORY NEW'
-    assert ea.source_story.duration is None
+    assert ea.source_story.duration == 0
     assert isinstance(ea.source_story.items, list)
     assert len(ea.source_story.items) == 1
     item = ea.source_story.items[0]
