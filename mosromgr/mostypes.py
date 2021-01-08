@@ -1388,9 +1388,11 @@ class RunningOrderControl(MosFile):
 
     @property
     def story(self):
+        "The story to which this roCtrl message relates"
         return Story(xml=self.base_tag)
 
     def merge(self, ro):
+        "Merge into the :class:`RunningOrder` object provided"
         story, story_index = find_child(parent=ro.base_tag, child_tag='story', id=self.story.id)
         if story is None:
             msg = f'{self.__class__.__name__} error in {self.message_id} - story not found'

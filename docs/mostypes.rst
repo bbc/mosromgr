@@ -266,6 +266,14 @@ RunningOrderEnd
     :inherited-members:
     :special-members: __add__, __lt__, __gt__, __str__
 
+RunningOrderControl
+-------------------
+
+.. autoclass:: RunningOrderControl()
+    :members:
+    :inherited-members:
+    :special-members: __add__, __lt__, __gt__, __str__
+
 Base classes
 ============
 
