@@ -119,12 +119,18 @@ class MosCollection:
             :class:`~mosromgr.exc.InvalidMosCollection` will be raised if one is
             not present. (keyword-only argument)
         """
-        logger.info("Making MosCollection from %s files", len(mos_file_paths))
-        mos_readers = sorted([
-            mr
-            for mr in [MosReader.from_file(mfp) for mfp in mos_file_paths]
-            if mr is not None
-        ])
+        if any("roCtrl" in filename for filename in mos_file_paths):
+            logger.info("Making MosCollection from %s files - roCtrl found so in filename order", len(mos_file_paths))
+            mos_readers = []
+            for mr in [MosReader.from_file(mfp) for mfp in mos_file_paths]:
+                mos_readers.append(mr)
+        else:
+            logger.info("Making MosCollection from %s files - messageID order", len(mos_file_paths))
+            mos_readers = sorted([
+                mr
+                for mr in [MosReader.from_file(mfp) for mfp in mos_file_paths]
+                if mr is not None
+            ])
         return cls(mos_readers, allow_incomplete=allow_incomplete)
 
     @classmethod
