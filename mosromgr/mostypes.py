@@ -1394,11 +1394,7 @@ class RunningOrderControl(MosFile):
     def merge(self, ro):
         "Merge into the :class:`RunningOrder` object provided"
         story, story_index = find_child(parent=ro.base_tag, child_tag='story', id=self.story.id)
-        if story is None:
-            msg = f'{self.__class__.__name__} error in {self.message_id} - story not found'
-            logger.warning(msg)
-            warnings.warn(msg, StoryNotFoundWarning)
-        else:
+        if story is not None:
             ro_story_payload = story.find('mosExternalMetadata').find('mosPayload')
             for new_tag in self.story.xml.find('mosExternalMetadata').find('mosPayload'):
                 if new_tag.text:
