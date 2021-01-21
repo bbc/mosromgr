@@ -10,7 +10,7 @@ from .exc import MosRoMgrException, MosInvalidXML, UnknownMosFileType, InvalidMo
 from . import __version__
 
 
-logger = logging.getLogger('mosromgr')
+logger = logging.getLogger('mosromgr.cli')
 logger.propagate = False
 
 
