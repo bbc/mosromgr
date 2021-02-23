@@ -557,7 +557,7 @@ class ItemInsert(MosFile):
         target_story_id = self.base_tag.find('storyID').text
         if not target_story_id:
             raise MosMergeError(
-                f'{self.__class__.__name__} error in {self.message_id} - no target storyID'
+                f"{self.__class__.__name__} error in {self.message_id} - no target storyID"
             )
         target_story, story_index = find_child(parent=ro.base_tag, child_tag='story', id=target_story_id)
         if not target_story:
@@ -565,14 +565,15 @@ class ItemInsert(MosFile):
                 f'{self.__class__.__name__} error in {self.message_id} - target story not found'
             )
         target_item_id = self.base_tag.find('itemID').text
+        item_index = None
         if target_item_id:
             target_item, item_index = find_child(parent=target_story, child_tag='item', id=target_item_id)
-        else:
+        if item_index is None:
             item_index = len(target_story.findall('item'))
         items = self.base_tag.findall('item')
         if not items:
             raise MosMergeError(
-                f'{self.__class__.__name__} error in {self.message_id} - no item to insert'
+                f"{self.__class__.__name__} error in {self.message_id} - no item to insert"
             )
         for item in items:
             insert_node(parent=target_story, node=item, index=item_index)
