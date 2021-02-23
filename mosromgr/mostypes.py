@@ -568,7 +568,7 @@ class ItemInsert(MosFile):
         if target_item_id:
             target_item, item_index = find_child(parent=target_story, child_tag='item', id=target_item_id)
         else:
-            item_index = len(target_story.findall('item)'))
+            item_index = len(target_story.findall('item'))
         items = self.base_tag.findall('item')
         if not items:
             raise MosMergeError(
