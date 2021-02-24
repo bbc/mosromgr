@@ -140,11 +140,13 @@ Contributors
 * `Owen Tourlamain`_
 * `Rob French`_
 * `Lucy MacGlashan`_
+* `Dave Bevan`_
 
 .. _Ben Nuttall: https://github.com/bennuttall
 .. _Owen Tourlamain: https://github.com/OwenTourlamain
 .. _Rob French: https://github.com/FrencR
 .. _Lucy MacGlashan: https://github.com/lannem
+.. _Dave Bevan: https://github.com/bevand10
 
 Licence
 =======
