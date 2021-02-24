@@ -271,7 +271,7 @@ class StorySend(MosFile):
         children = list(story_body)
         # move all children of <storyBody> to <story>
         for sb_index, child in enumerate(children, start=story_body_index):
-            insert_node(parent=ss_tag, node=child, index=story_body_index)
+            insert_node(parent=ss_tag, node=child, index=sb_index)
         remove_node(parent=ss_tag, node=story_body)
         return ss_tag
 
