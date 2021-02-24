@@ -693,10 +693,14 @@ class ItemMoveMultiple(MosFile):
         item_ids = self.base_tag.findall('itemID')
         target_item_id = item_ids[-1].text
         target_item_node, target_item_index = find_child(parent=target_story, child_tag='item', id=target_item_id)
-        source_item_ids = item_ids[:-1]
+        source_item_ids = [item.text for item in item_ids[:-1]]
 
         for item_id in source_item_ids:
-            source_item_node, source_item_index = find_child(parent=target_story, child_tag='item', id=item_id.text)
+            source_item_node, source_item_index = find_child(parent=target_story, child_tag='item', id=item_id)
+            if source_item_index is None:
+                raise MosMergeError(
+                    f'{self.__class__.__name__} error in {self.message_id} - source item not found'
+                )
             remove_node(parent=target_story, node=source_item_node)
             insert_node(parent=target_story, node=source_item_node, index=target_item_index)
             target_item_index += 1
