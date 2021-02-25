@@ -798,27 +798,25 @@ class ItemReplace(MosFile):
                 f'{self.__class__.__name__} error in {self.message_id} - no target storyID'
             )
         story_node, story_index = find_child(parent=ro.base_tag, child_tag='story', id=story_id)
-        if not story_node:
-            msg = f'{self.__class__.__name__} error in {self.message_id} - story not found'
+        if story_node is None:
+            msg = f"{self.__class__.__name__} error in {self.message_id} - story not found"
             logger.warning(msg)
             warnings.warn(msg, ItemNotFoundWarning)
             return ro
         item_id = self.base_tag.find('itemID').text
-        if not item_id:
+        if item_id is None:
             raise MosMergeError(
-                f'{self.__class__.__name__} error in {self.message_id} - no target itemID'
+                f"{self.__class__.__name__} error in {self.message_id} - no target itemID"
             )
         item_node, item_index = find_child(parent=story_node, child_tag='item', id=item_id)
+        if item_node is None:
+            raise MosMergeError(
+                f"{self.__class__.__name__} error in {self.message_id} - item not found"
+            )
         remove_node(parent=story_node, node=item_node)
         items = self.base_tag.findall('item')
-        for item in items:
-            if not item:
-                msg = f'{self.__class__.__name__} error in {self.message_id} - item not found'
-                logger.warning(msg)
-                warnings.warn(msg, ItemNotFoundWarning)
-            else:
-                insert_node(parent=story_node, node=item, index=item_index)
-                item_index += 1
+        for i, item in enumerate(items, start=item_index):
+            insert_node(parent=story_node, node=item, index=i)
         return ro
 
 
