@@ -682,24 +682,28 @@ class ItemMoveMultiple(MosFile):
         target_story_id = self.base_tag.find('storyID').text
         if not target_story_id:
             raise MosMergeError(
-                f'{self.__class__.__name__} error in {self.message_id} - no target storyID'
+                f"{self.__class__.__name__} error in {self.message_id} - no target storyID"
             )
         target_story, story_index = find_child(parent=ro.base_tag, child_tag='story', id=target_story_id)
         if target_story is None:
             raise MosMergeError(
-                f'{self.__class__.__name__} error in {self.message_id} - target story not found'
+                f"{self.__class__.__name__} error in {self.message_id} - target story not found"
             )
 
         item_ids = self.base_tag.findall('itemID')
         target_item_id = item_ids[-1].text
         target_item_node, target_item_index = find_child(parent=target_story, child_tag='item', id=target_item_id)
+        if target_item_node is None:
+            raise MosMergeError(
+                f"{self.__class__.__name__} error in {self.message_id} - target item not found"
+            )
         source_item_ids = [item.text for item in item_ids[:-1]]
 
         for item_id in source_item_ids:
             source_item_node, source_item_index = find_child(parent=target_story, child_tag='item', id=item_id)
             if source_item_index is None:
                 raise MosMergeError(
-                    f'{self.__class__.__name__} error in {self.message_id} - source item not found'
+                    f"{self.__class__.__name__} error in {self.message_id} - source item not found"
                 )
             remove_node(parent=target_story, node=source_item_node)
             insert_node(parent=target_story, node=source_item_node, index=target_item_index)
