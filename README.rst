@@ -2,7 +2,7 @@
 mosromgr
 ========
 
-Python client for managing `MOS`_ running orders. Pronounced *mos-ro-manager*.
+Python library for managing `MOS`_ running orders. Pronounced *mos-ro-manager*.
 
 .. _MOS: http://mosprotocol.com/
 
@@ -100,14 +100,24 @@ partially complete programme::
     with open('final.mos.xml', 'w') as f:
         f.write(str(mc))
 
+Issues and questions
+====================
+
+Questions can be asked on the `discussion board`_, and issues can be raised
+on the `issue tracker`_.
+
+.. _discussion board: https://github.com/bbc/mosromgr/discussions
+.. _issue tracker: https://github.com/bbc/mosromgr/issues
+
 Contributing
 ============
 
-Source code can be found on GitHub at https://github.com/bbc/mosromgr which
-also hosts the `issue tracker`_ and `contributing guidelines`_.
+Source code can be found on GitHub at `github.com/bbc/mosromgr`_.
 
-.. _issue tracker: https://github.com/bbc/mosromgr/issues
-.. _contributing guidelines: https://github.com/bbc/mosromgr/blob/main/CONTRIBUTING.md
+Contributions are welcome. Please refer to the `contributing guidelines`_.
+
+.. _github.com/bbc/mosromgr: https://github.com/bbc/mosromgr
+.. _contributing guidelines: https://github.com/bbc/mosromgr/blob/main/.github/CONTRIBUTING.md
 
 Contributors
 ============
@@ -134,6 +144,10 @@ Licensed under the `Apache License, Version 2.0`_.
 Contact
 =======
 
-Please contact `BBC News Labs team`_ if you want to get in touch.
+To get in touch with the maintainers, please contact the `BBC News Labs team`_.
 
 .. _BBC News Labs team: mailto:BBCNewsLabsTeam@bbc.co.uk
+
+.. image:: images/bbcnewslabs.*
+    :target: https://bbcnewslabs.co.uk/
+    :align: center
