@@ -1,3 +1,7 @@
+# mosromgr: Python library for managing MOS running orders
+# Copyright 2021 BBC
+# SPDX-License-Identifier: Apache-2.0
+
 import pytest
 from mock import patch
 import warnings

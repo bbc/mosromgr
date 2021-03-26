@@ -1,3 +1,7 @@
+.. mosromgr: Python library for managing MOS running orders
+.. Copyright 2021 BBC
+.. SPDX-License-Identifier: Apache-2.0
+
 ========
 mosromgr
 ========
@@ -151,7 +155,9 @@ Contributors
 Licence
 =======
 
-TBC
+Licensed under the `Apache License, Version 2.0`_.
+
+.. _Apache License, Version 2.0: https://opensource.org/licenses/Apache-2.0
 
 Contact
 =======
