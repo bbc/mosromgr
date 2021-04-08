@@ -148,6 +148,6 @@ To get in touch with the maintainers, please contact the `BBC News Labs team`_.
 
 .. _BBC News Labs team: mailto:BBCNewsLabsTeam@bbc.co.uk
 
-.. image:: images/bbcnewslabs.*
+.. image:: docs/images/bbcnewslabs.png
     :target: https://bbcnewslabs.co.uk/
     :align: center

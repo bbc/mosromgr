@@ -10,7 +10,7 @@ Python library for managing `MOS`_ running orders. Pronounced *mos-ro-manager*.
 
 .. _MOS: http://mosprotocol.com/
 
-.. image:: images/mos.*
+.. image:: images/mos.jpg
     :target: http://mosprotocol.com/
     :align: center
 
