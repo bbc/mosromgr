@@ -2,15 +2,11 @@
 # Copyright 2021 BBC
 # SPDX-License-Identifier: Apache-2.0
 
-from collections import namedtuple
 import logging
-import warnings
 
 from .mostypes import MosFile, RunningOrder, RunningOrderEnd
 from .utils import s3
-from .exc import (
-    InvalidMosCollection, MosMergeError, MosInvalidXML, UnknownMosFileType
-)
+from .exc import InvalidMosCollection
 
 
 logger = logging.getLogger('mosromgr.moscollection')

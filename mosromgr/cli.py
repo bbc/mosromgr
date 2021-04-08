@@ -2,14 +2,12 @@
 # Copyright 2021 BBC
 # SPDX-License-Identifier: Apache-2.0
 
-import os
 import sys
 import argparse
 import logging
 
 from .mostypes import MosFile, RunningOrder
 from .moscollection import MosCollection
-from .utils import s3
 from .exc import MosRoMgrException, MosInvalidXML, UnknownMosFileType, InvalidMosCollection
 from . import __version__
 
