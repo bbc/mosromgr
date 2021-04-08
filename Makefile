@@ -41,8 +41,6 @@ test: lint
 
 doc-graphs:
 	python docs/images/class_hierarchy.py
-	dot -Tpng docs/images/class_hierarchy.dot -o docs/images/class_hierarchy.png
-	dot -Tsvg docs/images/class_hierarchy.dot -o docs/images/class_hierarchy.svg
 
 doc: doc-graphs
 	rm -rf docs/build/
