@@ -27,6 +27,11 @@ This library was developed by the `BBC News Labs`_ team.
 
 .. _BBC News Labs: https://bbcnewslabs.co.uk/
 
+.. warning::
+    Note that the library is currently in beta. The API and CLI are not yet
+    stable and may change. Once the library reaches v1.0, it will be considered
+    stable.
+
 Usage
 =====
 
@@ -111,7 +116,6 @@ Table of Contents
 
 .. toctree::
     :maxdepth: 1
-    :numbered:
 
     mostypes
     moselements
@@ -119,6 +123,8 @@ Table of Contents
     cli
     utils
     exceptions
+    changelog
+    development
 
 Indices and tables
 ==================
