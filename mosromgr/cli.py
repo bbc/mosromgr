@@ -5,6 +5,7 @@
 import sys
 import argparse
 import logging
+import warnings
 
 from .mostypes import MosFile, RunningOrder
 from .moscollection import MosCollection
@@ -14,6 +15,7 @@ from . import __version__
 
 logger = logging.getLogger('mosromgr.cli')
 logger.propagate = False
+warnings.filterwarnings('ignore')
 
 
 class CLI:
@@ -77,14 +79,14 @@ class CLI:
             help=("Detect the MOS type of one or more files"))
         detect_cmd.add_argument(
             "files", metavar="files", nargs='+',
-            help=("The MOS file to detect")
+            help=("The MOS files to detect")
         )
         detect_cmd.set_defaults(func=self.do_detect)
 
         inspect_cmd = commands.add_parser(
             "inspect",
-            description=("Inspect the contents of one or more MOS files"),
-            help=("Inspect the contents of one or more MOS files"))
+            description=("Inspect the contents of a roCreate file"),
+            help=("Inspect the contents of a roCreate file"))
         inspect_cmd.add_argument(
             "-f", "--file", metavar="file",
             help=("The roCreate file to inspect")
@@ -92,10 +94,6 @@ class CLI:
         inspect_cmd.add_argument(
             "-b", "--bucket-name", metavar="bucket",
             help=("S3 bucket name containing the roCreate file")
-        )
-        inspect_cmd.add_argument(
-            "-p", "--prefix", metavar="prefix",
-            help=("The file prefix for the roCreate file in the S3 bucket")
         )
         inspect_cmd.add_argument(
             "-k", "--key", metavar="key",
@@ -139,7 +137,7 @@ class CLI:
             help=("Merge the provided MOS files"))
         merge_cmd.add_argument(
             "-f", "--files", metavar="files", nargs='*',
-            help=("The MOS file to inspect")
+            help=("The MOS files to merge")
         )
         merge_cmd.add_argument(
             "-b", "--bucket-name", metavar="bucket",
@@ -166,17 +164,17 @@ class CLI:
         try:
             return MosFile.from_file(mos_file_path)
         except MosInvalidXML as e:
-            sys.stdout.write(f"{mos_file_path}: Invalid XML\n")
+            sys.stderr.write(f"{mos_file_path}: Invalid XML\n")
         except UnknownMosFileType as e:
-            sys.stdout.write(f"{mos_file_path}: Unknown MOS file type\n")
+            sys.stderr.write(f"{mos_file_path}: Unknown MOS file type\n")
 
     def get_mos_object_from_s3(self, bucket, file_key):
         try:
             return MosFile.from_s3(bucket_name=bucket, mos_file_key=file_key)
         except MosInvalidXML as e:
-            sys.stdout.write(f"{file_key}: Invalid XML\n")
+            sys.stderr.write(f"{file_key}: Invalid XML\n")
         except UnknownMosFileType as e:
-            sys.stdout.write(f"{file_key}: Unknown MOS file type\n")
+            sys.stderr.write(f"{file_key}: Unknown MOS file type\n")
 
     def do_help(self):
         if self._args.cmd:
@@ -198,20 +196,19 @@ class CLI:
             mos_file_path = self._args.file
             mo = self.get_mos_object_from_file(mos_file_path)
         elif self._args.bucket_name:
-            if self._args.prefix and self._args.key:
-                bucket = self._args.bucket_name
-                prefix = self._args.prefix
-                key = self._args.key
-                file_key = file_key = f"{prefix}/{key}"
-                mo = self.get_mos_object_from_s3(bucket=bucket, file_key=file_key)
+            if self._args.key:
+                mo = self.get_mos_object_from_s3(
+                    bucket=self._args.bucket_name,
+                    file_key=self._args.key,
+                )
             else:
-                sys.stderr.write("Prefix and file key must be provided with bucket name\n")
+                sys.stderr.write("File key must be provided with bucket name\n")
                 return 2
         else:
-            sys.stderr.write("Files or bucket name, prefix and file key must be provided\n")
+            sys.stderr.write("Files or bucket name and file key must be provided\n")
             return 2
 
-        if not isinstance(mo, RunningOrder):
+        if type(mo) != RunningOrder:
             sys.stderr.write("Error: file must be a roCreate\n")
             return 2
 
@@ -223,6 +220,9 @@ class CLI:
         if self._args.duration:
             mins, secs = divmod(mo.duration, 60)
             hrs, mins = divmod(mins, 60)
+            hrs = int(hrs)
+            mins = int(mins)
+            secs = int(secs)
             print(f"Duration: {hrs}:{mins:02d}:{secs:02d}")
         print()
         if self._args.stories:

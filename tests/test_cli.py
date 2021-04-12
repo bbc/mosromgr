@@ -55,7 +55,6 @@ def test_inspect():
     args = main.parser.parse_args(['inspect', '-f', 'roCreate.mos.xml'])
     assert args.file == 'roCreate.mos.xml'
     assert not args.bucket_name
-    assert not args.prefix
     assert not args.key
     assert not args.start_time
     assert not args.duration
@@ -64,10 +63,9 @@ def test_inspect():
     assert not args.notes
 
     args = main.parser.parse_args(
-        ['inspect', '-b', 'bucket', '-p', 'prefix', '-k', 'key'])
+        ['inspect', '-b', 'bucket', '-k', 'key'])
     assert not args.file
     assert args.bucket_name == 'bucket'
-    assert args.prefix == 'prefix'
     assert args.key == 'key'
     assert not args.start_time
     assert not args.duration
@@ -79,7 +77,6 @@ def test_inspect():
         ['inspect', '-f', 'roCreate.mos.xml', '-t', '-d', '-s', '-i', '-n'])
     assert args.file == 'roCreate.mos.xml'
     assert not args.bucket_name
-    assert not args.prefix
     assert not args.key
     assert args.start_time
     assert args.duration
@@ -92,7 +89,6 @@ def test_inspect():
         '--duration', '--stories', '--items', '--notes'])
     assert args.file == 'roCreate.mos.xml'
     assert not args.bucket_name
-    assert not args.prefix
     assert not args.key
     assert args.start_time
     assert args.duration
