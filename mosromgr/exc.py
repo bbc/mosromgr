@@ -36,3 +36,7 @@ class ItemNotFoundWarning(MosRoMgrWarning):
 
 class StoryNotFoundWarning(MosRoMgrWarning):
     "Warning raised when a story cannot be found during a :class:`~mosromgr.mostypes.MosFile` merge"
+
+
+class DuplicateStoryWarning(MosRoMgrWarning):
+    "Warning raised when a story being added is already found during a :class:`~mosromgr.mostypes.EAStoryInsert` merge"

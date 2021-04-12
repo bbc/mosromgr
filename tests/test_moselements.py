@@ -449,14 +449,16 @@ def test_element_action_insert_story(roelementactionstoryinsert):
     assert ea.target_story.duration == 0
     assert ea.target_story.items is None
 
-    assert isinstance(ea.source_story, Story)
-    assert isinstance(ea.source_story.xml, Element)
-    assert ea.source_story.id == 'STORYNEW'
-    assert ea.source_story.slug == 'STORY NEW'
-    assert ea.source_story.duration == 0
-    assert isinstance(ea.source_story.items, list)
-    assert len(ea.source_story.items) == 1
-    item = ea.source_story.items[0]
+    assert isinstance(ea.source_stories, list)
+    source_story = ea.source_stories[0]
+    assert isinstance(source_story, Story)
+    assert isinstance(source_story.xml, Element)
+    assert source_story.id == 'STORYNEW'
+    assert source_story.slug == 'STORY NEW'
+    assert source_story.duration == 0
+    assert isinstance(source_story.items, list)
+    assert len(source_story.items) == 1
+    item = source_story.items[0]
     assert item.id == 'ITEMNEW'
     assert item.slug == 'ITEM NEW'
 

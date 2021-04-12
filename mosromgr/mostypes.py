@@ -15,7 +15,7 @@ from .utils import s3
 from .moselements import Story, Item
 from .exc import (
     MosInvalidXML, UnknownMosFileType, MosCompletedMergeError, MosMergeError,
-    ItemNotFoundWarning, StoryNotFoundWarning
+    ItemNotFoundWarning, StoryNotFoundWarning, DuplicateStoryWarning
 )
 
 
@@ -41,7 +41,7 @@ class MosFile:
         """
         try:
             xml = ET.parse(mos_file_path).getroot()
-        except ET.ParseError as e:
+        except (ET.ParseError, IsADirectoryError) as e:
             raise MosInvalidXML from e
         if cls == MosFile:
             return cls._classify(xml)
@@ -1116,9 +1116,12 @@ class EAStoryInsert(ElementAction):
         return Story(self.base_tag.find('element_target'), unknown_items=True)
 
     @property
-    def source_story(self):
-        "The :class:`~mosromgr.moselements.Story` object to be inserted"
-        return Story(self.base_tag.find('element_source').find('story'))
+    def source_stories(self):
+        "The :class:`~mosromgr.moselements.Story` objects to be inserted"
+        return [
+            Story(story_tag)
+            for story_tag in self.base_tag.find('element_source').findall('story')
+        ]
 
     def merge(self, ro):
         "Merge into the :class:`RunningOrder` object provided"
@@ -1129,13 +1132,20 @@ class EAStoryInsert(ElementAction):
         story, story_index = find_child(parent=ro.base_tag, child_tag='story', id=target_story_id)
         if not story:
             raise MosMergeError(
-                f'{self.__class__.__name__} error in {self.message_id} - story not found'
+                f"{self.__class__.__name__} error in {self.message_id} - target story not found"
             )
         if not new_stories:
             raise MosMergeError(
-                f'{self.__class__.__name__} error in {self.message_id} - story not found'
+                f"{self.__class__.__name__} error in {self.message_id} - no source stories found"
             )
+        ro_story_ids = {story.id for story in ro.stories}
         for new_story in new_stories:
+            new_story_id = new_story.find('storyID').text
+            if new_story_id in ro_story_ids:
+                msg = f"{self.__class__.__name__} error in {self.message_id} - story already found in running order"
+                logger.warning(msg)
+                warnings.warn(msg, DuplicateStoryWarning)
+                continue
             insert_node(parent=ro.base_tag, node=new_story, index=story_index)
             story_index += 1
         return ro
