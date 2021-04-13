@@ -7,38 +7,6 @@ import os
 from datetime import datetime
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../'))
 from mosromgr import __version__
-import sphinx_rtd_theme
-
-# Mock out certain modules while building documentation
-class Mock(object):
-    __all__ = []
-
-    def __init__(self, *args, **kw):
-        pass
-
-    def __call__(self, *args, **kw):
-        return Mock()
-
-    def __mul__(self, other):
-        return Mock()
-
-    def __and__(self, other):
-        return Mock()
-
-    def __bool__(self):
-        return False
-
-    def __nonzero__(self):
-        return False
-
-    @classmethod
-    def __getattr__(cls, name):
-        if name in ('__file__', '__path__'):
-            return '/dev/null'
-        else:
-            return Mock()
-
-sys.modules['boto3'] = Mock()
 
 # -- General configuration ------------------------------------------------
 
@@ -54,7 +22,7 @@ release = __version__
 #language = None
 #today_fmt = '%B %d, %Y'
 exclude_patterns = ['_build']
-highlight_language='python3'
+highlight_language = 'python3'
 #default_role = None
 #add_function_parentheses = True
 #add_module_names = True
@@ -62,6 +30,7 @@ highlight_language='python3'
 pygments_style = 'sphinx'
 #modindex_common_prefix = []
 #keep_warnings = False
+autodoc_mock_imports = ['boto3', 'xmltodict', 'dateutil']
 
 # -- Autodoc configuration ------------------------------------------------
 
