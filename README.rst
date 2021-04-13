@@ -6,7 +6,7 @@ Python library for managing `MOS`_ running orders. Pronounced *mos-ro-manager*.
 
 .. _MOS: http://mosprotocol.com/
 
-.. image:: docs/images/mos.jpg
+.. image:: https://mosromgr.readthedocs.io/en/latest/_images/mos.jpg
     :target: http://mosprotocol.com/
     :align: center
 
@@ -157,6 +157,6 @@ Contact
 To get in touch with the maintainers, please contact the BBC News Labs team:
 bbcnewslabsteam@bbc.co.uk
 
-.. image:: docs/images/bbcnewslabs.png
+.. image:: https://mosromgr.readthedocs.io/en/latest/_images/bbcnewslabs.png
     :target: https://bbcnewslabs.co.uk/
     :align: center
