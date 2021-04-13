@@ -11,6 +11,11 @@ Changelog
     stable and may change. Once the library reaches v1.0, it will be considered
     stable. Please consider giving :doc:`feedback` to help stabilise the API.
 
+Release 0.8.1 (2021-04-14)
+==========================
+
+- Fixup release
+
 Release 0.8.0 (2021-04-13)
 ==========================
 
