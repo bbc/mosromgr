@@ -389,9 +389,12 @@ def test_item_replace(roitemreplace):
     assert ir.target_item.id == 'ITEM21'
     assert ir.target_item.slug is None
 
-    assert isinstance(ir.source_item, Item)
-    assert ir.source_item.id == 'ITEM21'
-    assert ir.source_item.slug == 'NEW ITEM 21'
+    assert isinstance(ir.source_items, list)
+    source_item = ir.source_items[0]
+    assert isinstance(source_item, Item)
+    source_item = ir.source_items[0]
+    assert source_item.id == 'ITEM21'
+    assert source_item.slug == 'NEW ITEM 21'
 
 def test_element_action_replace_story(roelementactionstoryreplace):
     """
@@ -426,13 +429,15 @@ def test_element_action_delete_story(roelementactionstorydelete):
     """
     ea = EAStoryDelete.from_file(roelementactionstorydelete)
     assert isinstance(ea.xml, Element)
-    assert isinstance(ea.story, Story)
-    assert isinstance(ea.story.xml, Element)
-    assert ea.story.id == 'STORY1'
-    assert ea.story.slug is None
-    assert ea.story.duration == 0
-    assert isinstance(ea.story.items, list)
-    assert len(ea.story.items) == 0
+    assert isinstance(ea.stories, list)
+    story = ea.stories[0]
+    assert isinstance(story, Story)
+    assert isinstance(story.xml, Element)
+    assert story.id == 'STORY1'
+    assert story.slug is None
+    assert story.duration == 0
+    assert isinstance(story.items, list)
+    assert len(story.items) == 0
 
 def test_element_action_insert_story(roelementactionstoryinsert):
     """
@@ -495,11 +500,13 @@ def test_element_action_move_story(roelementactionstorymove):
     assert ea.target_story.id == 'STORY1'
     assert ea.target_story.items is None
 
-    assert isinstance(ea.source_story, Story)
-    assert isinstance(ea.source_story.xml, Element)
-    assert ea.source_story.id == 'STORY3'
-    assert isinstance(ea.source_story.items, list)
-    assert len(ea.source_story.items) == 0
+    assert isinstance(ea.source_stories, list)
+    source_story = ea.source_stories[0]
+    assert isinstance(source_story, Story)
+    assert isinstance(source_story.xml, Element)
+    assert source_story.id == 'STORY3'
+    assert isinstance(source_story.items, list)
+    assert len(source_story.items) == 0
 
 def test_element_action_replace_item(roelementactionitemreplace):
     """
@@ -517,9 +524,11 @@ def test_element_action_replace_item(roelementactionitemreplace):
     assert ea.target_item.id == 'ITEM21'
     assert ea.target_item.slug is None
 
-    assert isinstance(ea.source_item, Item)
-    assert ea.source_item.id == 'ITEM21'
-    assert ea.source_item.slug == 'NEW ITEM 21'
+    assert isinstance(ea.source_items, list)
+    source_item = ea.source_items[0]
+    assert isinstance(source_item, Item)
+    assert source_item.id == 'ITEM21'
+    assert source_item.slug == 'NEW ITEM 21'
 
 def test_element_action_delete_item(roelementactionitemdelete):
     """
@@ -533,9 +542,11 @@ def test_element_action_delete_item(roelementactionitemdelete):
     assert ea.target_story.slug is None
     assert ea.target_story.items is None
 
-    assert isinstance(ea.source_item, Item)
-    assert ea.source_item.id == 'ITEM1'
-    assert ea.source_item.slug is None
+    assert isinstance(ea.source_items, list)
+    source_item = ea.source_items[0]
+    assert isinstance(source_item, Item)
+    assert source_item.id == 'ITEM1'
+    assert source_item.slug is None
 
 def test_element_action_insert_item(roelementactioniteminsert):
     """
@@ -553,9 +564,11 @@ def test_element_action_insert_item(roelementactioniteminsert):
     assert ea.target_item.id == 'ITEM2'
     assert ea.target_item.slug is None
 
-    assert isinstance(ea.source_item, Item)
-    assert ea.source_item.id == 'ITEMNEW'
-    assert ea.source_item.slug == 'ITEM NEW'
+    assert isinstance(ea.source_items, list)
+    source_item = ea.source_items[0]
+    assert isinstance(source_item, Item)
+    assert source_item.id == 'ITEMNEW'
+    assert source_item.slug == 'ITEM NEW'
 
 def test_element_action_swap_item(roelementactionitemswap):
     """
@@ -584,9 +597,11 @@ def test_element_action_move_item(roelementactionitemmove):
     assert ea.target_story.slug is None
     assert ea.target_story.items is None
 
-    assert isinstance(ea.target_item, Item)
-    assert ea.target_item.id == 'ITEM1'
-    assert ea.target_item.slug is None
+    assert isinstance(ea.target_items, list)
+    target_item = ea.target_items[0]
+    assert isinstance(target_item, Item)
+    assert target_item.id == 'ITEM1'
+    assert target_item.slug is None
 
     assert isinstance(ea.source_item, Item)
     assert ea.source_item.id == 'ITEM3'
