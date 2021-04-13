@@ -20,7 +20,7 @@ order, and providing a "completed" programme including all additions and changes
 made between the first message (``roCreate``) and the last (``roDelete``).
 
 This can be used as a library, using the utilities provided in the *mosromgr*
-module, and the command line command :ref:`cli-mosromgr` can be used to process
+module, and the command line command :doc:`cli` can be used to process
 either a directory of MOS files, or a folder within an S3 bucket.
 
 This library was developed by the `BBC News Labs`_ team.
@@ -30,10 +30,10 @@ This library was developed by the `BBC News Labs`_ team.
 .. warning::
     Note that the library is currently in beta. The API and CLI are not yet
     stable and may change. Once the library reaches v1.0, it will be considered
-    stable.
+    stable. Please consider giving :doc:`feedback` to help stablise the API.
 
-Usage
-=====
+Example Usage
+=============
 
 Command line
 ------------
@@ -111,23 +111,36 @@ MOS files within a complete or partially complete programme::
     with open('final.mos.xml', 'w') as f:
         f.write(str(mc))
 
-Table of Contents
-=================
+Documentation
+=============
+
+Comprehensive documentation is provided at https://apps.test.newslabs.co/docs/mosromgr/
+
+This documentation follows the `Diátaxis`_ system, so is split between four
+modes of documentation: tutorials, how-to guides, technical reference and
+explanation.
+
+.. _Diátaxis: https://diataxis.fr/
 
 .. toctree::
     :maxdepth: 1
 
-    mostypes
-    moselements
-    moscollection
+    getting_started
+    guide
+    howto
+    api_mostypes
+    api_moselements
+    api_moscollection
+    api_utils
+    api_exceptions
     cli
-    utils
-    exceptions
+    uses
     changelog
     development
+    feedback
 
 Indices and tables
-==================
+-------------------
 
 * :ref:`genindex`
 * :ref:`modindex`
@@ -177,9 +190,8 @@ Licensed under the `Apache License, Version 2.0`_.
 Contact
 =======
 
-To get in touch with the maintainers, please contact the `BBC News Labs team`_.
-
-.. _BBC News Labs team: mailto:BBCNewsLabsTeam@bbc.co.uk
+To get in touch with the maintainers, please contact the BBC News Labs team:
+bbcnewslabsteam@bbc.co.uk
 
 .. image:: images/bbcnewslabs.png
     :target: https://bbcnewslabs.co.uk/

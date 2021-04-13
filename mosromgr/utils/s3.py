@@ -26,11 +26,13 @@ class S3:
 s3 = S3()
 
 
-def get_mos_files(bucket_name, prefix, *, suffix='.mos.xml'):
+def get_mos_files(bucket_name, prefix=None, *, suffix='.mos.xml'):
     """
     Retrieve MOS files from given S3 bucket in location defined by *prefix*.
     Returns a list of file keys.
     """
+    if prefix is None:
+        prefix = ''
     paginator = s3.client.get_paginator('list_objects')
     files = []
     for page in paginator.paginate(Bucket=bucket_name, Prefix=prefix):

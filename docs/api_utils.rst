@@ -2,9 +2,9 @@
 .. Copyright 2021 BBC
 .. SPDX-License-Identifier: Apache-2.0
 
-=========
-Utilities
-=========
+===============
+API - Utilities
+===============
 
 .. module:: mosromgr.utils
 
@@ -14,6 +14,10 @@ largely for internal use.
 The various utilities are typically imported like so::
 
     from mosromgr.utils import s3
+
+.. warning::
+    This part of the module should not be considered part of the stable API and
+    is subject to backwards-incompatible changes.
 
 S3
 ==

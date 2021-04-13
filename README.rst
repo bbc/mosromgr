@@ -100,6 +100,16 @@ partially complete programme::
     with open('final.mos.xml', 'w') as f:
         f.write(str(mc))
 
+Documentation
+=============
+
+Comprehensive documentation is provided at https://apps.test.newslabs.co/docs/mosromgr/
+
+The documentation follows the `Diátaxis`_ system, so is split between four modes
+of documentation: tutorials, how-to guides, technical reference and explanation.
+
+.. _Diátaxis: https://diataxis.fr/adoption/
+
 Issues and questions
 ====================
 
@@ -144,9 +154,8 @@ Licensed under the `Apache License, Version 2.0`_.
 Contact
 =======
 
-To get in touch with the maintainers, please contact the `BBC News Labs team`_.
-
-.. _BBC News Labs team: mailto:BBCNewsLabsTeam@bbc.co.uk
+To get in touch with the maintainers, please contact the BBC News Labs team:
+bbcnewslabsteam@bbc.co.uk
 
 .. image:: docs/images/bbcnewslabs.png
     :target: https://bbcnewslabs.co.uk/

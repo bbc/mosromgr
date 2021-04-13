@@ -97,3 +97,4 @@ html_static_path = ['_static']
 #html_use_opensearch = ''
 #html_file_suffix = None
 htmlhelp_basename = '%sdoc' % project
+nitpicky = True

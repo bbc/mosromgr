@@ -66,7 +66,7 @@ with verbose output (``-vv``), and stop at the first failure (``-x``).
 Documentation
 =============
 
-The documentation is built using `sphinx`_ using the `diataxis` framework.
+The documentation is built using `sphinx`_ using the `diataxis`_ framework.
 
 .. _sphinx: https://www.sphinx-doc.org/
 .. _diataxis: https://diataxis.fr/
@@ -86,3 +86,6 @@ located in ``docs/build/html``. Serve them with the command:
 .. code-block:: console
 
     $ make doc-serve
+
+You'll now be able to open the docs on your browser at
+``http://localhost:8000/``.

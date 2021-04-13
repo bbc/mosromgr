@@ -154,7 +154,7 @@ class MosCollection:
         return cls(mos_readers, allow_incomplete=allow_incomplete)
 
     @classmethod
-    def from_s3(cls, *, bucket_name, prefix, allow_incomplete=False):
+    def from_s3(cls, *, bucket_name, prefix, suffix='.mos.xml', allow_incomplete=False):
         """
         Construct from a list of MOS files in an S3 bucket
 
@@ -168,6 +168,12 @@ class MosCollection:
         :param prefix:
             The prefix of the file keys in the S3 bucket (keyword-only argument)
 
+        :type suffix:
+            str
+        :param suffix:
+            The suffix of the file keys in the S3 bucket (keyword-only argument).
+            Defaults to '.mos.xml'.
+
         :type allow_incomplete:
             bool
         :param allow_incomplete:
@@ -176,7 +182,11 @@ class MosCollection:
             :class:`~mosromgr.exc.InvalidMosCollection` will be raised if one is
             not present. (keyword-only argument)
         """
-        mos_file_keys = s3.get_mos_files(bucket_name=bucket_name, prefix=prefix)
+        mos_file_keys = s3.get_mos_files(
+            bucket_name=bucket_name,
+            prefix=prefix,
+            suffix=suffix,
+        )
         logger.info("Making MosCollection from %s S3 files", len(mos_file_keys))
         mos_readers = sorted([
             mr
