@@ -30,7 +30,7 @@ This library was developed by the `BBC News Labs`_ team.
 .. warning::
     Note that the library is currently in beta. The API and CLI are not yet
     stable and may change. Once the library reaches v1.0, it will be considered
-    stable. Please consider giving :doc:`feedback` to help stablise the API.
+    stable. Please consider giving :doc:`feedback` to help stabilise the API.
 
 Example Usage
 =============

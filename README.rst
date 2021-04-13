@@ -103,7 +103,7 @@ partially complete programme::
 Documentation
 =============
 
-Comprehensive documentation is provided at https://apps.test.newslabs.co/docs/mosromgr/
+Comprehensive documentation is provided at https://mosromgr.readthedocs.io/
 
 The documentation follows the `Diátaxis`_ system, so is split between four modes
 of documentation: tutorials, how-to guides, technical reference and explanation.

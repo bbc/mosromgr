@@ -9,14 +9,17 @@ Changelog
 .. warning::
     Note that the library is currently in beta. The API and CLI are not yet
     stable and may change. Once the library reaches v1.0, it will be considered
-    stable. Please consider giving :doc:`feedback` to help stablise the API.
+    stable. Please consider giving :doc:`feedback` to help stabilise the API.
 
-Release 0.8.0 (TBC)
-===================
+Release 0.8.0 (2021-04-13)
+==========================
 
 - Improved validation and error handling when merging various
   :class:`~mosromgr.mostypes.MosFile` objects
 - Added more arguments to CLI commands
+- Corrected some singular :class:`~mosromgr.mostypes.MosFile`
+  :doc:`api_moselements` properties that should have been lists (e.g.
+  ``source_story`` should have been ``source_stories``)
 
 Release 0.7.0 (2021-01-08)
 ==========================
