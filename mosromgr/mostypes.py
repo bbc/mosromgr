@@ -26,6 +26,8 @@ logging.basicConfig(level=logging.INFO)
 class MosFile:
     "Base class for all MOS files"
     def __init__(self, xml):
+        if type(xml) != ET.Element:
+            raise TypeError("MosFile objects should be constructed using from_ classmethods")
         self._xml = xml
         self._base_tag = None
 
@@ -41,8 +43,8 @@ class MosFile:
         """
         try:
             xml = ET.parse(mos_file_path).getroot()
-        except (ET.ParseError, IsADirectoryError) as e:
-            raise MosInvalidXML from e
+        except ET.ParseError as e:
+            raise MosInvalidXML(e) from e
         if cls == MosFile:
             return cls._classify(xml)
         return cls(xml)
@@ -60,7 +62,7 @@ class MosFile:
         try:
             xml = ET.fromstring(mos_xml_string)
         except ET.ParseError as e:
-            raise MosInvalidXML from e
+            raise MosInvalidXML(e) from e
         if cls == MosFile:
             return cls._classify(xml)
         return cls(xml)
