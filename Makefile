@@ -4,7 +4,6 @@
 NAME=mosromgr
 DOC_HTML=docs/build/html
 DOC_TREES=docs/build/doctrees
-DOC_S3=s3://apps.test.newslabs.co.documentroot/docs/mosromgr/
 
 # Default target
 all:
@@ -17,13 +16,13 @@ all:
 	@echo "make doc-graphs - Generate graphviz graphs"
 	@echo "make doc - Build the docs as HTML"
 	@echo "make doc-serve - Serve the docs locally"
-	@echo "make doc-deploy - Deploy the docs to S3"
 
 install:
 	pip install .
 
 develop:
 	pip install -e .[test,doc]
+	pip install twine
 	@echo "To build the docs you will also need to install graphviz using apt/brew"
 
 build: clean
@@ -49,7 +48,4 @@ doc: doc-graphs
 doc-serve:
 	python -m http.server -d $(DOC_HTML)
 
-doc-deploy:
-	aws s3 sync --delete $(DOC_HTML) $(DOC_S3)
-
-.PHONY: all install develop build clean lint test doc-graphs doc doc-serve doc-deploy
+.PHONY: all install develop build clean lint test doc-graphs doc doc-serve
