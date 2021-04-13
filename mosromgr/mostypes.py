@@ -169,6 +169,9 @@ class RunningOrder(MosFile):
     A ``RunningOrder`` object is created from a ``roCreate`` MOS file and can be
     constructed using classmethods :meth:`from_file`, :meth:`from_string` or
     :meth:`from_s3`.
+
+    *Specification: Create Running Order*
+    http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-32
     """
     def __add__(self, other):
         """
@@ -249,6 +252,9 @@ class StorySend(MosFile):
     ``StorySend`` objects can be merged with a :class:`RunningOrder` by using
     the ``+`` operator. This behaviour is defined in the :meth:`merge` method in
     this class.
+
+    *Specification: Send Story information, including Body of the Story*
+    http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-49
     """
     @property
     def base_tag_name(self):
@@ -308,6 +314,9 @@ class MetaDataReplace(MosFile):
     ``MetaDataReplace`` objects can be merged with a :class:`RunningOrder` by
     using the ``+`` operator. This behaviour is defined in the :meth:`merge`
     method in this class.
+
+    *Specification: Replace RO metadata without deleting the RO structure*
+    http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-34
     """
     @property
     def base_tag_name(self):
@@ -340,6 +349,9 @@ class StoryAppend(MosFile):
     ``StoryAppend`` objects can be merged with a :class:`RunningOrder` by using
     the ``+`` operator. This behaviour is defined in the :meth:`merge` method in
     this class.
+
+    *Specification: Append Stories to Running Order*
+    http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOS_Protocol_Version_2.8.5_Final.htm#roStoryAppend
     """
     @property
     def base_tag_name(self):
@@ -375,6 +387,9 @@ class StoryDelete(MosFile):
     ``StoryDelete`` objects can be merged with a :class:`RunningOrder` by using
     the ``+`` operator. This behaviour is defined in the :meth:`merge` method in
     this class.
+
+    *Specification: Delete Stories from Running Order*
+    http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOS_Protocol_Version_2.8.5_Final.htm#roStoryDelete
     """
     @property
     def base_tag_name(self):
@@ -416,6 +431,9 @@ class ItemDelete(MosFile):
     ``ItemDelete`` objects can be merged with a :class:`RunningOrder` by using
     the ``+`` operator. This behaviour is defined in the :meth:`merge` method in
     this class.
+
+    *Specification: Delete Items in Story*
+    http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOS_Protocol_Version_2.8.5_Final.htm#roItemDelete
     """
     @property
     def base_tag_name(self):
@@ -476,6 +494,9 @@ class StoryInsert(MosFile):
     ``StoryInsert`` objects can be merged with a :class:`RunningOrder` by using
     the ``+`` operator. This behaviour is defined in the :meth:`merge` method in
     this class.
+
+    *Specification: Insert Stories in Running Order*
+    http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOS_Protocol_Version_2.8.5_Final.htm#roStoryInsert
     """
     @property
     def base_tag_name(self):
@@ -530,6 +551,9 @@ class ItemInsert(MosFile):
     ``ItemInsert`` objects can be merged with a :class:`RunningOrder` by using
     the ``+`` operator. This behaviour is defined in the :meth:`merge` method in
     this class.
+
+    *Specification: Insert Items in Story*
+    http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOS_Protocol_Version_2.8.5_Final.htm#roItemInsert
     """
     @property
     def base_tag_name(self):
@@ -598,6 +622,9 @@ class StoryMove(MosFile):
     ``StoryMove`` objects can be merged with a :class:`RunningOrder` by using
     the ``+`` operator. This behaviour is defined in the :meth:`merge` method in
     this class.
+
+    *Specification: Move a story to a new position in the Playlist*
+    http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOS_Protocol_Version_2.8.5_Final.htm#roStoryMove
     """
     @property
     def base_tag_name(self):
@@ -654,6 +681,9 @@ class ItemMoveMultiple(MosFile):
     ``ItemMoveMultiple`` objects can be merged with a :class:`RunningOrder` by
     using the ``+`` operator. This behaviour is defined in the :meth:`merge`
     method in this class.
+
+    *Specification: Move one or more Items to a specified position within a Story*
+    http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOS_Protocol_Version_2.8.5_Final.htm#roItemMoveMultiple
     """
     @property
     def base_tag_name(self):
@@ -730,6 +760,9 @@ class StoryReplace(MosFile):
     ``StoryReplace`` objects can be merged with a :class:`RunningOrder` by using
     the ``+`` operator. This behaviour is defined in the :meth:`merge` method in
     this class.
+
+    *Specification: Replace a Story with Another in a Running Order*
+    http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOS_Protocol_Version_2.8.5_Final.htm#roStoryReplace
     """
     @property
     def base_tag_name(self):
@@ -779,6 +812,9 @@ class ItemReplace(MosFile):
     ``ItemReplace`` objects can be merged with a :class:`RunningOrder` by using
     the ``+`` operator. This behaviour is defined in the :meth:`merge` method in
     this class.
+
+    *Specification: Replace an Item with one or more Items in a Story*
+    http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOS_Protocol_Version_2.8.5_Final.htm#roItemReplace
     """
     @property
     def base_tag_name(self):
@@ -842,6 +878,9 @@ class ReadyToAir(MosFile):
     ``ReadyToAir`` objects can be merged with a :class:`RunningOrder` by using
     the ``+`` operator. This behaviour is defined in the :meth:`merge` method in
     this class.
+
+    *Specification: Identify a Running Order as Ready to Air*
+    http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-41
     """
     @property
     def base_tag_name(self):
@@ -862,6 +901,9 @@ class RunningOrderReplace(RunningOrder):
     ``RunningOrderReplace`` objects can be merged with a :class:`RunningOrder`
     by using the ``+`` operator. This behaviour is defined in the :meth:`merge`
     method in this class.
+
+    *Specification: Replace Running Order*
+    http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-33
     """
     @property
     def base_tag_name(self):
@@ -890,7 +932,13 @@ class RunningOrderEnd(MosFile):
 
     ``RunningOrderEnd`` objects can be merged with a :class:`RunningOrder` by
     using the ``+`` operator. This behaviour is defined in the :meth:`merge`
-    method in this class.
+    method in this class. Once a ``RunningOrderEnd`` object has been merged into
+    a :class:`RunningOrder`, the running order is considered "completed" and no
+    further messages can be merged (with the exception of
+    :class:`RunningOrderControl`).
+
+    *Specification: Delete Running Order*
+    http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-35
     """
     @property
     def base_tag_name(self):
@@ -932,6 +980,9 @@ class EAStoryReplace(ElementAction):
     ``EAStoryReplace`` objects can be merged with a :class:`RunningOrder` by
     using the ``+`` operator. This behaviour is defined in the :meth:`merge`
     method in this class.
+
+    *Specification: Performs specific Action on a Running Order*
+    http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-43
     """
     @property
     def target_story(self):
@@ -974,6 +1025,9 @@ class EAItemReplace(ElementAction):
     ``EAItemReplace`` objects can be merged with a :class:`RunningOrder` by
     using the ``+`` operator. This behaviour is defined in the :meth:`merge`
     method in this class.
+
+    *Specification: Replacing an item*
+    http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-43
     """
     @property
     def target_story(self):
@@ -1032,6 +1086,9 @@ class EAStoryDelete(ElementAction):
     ``EAStoryDelete`` objects can be merged with a :class:`RunningOrder` by
     using the ``+`` operator. This behaviour is defined in the :meth:`merge`
     method in this class.
+
+    *Specification: Deleting stories*
+    http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-43
     """
     @property
     def story(self):
@@ -1063,6 +1120,9 @@ class EAItemDelete(ElementAction):
     ``EAItemDelete`` objects can be merged with a :class:`RunningOrder` by using
     the ``+`` operator. This behaviour is defined in the :meth:`merge` method in
     this class.
+
+    *Specification: Deleting items*
+    http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-43
     """
     @property
     def target_story(self):
@@ -1108,6 +1168,9 @@ class EAStoryInsert(ElementAction):
     ``EAStoryInsert`` objects can be merged with a :class:`RunningOrder` by
     using the ``+`` operator. This behaviour is defined in the :meth:`merge`
     method in this class.
+
+    *Specification: Inserting stories*
+    http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-43
     """
     @property
     def target_story(self):
@@ -1162,6 +1225,9 @@ class EAItemInsert(ElementAction):
     ``EAItemInsert`` objects can be merged with a :class:`RunningOrder` by using
     the ``+`` operator. This behaviour is defined in the :meth:`merge` method in
     this class.
+
+    *Specification: Inserting items*
+    http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-43
     """
     @property
     def target_story(self):
@@ -1216,6 +1282,9 @@ class EAStorySwap(ElementAction):
     ``EAStorySwap`` objects can be merged with a :class:`RunningOrder` by using
     the ``+`` operator. This behaviour is defined in the :meth:`merge` method in
     this class.
+
+    *Specification: Swapping stories*
+    http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-43
     """
     @property
     def stories(self):
@@ -1260,6 +1329,9 @@ class EAItemSwap(ElementAction):
     ``EAItemSwap`` objects can be merged with a :class:`RunningOrder` by using
     the ``+`` operator. This behaviour is defined in the :meth:`merge` method in
     this class.
+
+    *Specification: Swapping items*
+    http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-43
     """
     @property
     def target_story(self):
@@ -1315,6 +1387,9 @@ class EAStoryMove(ElementAction):
     ``EAStoryMove`` objects can be merged with a :class:`RunningOrder` by using
     the ``+`` operator. This behaviour is defined in the :meth:`merge` method in
     this class.
+
+    *Specification: Moving stories*
+    http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-43
     """
     @property
     def target_story(self):
@@ -1358,6 +1433,9 @@ class EAItemMove(ElementAction):
     ``EAItemMove`` objects can be merged with a :class:`RunningOrder` by using
     the ``+`` operator. This behaviour is defined in the :meth:`merge` method in
     this class.
+
+    *Specification: Moving items*
+    http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-43
     """
     @property
     def target_story(self):
@@ -1409,6 +1487,14 @@ class EAItemMove(ElementAction):
 
 
 class RunningOrderControl(MosFile):
+    """
+    A ``RunningOrderControl`` object is created from a ``roCtrl`` MOS file and
+    can be constructed using classmethods :meth:`from_file`, :meth:`from_string`
+    or :meth:`from_s3`.
+
+    *Specification: Running Order Control*
+    http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-47
+    """
     @property
     def base_tag_name(self):
         "The name of the base XML tag for this file type (:class:`str`)"
