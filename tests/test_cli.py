@@ -27,21 +27,14 @@ def test_help(capsys):
     assert "managing MOS running orders" in out
 
 def test_detect():
-    with pytest.raises(SystemExit):
-        args = main.parser.parse_args(['detect'])
-
-    args = main.parser.parse_args(['detect', 'roCreate.mos.xml'])
+    args = main.parser.parse_args(['detect', '-f', 'roCreate.mos.xml'])
     assert args.files == ['roCreate.mos.xml']
 
     args = main.parser.parse_args(
-        ['detect', 'roCreate.mos.xml', 'roDelete.mos.xml'])
+        ['detect', '-f', 'roCreate.mos.xml', 'roDelete.mos.xml'])
     assert args.files == ['roCreate.mos.xml', 'roDelete.mos.xml']
 
 def test_inspect():
-    # TODO
-    # with pytest.raises(SystemExit):
-    #     args = main.parser.parse_args(['inspect'])
-
     args = main.parser.parse_args(['inspect', '-f', 'roCreate.mos.xml'])
     assert args.file == 'roCreate.mos.xml'
 
