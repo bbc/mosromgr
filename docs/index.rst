@@ -114,8 +114,6 @@ MOS files within a complete or partially complete programme::
 Documentation
 =============
 
-Comprehensive documentation is provided at https://apps.test.newslabs.co/docs/mosromgr/
-
 This documentation follows the `Diátaxis`_ system, so is split between four
 modes of documentation: tutorials, how-to guides, technical reference and
 explanation.
@@ -126,7 +124,7 @@ explanation.
     :maxdepth: 1
 
     getting_started
-    guide
+    intro
     howto
     api_mostypes
     api_moselements

@@ -2,9 +2,9 @@
 .. Copyright 2021 BBC
 .. SPDX-License-Identifier: Apache-2.0
 
-==========
-User guide
-==========
+============
+Introduction
+============
 
 This section is a walkthrough of the contents of the module, intended to explain
 how *mosromgr* works and introduce the concepts.
