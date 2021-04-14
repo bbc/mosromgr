@@ -16,6 +16,7 @@ all:
 	@echo "make doc-graphs - Generate graphviz graphs"
 	@echo "make doc - Build the docs as HTML"
 	@echo "make doc-serve - Serve the docs locally"
+	@echo "make release - Release to PyPI"
 
 install:
 	pip install .
@@ -48,4 +49,7 @@ doc: doc-graphs
 doc-serve:
 	python -m http.server -d $(DOC_HTML)
 
-.PHONY: all install develop build clean lint test doc-graphs doc doc-serve
+release:
+	twine upload dist/*
+
+.PHONY: all install develop build clean lint test doc-graphs doc doc-serve release
