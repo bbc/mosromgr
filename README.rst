@@ -108,7 +108,7 @@ Comprehensive documentation is provided at https://mosromgr.readthedocs.io/
 The documentation follows the `Diátaxis`_ system, so is split between four modes
 of documentation: tutorials, how-to guides, technical reference and explanation.
 
-.. _Diátaxis: https://diataxis.fr/adoption/
+.. _Diátaxis: https://diataxis.fr/
 
 Issues and questions
 ====================
