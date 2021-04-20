@@ -250,13 +250,15 @@ def test_story_replace(rostoryreplace):
     assert sr.target_story.id == 'STORY1'
     assert sr.target_story.items is None
 
-    assert isinstance(sr.source_story, Story)
-    assert isinstance(sr.source_story.xml, Element)
-    assert sr.source_story.id == 'STORY1'
-    assert sr.source_story.slug == 'STORY ONE'
-    assert isinstance(sr.source_story.items, list)
-    assert len(sr.source_story.items) == 1
-    item1 = sr.source_story.items[0]
+    assert isinstance(sr.source_stories, list)
+    source_story = sr.source_stories[0]
+    assert isinstance(source_story, Story)
+    assert isinstance(source_story.xml, Element)
+    assert source_story.id == 'STORY1'
+    assert source_story.slug == 'STORY ONE'
+    assert isinstance(source_story.items, list)
+    assert len(source_story.items) == 1
+    item1 = source_story.items[0]
     assert isinstance(item1, Item)
     assert item1.id == 'ITEM1'
     assert item1.slug == 'ITEM ONE'
@@ -411,14 +413,16 @@ def test_element_action_replace_story(roelementactionstoryreplace):
     assert ea.target_story.duration == 0
     assert ea.target_story.items is None
 
-    assert isinstance(ea.source_story, Story)
-    assert isinstance(ea.source_story.xml, Element)
-    assert ea.source_story.id == 'STORY1'
-    assert ea.source_story.slug == 'STORY ONE'
-    assert ea.source_story.duration == 30
-    assert isinstance(ea.source_story.items, list)
-    assert len(ea.source_story.items) == 1
-    item = ea.source_story.items[0]
+    assert isinstance(ea.source_stories, list)
+    source_story = ea.source_stories[0]
+    assert isinstance(source_story, Story)
+    assert isinstance(source_story.xml, Element)
+    assert source_story.id == 'STORY1'
+    assert source_story.slug == 'STORY ONE'
+    assert source_story.duration == 30
+    assert isinstance(source_story.items, list)
+    assert len(source_story.items) == 1
+    item = source_story.items[0]
     assert item.id == 'ITEM1'
     assert item.slug == 'ITEM ONE'
 
@@ -537,13 +541,13 @@ def test_element_action_delete_item(roelementactionitemdelete):
     """
     ea = EAItemDelete.from_file(roelementactionitemdelete)
     assert isinstance(ea.xml, Element)
-    assert isinstance(ea.target_story, Story)
-    assert ea.target_story.id == 'STORY1'
-    assert ea.target_story.slug is None
-    assert ea.target_story.items is None
+    assert isinstance(ea.story, Story)
+    assert ea.story.id == 'STORY1'
+    assert ea.story.slug is None
+    assert ea.story.items is None
 
-    assert isinstance(ea.source_items, list)
-    source_item = ea.source_items[0]
+    assert isinstance(ea.items, list)
+    source_item = ea.items[0]
     assert isinstance(source_item, Item)
     assert source_item.id == 'ITEM1'
     assert source_item.slug is None
@@ -577,13 +581,13 @@ def test_element_action_swap_item(roelementactionitemswap):
     """
     ea = EAItemSwap.from_file(roelementactionitemswap)
     assert isinstance(ea.xml, Element)
-    assert isinstance(ea.target_story, Story)
-    assert ea.target_story.items is None
-    assert isinstance(ea.source_items, set)
-    item1, item2 = ea.source_items
+    assert isinstance(ea.story, Story)
+    assert ea.story.items is None
+    assert isinstance(ea.items, set)
+    item1, item2 = ea.items
     assert isinstance(item1, Item)
     assert isinstance(item2, Item)
-    assert {item.id for item in ea.source_items} == {'ITEM1', 'ITEM2'}
+    assert {item.id for item in ea.items} == {'ITEM1', 'ITEM2'}
 
 def test_element_action_move_item(roelementactionitemmove):
     """
@@ -592,17 +596,17 @@ def test_element_action_move_item(roelementactionitemmove):
     """
     ea = EAItemMove.from_file(roelementactionitemmove)
     assert isinstance(ea.xml, Element)
-    assert isinstance(ea.target_story, Story)
-    assert ea.target_story.id == 'STORY1'
-    assert ea.target_story.slug is None
-    assert ea.target_story.items is None
+    assert isinstance(ea.story, Story)
+    assert ea.story.id == 'STORY1'
+    assert ea.story.slug is None
+    assert ea.story.items is None
 
-    assert isinstance(ea.target_items, list)
-    target_item = ea.target_items[0]
-    assert isinstance(target_item, Item)
-    assert target_item.id == 'ITEM1'
-    assert target_item.slug is None
+    assert isinstance(ea.target_item, Item)
+    assert ea.target_item.id == 'ITEM1'
+    assert ea.target_item.slug is None
 
-    assert isinstance(ea.source_item, Item)
-    assert ea.source_item.id == 'ITEM3'
-    assert ea.source_item.slug is None
+    assert isinstance(ea.source_items, list)
+    source_item = ea.source_items[0]
+    assert isinstance(source_item, Item)
+    assert source_item.id == 'ITEM3'
+    assert source_item.slug is None

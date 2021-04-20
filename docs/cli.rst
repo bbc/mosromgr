@@ -21,15 +21,15 @@ mosromgr
     mosromgr is a tool for managing MOS running orders
 
     optional arguments:
-      -h, --help            show this help message and exit
-      --version             show program's version number and exit
+    -h, --help            show this help message and exit
+    --version             show program's version number and exit
 
     commands:
-      {help,detect,inspect,merge}
-        help                Displays help about the specified command
-        detect              Detect the MOS type of one or more files
-        inspect             Inspect the contents of a roCreate file
-        merge               Merge the provided MOS files
+    {help,detect,inspect,merge}
+    help                Displays help about the specified command
+    detect              Detect the MOS type of one or more files
+    inspect             Inspect the contents of a MOS file
+    merge               Merge the provided MOS files
 
 .. _cli_mosromgr_detect:
 
@@ -61,23 +61,21 @@ mosromgr inspect
 
 .. code-block:: text
 
-    usage: mosromgr inspect [-h] [-f file] [-b bucket] [-k key] [-t] [-e] [-d] [-s] [-i] [-n]
+    usage: mosromgr inspect [-h] [-f [files [files ...]]] [-b bucket] [-p prefix] [-s suffix] [-k key]
 
-    Inspect the contents of a roCreate file
+    Inspect the contents of a MOS file
 
     optional arguments:
       -h, --help            show this help message and exit
-      -f file, --file file  The roCreate file to inspect
+      -f [files [files ...]], --files [files [files ...]]
+                            The MOS files to inspect
       -b bucket, --bucket-name bucket
-                            S3 bucket name containing the roCreate file
-      -k key, --key key     The file key for the roCreate file in the S3 bucket
-      -t, --start-time      Show programme start time
-      -e, --end-time        Show programme end time
-      -d, --duration        Show total running order duration
-      -s, --stories         Show stories within the running order in the running order
-      -i, --items           Show items within stories in the running order
-      -n, --notes           Show notes within story items in the running order
-
+                            name of the S3 bucket containing the MOS files
+      -p prefix, --prefix prefix
+                            The prefix for MOS files in the S3 bucket
+      -s suffix, --suffix suffix
+                            The suffix for MOS files in the S3 bucket
+      -k key, --key key     The file key for a MOS file in the S3 bucket
 
 .. _cli_mosromgr_merge:
 

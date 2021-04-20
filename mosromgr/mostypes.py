@@ -211,8 +211,14 @@ class RunningOrder(MosFile):
 
     @property
     def start_time(self):
-        "Transmission start time (:class:`datetime.datetime`)"
-        ro_ed_start = self.base_tag.find('roEdStart').text
+        """
+        Transmission start time (:class:`datetime.datetime`) or ``None`` if not
+        available in the XML
+        """
+        try:
+            ro_ed_start = self.base_tag.find('roEdStart').text
+        except AttributeError:
+            return
         return parse(ro_ed_start)
 
     @property
@@ -235,12 +241,18 @@ class RunningOrder(MosFile):
         """
         return self.xml.find('mosromgrmeta') is not None
 
-    def find_story(self, story_id):
+    def _find_story(self, story_id):
         return [
             (story.xml, i)
             for i, story in enumerate(self.stories)
             if story.id == story_id
         ][0]
+
+    def inspect(self):
+        "Print an outline of the key file contents"
+        print("RO:", self.ro_slug)
+        for story in self.stories:
+            print("STORY:", story.id)
 
 
 class StorySend(MosFile):
@@ -297,7 +309,7 @@ class StorySend(MosFile):
         ``roStorySend`` message.
         """
         try:
-            story, story_index = ro.find_story(self.story.id)
+            story, story_index = ro._find_story(self.story.id)
         except IndexError:
             msg = f"{self.__class__.__name__} error in {self.message_id} - story not found"
             logger.warning(msg)
@@ -308,6 +320,10 @@ class StorySend(MosFile):
         remove_node(parent=ro.base_tag, node=story)
         insert_node(parent=ro.base_tag, node=new_story, index=story_index)
         return ro
+
+    def inspect(self):
+        "Print an outline of the key file contents"
+        print("SEND STORY:", self.story.id)
 
 
 class MetaDataReplace(MosFile):
@@ -348,6 +364,13 @@ class MetaDataReplace(MosFile):
                 )
             replace_node(parent=ro.base_tag, old_node=target, new_node=source, index=target_index)
         return ro
+
+    def inspect(self):
+        "Print an outline of the key file contents"
+        print("NEW METATDATA:")
+        for tag in self.base_tag:
+            if tag.text:
+                print(tag.tag, tag.text)
 
 
 class StoryAppend(MosFile):
@@ -391,6 +414,11 @@ class StoryAppend(MosFile):
         for story in stories:
             ro.base_tag.append(story)
         return ro
+
+    def inspect(self):
+        "Print an outline of the key file contents"
+        for story in self.stories:
+            print("ADD STORY:", story.id)
 
 
 class StoryDelete(MosFile):
@@ -441,6 +469,11 @@ class StoryDelete(MosFile):
                 remove_node(parent=ro.base_tag, node=found_node)
         return ro
 
+    def inspect(self):
+        "Print an outline of the key file contents"
+        for story in self.stories:
+            print("DELETE STORY:", story.id)
+
 
 class ItemDelete(MosFile):
     """
@@ -464,7 +497,7 @@ class ItemDelete(MosFile):
     def target_story(self):
         """
         The :class:`~mosromgr.moselements.Story` object containing the items
-        being replaced
+        being deleted
         """
         return Story(self.base_tag, unknown_items=True)
 
@@ -509,6 +542,12 @@ class ItemDelete(MosFile):
                 remove_node(parent=story, node=found_node)
         return ro
 
+    def inspect(self):
+        "Print an outline of the key file contents"
+        print("IN STORY:", self.target_story.id)
+        for item in self.target_items:
+            print("  DELETE ITEM:", item.id)
+
 
 class StoryInsert(MosFile):
     """
@@ -548,8 +587,8 @@ class StoryInsert(MosFile):
         """
         Merge into the :class:`RunningOrder` object provided.
 
-        Inserts the story tags from the ``roStoryInsert`` message into the running
-        order.
+        Inserts the story tags from the ``roStoryInsert`` message into the
+        running order.
         """
         target_id = self.base_tag.find('storyID').text
         if not target_id:
@@ -570,6 +609,11 @@ class StoryInsert(MosFile):
             insert_node(parent=ro.base_tag, node=story, index=target_index)
             target_index += 1
         return ro
+
+    def inspect(self):
+        "Print an outline of the key file contents"
+        for story in self.source_stories:
+            print("INSERT STORY:", story.id)
 
 
 class ItemInsert(MosFile):
@@ -647,6 +691,12 @@ class ItemInsert(MosFile):
             item_index += 1
         return ro
 
+    def inspect(self):
+        "Print an outline of the key file contents"
+        print("IN STORY:", self.target_story.id)
+        for item in self.source_items:
+            print("INSERT ITEM:", item.id)
+
 
 class StoryMove(MosFile):
     """
@@ -710,6 +760,10 @@ class StoryMove(MosFile):
         insert_node(parent=ro.base_tag, node=source_node, index=target_index)
 
         return ro
+
+    def inspect(self):
+        "Print an outline of the key file contents"
+        print("MOVE STORY:", self.source_story.id)
 
 
 class ItemMoveMultiple(MosFile):
@@ -795,6 +849,12 @@ class ItemMoveMultiple(MosFile):
 
         return ro
 
+    def inspect(self):
+        "Print an outline of the key file contents"
+        print("IN STORY:", self.target_story.id)
+        for item in self.source_items:
+            print("MOVE ITEM:", item.id)
+
 
 class StoryReplace(MosFile):
     """
@@ -820,9 +880,12 @@ class StoryReplace(MosFile):
         return Story(self.base_tag, unknown_items=True)
 
     @property
-    def source_story(self):
-        "The replacement :class:`~mosromgr.moselements.Story` object"
-        return Story(self.base_tag.find('story'))
+    def source_stories(self):
+        "A list of replacement :class:`~mosromgr.moselements.Story` objects"
+        return [
+            Story(story_tag)
+            for story_tag in self.base_tag.findall('story')
+        ]
 
     def merge(self, ro):
         """
@@ -851,6 +914,12 @@ class StoryReplace(MosFile):
             insert_node(parent=ro.base_tag, node=story, index=target_index)
             target_index += 1
         return ro
+
+    def inspect(self):
+        "Print an outline of the key file contents"
+        print("REPLACE STORY:", self.target_story.id, "WITH:")
+        for story in self.source_stories:
+            print("  STORY:", story.id)
 
 
 class ItemReplace(MosFile):
@@ -896,7 +965,7 @@ class ItemReplace(MosFile):
         """
         Merge into the :class:`RunningOrder` object provided.
 
-        Replaces the story tag in the running order with the one in the
+        Replaces the story tag in the running order with the ones in the
         ``roStorySend`` message
         """
         story_id = self.base_tag.find('storyID').text
@@ -926,6 +995,13 @@ class ItemReplace(MosFile):
             insert_node(parent=story_node, node=item, index=i)
         return ro
 
+    def inspect(self):
+        "Print an outline of the key file contents"
+        print("IN STORY:", self.target_story.id)
+        print("REPLACE ITEM:", self.target_item.id, "WITH:")
+        for item in self.source_items:
+            print("  ITEM:", item.id)
+
 
 class ReadyToAir(MosFile):
     """
@@ -953,6 +1029,10 @@ class ReadyToAir(MosFile):
         TODO: #18
         """
         return ro
+
+    def inspect(self):
+        "Print an outline of the key file contents"
+        print("READY TO AIR")
 
 
 class RunningOrderReplace(RunningOrder):
@@ -985,11 +1065,18 @@ class RunningOrderReplace(RunningOrder):
             raise MosMergeError(
                 f"{self.__class__.__name__} error in {self.message_id} - roCreate not found"
             )
-        rr = copy.deepcopy(self.xml.find('roReplace'))
+        rr = copy.deepcopy(self.base_tag)
         rr.tag = 'roCreate'
         remove_node(parent=ro.xml, node=ro.base_tag)
         insert_node(parent=ro.xml, node=rr, index=rc_index)
         return ro
+
+    def inspect(self):
+        "Print an outline of the key file contents"
+        print("REPLACE RO:")
+        for tag in self.base_tag:
+            if tag.text.strip():
+                print("", tag.tag + ":", tag.text.strip())
 
 
 class RunningOrderEnd(MosFile):
@@ -1028,6 +1115,10 @@ class RunningOrderEnd(MosFile):
         mosromgrmeta.append(self.base_tag)
         return ro
 
+    def inspect(self):
+        "Print an outline of the key file contents"
+        print("RO DELETE:", self.ro_id)
+
 
 class ElementAction(MosFile):
     "Base class for various ``roElementAction`` MOS files"
@@ -1063,9 +1154,12 @@ class EAStoryReplace(ElementAction):
         return Story(self.base_tag.find('element_target'), unknown_items=True)
 
     @property
-    def source_story(self):
-        "The replacement :class:`~mosromgr.moselements.Story` object"
-        return Story(self.base_tag.find('element_source').find('story'))
+    def source_stories(self):
+        "A list of replacement :class:`~mosromgr.moselements.Story` objects"
+        return [
+            Story(story_tag)
+            for story_tag in self.base_tag.find('element_source').findall('story')
+        ]
 
     def merge(self, ro):
         """
@@ -1081,18 +1175,24 @@ class EAStoryReplace(ElementAction):
         story, story_index = find_child(parent=ro.base_tag, child_tag='story', id=target_story_id)
         if not story:
             raise MosMergeError(
-                f"{self.__class__.__name__} error in {self.message_id} - story not found"
+                f"{self.__class__.__name__} error in {self.message_id} - target story not found"
             )
         new_stories = source.findall('story')
         if not new_stories:
             raise MosMergeError(
-                f"{self.__class__.__name__} error in {self.message_id} - story not found"
+                f"{self.__class__.__name__} error in {self.message_id} - no source stories found"
             )
         remove_node(parent=ro.base_tag, node=story)
         for new_story in new_stories:
             insert_node(parent=ro.base_tag, node=new_story, index=story_index)
             story_index += 1
         return ro
+
+    def inspect(self):
+        "Print an outline of the key file contents"
+        print("REPLACE STORY:", self.target_story.id, "WITH:")
+        for story in self.source_stories:
+            print("  STORY:", story.id)
 
 
 class EAItemReplace(ElementAction):
@@ -1164,6 +1264,13 @@ class EAItemReplace(ElementAction):
             item_index += 1
         return ro
 
+    def inspect(self):
+        "Print an outline of the key file contents"
+        print("IN STORY:", self.target_story.id)
+        print("REPLACE ITEM:", self.target_item.id, "WITH:")
+        for item in self.source_items:
+            print("  ITEM:", item.id)
+
 
 class EAStoryDelete(ElementAction):
     """
@@ -1205,6 +1312,11 @@ class EAStoryDelete(ElementAction):
                 remove_node(parent=ro.base_tag, node=story)
         return ro
 
+    def inspect(self):
+        "Print an outline of the key file contents"
+        for story in self.stories:
+            print("DELETE STORY:", story.id)
+
 
 class EAItemDelete(ElementAction):
     """
@@ -1220,7 +1332,7 @@ class EAItemDelete(ElementAction):
     http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-43
     """
     @property
-    def target_story(self):
+    def story(self):
         """
         The :class:`~mosromgr.moselements.Story` object containing the items
         being deleted
@@ -1228,7 +1340,7 @@ class EAItemDelete(ElementAction):
         return Story(self.base_tag.find('element_target'), unknown_items=True)
 
     @property
-    def source_items(self):
+    def items(self):
         "A list of :class:`~mosromgr.moselements.Item` objects being deleted"
         return [
             Item(item_tag)
@@ -1260,6 +1372,12 @@ class EAItemDelete(ElementAction):
             else:
                 remove_node(parent=story, node=item)
         return ro
+
+    def inspect(self):
+        "Print an outline of the key file contents"
+        print("IN STORY:", self.story.id)
+        for item in self.items:
+            print("  DELETE ITEM:", item.id)
 
 
 class EAStoryInsert(ElementAction):
@@ -1322,6 +1440,11 @@ class EAStoryInsert(ElementAction):
             insert_node(parent=ro.base_tag, node=new_story, index=story_index)
             story_index += 1
         return ro
+
+    def inspect(self):
+        "Print an outline of the key file contents"
+        for story in self.source_stories:
+            print("INSERT STORY:", story.id)
 
 
 class EAItemInsert(ElementAction):
@@ -1389,6 +1512,12 @@ class EAItemInsert(ElementAction):
             item_index += 1
         return ro
 
+    def inspect(self):
+        "Print an outline of the key file contents"
+        print("IN STORY:", self.target_story.id)
+        for item in self.source_items:
+            print("  INSERT ITEM:", item.id)
+
 
 class EAStorySwap(ElementAction):
     """
@@ -1440,6 +1569,12 @@ class EAStorySwap(ElementAction):
         insert_node(parent=ro.base_tag, node=story1, index=story2_index)
         return ro
 
+    def inspect(self):
+        "Print an outline of the key file contents"
+        story1, story2 = self.stories
+        print("SWAP STORY:", story1.id)
+        print("WITH STORY:", story2.id)
+
 
 class EAItemSwap(ElementAction):
     """
@@ -1455,7 +1590,7 @@ class EAItemSwap(ElementAction):
     http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-43
     """
     @property
-    def target_story(self):
+    def story(self):
         """
         The :class:`~mosromgr.moselements.Story` object containing the items
         being swapped
@@ -1463,7 +1598,7 @@ class EAItemSwap(ElementAction):
         return Story(self.base_tag.find('element_target'), unknown_items=True)
 
     @property
-    def source_items(self):
+    def items(self):
         "A set of :class:`~mosromgr.moselements.Item` objects to be swapped"
         source = self.base_tag.find('element_source')
         return {
@@ -1503,6 +1638,13 @@ class EAItemSwap(ElementAction):
         insert_node(parent=story, node=item2, index=item1_index)
         insert_node(parent=story, node=item1, index=item2_index)
         return ro
+
+    def inspect(self):
+        "Print an outline of the key file contents"
+        print("IN STORY:", self.story.id)
+        item1, item2 = self.items
+        print("  SWAP ITEM:", item1.id)
+        print("  WITH ITEM:", item2.id)
 
 
 class EAStoryMove(ElementAction):
@@ -1558,6 +1700,11 @@ class EAStoryMove(ElementAction):
             insert_node(parent=ro.base_tag, node=source_story, index=target_index)
         return ro
 
+    def inspect(self):
+        "Print an outline of the key file contents"
+        for story in self.source_stories:
+            print("MOVE STORY:", story.id)
+
 
 class EAItemMove(ElementAction):
     """
@@ -1573,7 +1720,7 @@ class EAItemMove(ElementAction):
     http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-43
     """
     @property
-    def target_story(self):
+    def story(self):
         """
         The :class:`~mosromgr.moselements.Story` object containing the item
         being replaced
@@ -1581,20 +1728,21 @@ class EAItemMove(ElementAction):
         return Story(self.base_tag.find('element_target'), unknown_items=True)
 
     @property
-    def target_items(self):
+    def target_item(self):
         """
-        A list of :class:`~mosromgr.moselements.Item` object above which the
+        The :class:`~mosromgr.moselements.Item` object above which the
         source items will be moved
         """
-        return [
-            Item(item_tag)
-            for item_tag in self.base_tag.findall('element_target')
-        ]
+        return Item(self.base_tag.find('element_target'))
 
     @property
-    def source_item(self):
-        "The :class:`~mosromgr.moselements.Item` object to be moved"
-        return Item(self.base_tag.find('element_source'))
+    def source_items(self):
+        "A list of :class:`~mosromgr.moselements.Item` objects to be moved"
+        source = self.base_tag.find('element_source')
+        return [
+            Item(source, id=item.text)
+            for item in source.findall('itemID')
+        ]
 
     def merge(self, ro):
         """
@@ -1627,6 +1775,12 @@ class EAItemMove(ElementAction):
             remove_node(parent=story, node=source_item)
             insert_node(parent=story, node=source_item, index=target_item_index)
         return ro
+
+    def inspect(self):
+        "Print an outline of the key file contents"
+        print("IN STORY:", self.story.id)
+        for item in self.source_items:
+            print("  MOVE ITEM:", item.id)
 
 
 class RunningOrderControl(MosFile):
@@ -1672,6 +1826,10 @@ class RunningOrderControl(MosFile):
                     else:
                         replace_node(parent=ro_story_payload, old_node=old_tag, new_node=new_tag, index=old_tag_index)
         return ro
+
+    def inspect(self):
+        "Print an outline of the key file contents"
+        print("RO CTRL FOR STORY:", self.story.id)
 
 
 TAG_CLASS_MAP = {

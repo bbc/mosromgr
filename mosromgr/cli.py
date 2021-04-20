@@ -84,7 +84,7 @@ class CLI:
         )
         detect_cmd.add_argument(
             "-b", "--bucket-name", metavar="bucket",
-            help=("S3 bucket name containing the MOS files")
+            help=("name of the S3 bucket containing the MOS files")
         )
         detect_cmd.add_argument(
             "-p", "--prefix", metavar="prefix",
@@ -102,49 +102,27 @@ class CLI:
 
         inspect_cmd = commands.add_parser(
             "inspect",
-            description=("Inspect the contents of a roCreate file"),
-            help=("Inspect the contents of a roCreate file"))
+            description=("Inspect the contents of a MOS file"),
+            help=("Inspect the contents of a MOS file"))
         inspect_cmd.add_argument(
-            "-f", "--file", metavar="file",
-            help=("The roCreate file to inspect")
+            "-f", "--files", metavar="files", nargs='*',
+            help=("The MOS files to inspect")
         )
         inspect_cmd.add_argument(
             "-b", "--bucket-name", metavar="bucket",
-            help=("S3 bucket name containing the roCreate file")
+            help=("name of the S3 bucket containing the MOS files")
+        )
+        inspect_cmd.add_argument(
+            "-p", "--prefix", metavar="prefix",
+            help=("The prefix for MOS files in the S3 bucket")
+        )
+        inspect_cmd.add_argument(
+            "-s", "--suffix", metavar="suffix",
+            help=("The suffix for MOS files in the S3 bucket")
         )
         inspect_cmd.add_argument(
             "-k", "--key", metavar="key",
-            help=("The file key for the roCreate file in the S3 bucket")
-        )
-        inspect_cmd.add_argument(
-            "-t", "--start-time",
-            action='store_true',
-            help=("Show programme start time")
-        )
-        inspect_cmd.add_argument(
-            "-e", "--end-time",
-            action='store_true',
-            help=("Show programme end time")
-        )
-        inspect_cmd.add_argument(
-            "-d", "--duration",
-            action='store_true',
-            help=("Show total running order duration")
-        )
-        inspect_cmd.add_argument(
-            "-s", "--stories",
-            action='store_true',
-            help=("Show stories within the running order in the running order")
-        )
-        inspect_cmd.add_argument(
-            "-i", "--items",
-            action='store_true',
-            help=("Show items within stories in the running order")
-        )
-        inspect_cmd.add_argument(
-            "-n", "--notes",
-            action='store_true',
-            help=("Show notes within story items in the running order")
+            help=("The file key for a MOS file in the S3 bucket")
         )
         inspect_cmd.set_defaults(func=self.do_inspect)
 
@@ -158,7 +136,7 @@ class CLI:
         )
         merge_cmd.add_argument(
             "-b", "--bucket-name", metavar="bucket",
-            help=("S3 bucket name containing MOS files")
+            help=("name of the S3 bucket containing MOS files")
         )
         merge_cmd.add_argument(
             "-p", "--prefix", metavar="prefix",
@@ -205,6 +183,13 @@ class CLI:
 
     def do_detect(self):
         self._args.cmd = 'detect'
+        return self.detect_or_inspect(inspect=False)
+
+    def do_inspect(self):
+        self._args.cmd = 'inspect'
+        return self.detect_or_inspect(inspect=True)
+
+    def detect_or_inspect(self, inspect=False):
         if self._args.files:
             for file in self._args.files:
                 try:
@@ -213,6 +198,9 @@ class CLI:
                     sys.stderr.write(f"{file}: Invalid\n")
                     continue
                 self.detect_file(mo, file)
+                if inspect:
+                    mo.inspect()
+                    print()
         elif self._args.bucket_name:
             if self._args.prefix:
                 if self._args.suffix:
@@ -239,6 +227,9 @@ class CLI:
                     sys.stderr.write(f"{mos_file_key}: Invalid\n")
                     continue
                 self.detect_file(mo, mos_file_key)
+                if inspect:
+                    mo.inspect()
+                    print()
         else:
             sys.stderr.write("Files or bucket name and prefix or key must be provided\n\n")
             self.do_help()
@@ -249,59 +240,6 @@ class CLI:
             print(f"{filename}: {mo.__class__.__name__} (completed)")
         else:
             print(f"{filename}: {mo.__class__.__name__}")
-
-    def do_inspect(self):
-        self._args.cmd = 'inspect'
-        if self._args.file:
-            mos_file_path = self._args.file
-            mo = self.get_mos_object_from_file(mos_file_path)
-        elif self._args.bucket_name:
-            if self._args.key:
-                mo = self.get_mos_object_from_s3(
-                    bucket=self._args.bucket_name,
-                    file_key=self._args.key,
-                )
-            else:
-                sys.stderr.write("File key must be provided with bucket name\n\n")
-                self.do_help()
-                return 2
-        else:
-            sys.stderr.write("Files or bucket name and file key must be provided\n\n")
-            self.do_help()
-            return 2
-
-        if type(mo) != RunningOrder:
-            sys.stderr.write("Error: file must be a roCreate\n\n")
-            self.do_help()
-            return 2
-
-        print(mo.ro_slug)
-        if self._args.start_time:
-            print(f"Start time: {mo.start_time.strftime('%Y-%m-%d %H:%M')}")
-        if self._args.end_time:
-            print(f"End time: {mo.end_time.strftime('%Y-%m-%d %H:%M')}")
-        if self._args.duration:
-            mins, secs = divmod(mo.duration, 60)
-            hrs, mins = divmod(mins, 60)
-            hrs = int(hrs)
-            mins = int(mins)
-            secs = int(secs)
-            print(f"Duration: {hrs}:{mins:02d}:{secs:02d}")
-        print()
-        if self._args.stories:
-            for story in mo.stories:
-                print(story.slug)
-                if self._args.items:
-                    for item in story.items:
-                        if self._args.notes:
-                            print(f"    {item.slug} - {item.note}")
-                        else:
-                            print(f"    {item.slug}")
-                elif self._args.notes:
-                    for item in story.items:
-                        if item.note:
-                            print(f"    Note: {item.note}")
-                print()
 
     def do_merge(self):
         self._args.cmd = 'merge'

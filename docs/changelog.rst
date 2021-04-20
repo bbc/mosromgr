@@ -11,6 +11,14 @@ Changelog
     stable and may change. Once the library reaches v1.0, it will be considered
     stable. Please consider giving :doc:`feedback` to help stabilise the API.
 
+Since last release
+==================
+
+- Updated :ref:`cli_mosromgr_inspect` CLI command to work for all file types
+- Corrected some singular :class:`~mosromgr.mostypes.MosFile`
+  :doc:`api_moselements` properties that should have been lists (e.g.
+  ``source_story`` should have been ``source_stories``)
+
 Release 0.8.1 (2021-04-14)
 ==========================
 
