@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<mos>
+  <mosID>MOS ID</mosID>
+  <messageID>1027</messageID>
+  <roCtrl>
+    <roID>RO ID</roID>
+    <storyID>STORY1</storyID>
+    <command>STOP</command>
+    <mosExternalMetadata>
+      <mosPayload>
+        <StoryStarted>2021-01-01T12:30:00.00Z</StoryStarted>
+        <StoryEnded>2021-01-01T12:40:00.00Z</StoryEnded>
+        <StoryDuration>10.0</StoryDuration>
+        <timingSource>roCtrl</timingSource>
+        <timingOrigin>mosart</timingOrigin>
+      </mosPayload>
+    </mosExternalMetadata>
+  </roCtrl>
+</mos>

@@ -90,8 +90,8 @@ class MosFile:
         "Classify the MOS type and return an instance of the relevant class"
         for tag, subcls in TAG_CLASS_MAP.items():
             if xml.find(tag):
-                if subcls == ElementAction:
-                    return ElementAction._classify(xml)
+                if subcls in (ElementAction, RunningOrderControl):
+                    return subcls._classify(xml)
                 return subcls(xml)
         raise UnknownMosFileType("Unable to determine MOS file type")
 
@@ -1784,21 +1784,21 @@ class EAItemMove(ElementAction):
 
 
 class RunningOrderControl(MosFile):
-    """
-    A ``RunningOrderControl`` object is created from a ``roCtrl`` MOS file and
-    can be constructed using classmethods :meth:`from_file`, :meth:`from_string`
-    or :meth:`from_s3`.
+    "Base class for various ``roCtrl`` MOS files"
+    @classmethod
+    def _classify(cls, xml):
+        "Classify the MOS type and return an instance of the relevant class"
+        cmd = xml.find('roCtrl').find('command').text
+        subcls = CTRL_CLASS_MAP[cmd]
+        return subcls(xml)
 
-    *Specification: Running Order Control*
-    http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-47
-
-    TODO: generalise this class #20
-    """
     @property
     def base_tag_name(self):
         "The name of the base XML tag for this file type (:class:`str`)"
         return 'roCtrl'
 
+
+class ControlStop(RunningOrderControl):
     @property
     def story(self):
         "The story to which this roCtrl message relates"
@@ -1829,7 +1829,7 @@ class RunningOrderControl(MosFile):
 
     def inspect(self):
         "Print an outline of the key file contents"
-        print("RO CTRL FOR STORY:", self.story.id)
+        print("RO CTRL STOP FOR STORY:", self.story.id)
 
 
 TAG_CLASS_MAP = {
@@ -1858,4 +1858,8 @@ EA_CLASS_MAP = {
     'INSERT': lambda ea: EAStoryInsert if ea.find('element_target').find('itemID') is None else EAItemInsert,
     'SWAP': lambda ea: EAStorySwap if ea.find('element_target') is None else EAItemSwap,
     'MOVE': lambda ea: EAStoryMove if ea.find('element_target').find('itemID') is None else EAItemMove,
+}
+
+CTRL_CLASS_MAP = {
+    'STOP': ControlStop,
 }

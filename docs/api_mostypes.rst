@@ -290,10 +290,10 @@ RunningOrderEnd
     :inherited-members:
     :special-members: __add__, __lt__, __gt__, __str__
 
-RunningOrderControl
--------------------
+ControlStop
+-----------
 
-.. autoclass:: RunningOrderControl()
+.. autoclass:: ControlStop()
     :show-inheritance:
     :members:
     :inherited-members:
@@ -319,5 +319,12 @@ ElementAction
 -------------
 
 .. autoclass:: ElementAction()
+    :members:
+    :inherited-members:
+
+RunningOrderControl
+-------------------
+
+.. autoclass:: RunningOrderControl()
     :members:
     :inherited-members:

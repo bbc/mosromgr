@@ -22,7 +22,7 @@ def test_mosfile_detect_rocreate_contents(rocreate):
     with open(rocreate) as f:
         contents = f.read()
     rc = MosFile.from_string(contents)
-    assert isinstance(rc, RunningOrder)
+    assert type(rc) == RunningOrder
 
 def test_mosfile_detect_rocreate(rocreate):
     """
@@ -30,7 +30,7 @@ def test_mosfile_detect_rocreate(rocreate):
     EXPECT: An object of type RunningOrder
     """
     rc = MosFile.from_file(rocreate)
-    assert isinstance(rc, RunningOrder)
+    assert type(rc) == RunningOrder
 
 def test_mosfile_detect_storysend(rostorysend1):
     """
@@ -38,7 +38,7 @@ def test_mosfile_detect_storysend(rostorysend1):
     EXPECT: An object of type StorySend
     """
     ss = MosFile.from_file(rostorysend1)
-    assert isinstance(ss, StorySend)
+    assert type(ss) == StorySend
 
 def test_mosfile_detect_appendstory(rostoryappend):
     """
@@ -46,7 +46,7 @@ def test_mosfile_detect_appendstory(rostoryappend):
     EXPECT: An object of type StoryAppend
     """
     sa = MosFile.from_file(rostoryappend)
-    assert isinstance(sa, StoryAppend)
+    assert type(sa) == StoryAppend
 
 def test_mosfile_detect_storydelete(rostorydelete):
     """
@@ -54,7 +54,7 @@ def test_mosfile_detect_storydelete(rostorydelete):
     EXPECT: An object of type StoryDelete
     """
     sd = MosFile.from_file(rostorydelete)
-    assert isinstance(sd, StoryDelete)
+    assert type(sd) == StoryDelete
 
 def test_mosfile_detect_storyinsert(rostoryinsert):
     """
@@ -62,7 +62,7 @@ def test_mosfile_detect_storyinsert(rostoryinsert):
     EXPECT: An object of type StoryInsert
     """
     si = MosFile.from_file(rostoryinsert)
-    assert isinstance(si, StoryInsert)
+    assert type(si) == StoryInsert
 
 def test_mosfile_detect_storymove(rostorymove):
     """
@@ -70,7 +70,7 @@ def test_mosfile_detect_storymove(rostorymove):
     EXPECT: An object of type StoryMove
     """
     sm = MosFile.from_file(rostorymove)
-    assert isinstance(sm, StoryMove)
+    assert type(sm) == StoryMove
 
 def test_mosfile_detect_storyreplace(rostoryreplace):
     """
@@ -78,7 +78,7 @@ def test_mosfile_detect_storyreplace(rostoryreplace):
     EXPECT: An object of type StoryReplace
     """
     sr = MosFile.from_file(rostoryreplace)
-    assert isinstance(sr, StoryReplace)
+    assert type(sr) == StoryReplace
 
 def test_mosfile_detect_itemdelete(roitemdelete):
     """
@@ -86,7 +86,7 @@ def test_mosfile_detect_itemdelete(roitemdelete):
     EXPECT: An object of type ItemDelete
     """
     id = MosFile.from_file(roitemdelete)
-    assert isinstance(id, ItemDelete)
+    assert type(id) == ItemDelete
 
 def test_mosfile_detect_iteminsert(roiteminsert):
     """
@@ -94,7 +94,7 @@ def test_mosfile_detect_iteminsert(roiteminsert):
     EXPECT: An object of type ItemInsert
     """
     ii = MosFile.from_file(roiteminsert)
-    assert isinstance(ii, ItemInsert)
+    assert type(ii) == ItemInsert
 
 def test_mosfile_detect_movemultipleitem(roitemmovemultiple):
     """
@@ -102,7 +102,7 @@ def test_mosfile_detect_movemultipleitem(roitemmovemultiple):
     EXPECT: An object of type ItemMoveMultiple
     """
     imm = MosFile.from_file(roitemmovemultiple)
-    assert isinstance(imm, ItemMoveMultiple)
+    assert type(imm) == ItemMoveMultiple
 
 def test_mosfile_detect_replaceitem(roitemreplace):
     """
@@ -110,7 +110,7 @@ def test_mosfile_detect_replaceitem(roitemreplace):
     EXPECT: An object of type ItemReplace
     """
     ir = MosFile.from_file(roitemreplace)
-    assert isinstance(ir, ItemReplace)
+    assert type(ir) == ItemReplace
 
 def test_mosfile_detect_roreplace(roreplace):
     """
@@ -118,7 +118,7 @@ def test_mosfile_detect_roreplace(roreplace):
     EXPECT: An object of type RunningOrderReplace
     """
     rr = MosFile.from_file(roreplace)
-    assert isinstance(rr, RunningOrderReplace)
+    assert type(rr) == RunningOrderReplace
 
 def test_mosfile_detect_elementaction_replace_story(roelementactionstoryreplace):
     """
@@ -127,7 +127,7 @@ def test_mosfile_detect_elementaction_replace_story(roelementactionstoryreplace)
     EXPECT: An object of type EAStoryReplace
     """
     ea = MosFile.from_file(roelementactionstoryreplace)
-    assert isinstance(ea, EAStoryReplace)
+    assert type(ea) == EAStoryReplace
 
 def test_mosfile_detect_elementaction_replace_item(roelementactionitemreplace):
     """
@@ -136,7 +136,7 @@ def test_mosfile_detect_elementaction_replace_item(roelementactionitemreplace):
     EXPECT: An object of type EAItemReplace
     """
     ea = MosFile.from_file(roelementactionitemreplace)
-    assert isinstance(ea, EAItemReplace)
+    assert type(ea) == EAItemReplace
 
 def test_mosfile_detect_elementaction_delete_story(roelementactionstorydelete):
     """
@@ -145,7 +145,7 @@ def test_mosfile_detect_elementaction_delete_story(roelementactionstorydelete):
     EXPECT: An object of type EAStoryDelete
     """
     ea = MosFile.from_file(roelementactionstorydelete)
-    assert isinstance(ea, EAStoryDelete)
+    assert type(ea) == EAStoryDelete
 
 def test_mosfile_detect_elementaction_delete_item(roelementactionitemdelete):
     """
@@ -154,7 +154,7 @@ def test_mosfile_detect_elementaction_delete_item(roelementactionitemdelete):
     EXPECT: An object of type EAItemDelete
     """
     ea = MosFile.from_file(roelementactionitemdelete)
-    assert isinstance(ea, EAItemDelete)
+    assert type(ea) == EAItemDelete
 
 def test_mosfile_detect_elementaction_insert_story(roelementactionstoryinsert):
     """
@@ -163,7 +163,7 @@ def test_mosfile_detect_elementaction_insert_story(roelementactionstoryinsert):
     EXPECT: An object of type EAStoryInsert
     """
     ea = MosFile.from_file(roelementactionstoryinsert)
-    assert isinstance(ea, EAStoryInsert)
+    assert type(ea) == EAStoryInsert
 
 def test_mosfile_detect_elementaction_insert_item(roelementactioniteminsert):
     """
@@ -172,7 +172,7 @@ def test_mosfile_detect_elementaction_insert_item(roelementactioniteminsert):
     EXPECT: An object of type EAItemInsert
     """
     ea = MosFile.from_file(roelementactioniteminsert)
-    assert isinstance(ea, EAItemInsert)
+    assert type(ea) == EAItemInsert
 
 def test_mosfile_detect_elementaction_swap_story(roelementactionstoryswap):
     """
@@ -181,7 +181,7 @@ def test_mosfile_detect_elementaction_swap_story(roelementactionstoryswap):
     EXPECT: An object of type EAStorySwap
     """
     ea = MosFile.from_file(roelementactionstoryswap)
-    assert isinstance(ea, EAStorySwap)
+    assert type(ea) == EAStorySwap
 
 def test_mosfile_detect_elementaction_swap_item(roelementactionitemswap):
     """
@@ -190,7 +190,7 @@ def test_mosfile_detect_elementaction_swap_item(roelementactionitemswap):
     EXPECT: An object of type EAItemSwap
     """
     ea = MosFile.from_file(roelementactionitemswap)
-    assert isinstance(ea, EAItemSwap)
+    assert type(ea) == EAItemSwap
 
 def test_mosfile_detect_elementaction_move_story(roelementactionstorymove):
     """
@@ -199,7 +199,7 @@ def test_mosfile_detect_elementaction_move_story(roelementactionstorymove):
     EXPECT: An object of type EAStoryMove
     """
     ea = MosFile.from_file(roelementactionstorymove)
-    assert isinstance(ea, EAStoryMove)
+    assert type(ea) == EAStoryMove
 
 def test_mosfile_detect_elementaction_move_item(roelementactionitemmove):
     """
@@ -208,7 +208,7 @@ def test_mosfile_detect_elementaction_move_item(roelementactionitemmove):
     EXPECT: An object of type EAItemMove
     """
     ea = MosFile.from_file(roelementactionitemmove)
-    assert isinstance(ea, EAItemMove)
+    assert type(ea) == EAItemMove
 
 def test_mosfile_detect_metadata_replace(rometadatareplace):
     """
@@ -216,7 +216,7 @@ def test_mosfile_detect_metadata_replace(rometadatareplace):
     EXPECT: An object of type MetaDataReplace
     """
     ea = MosFile.from_file(rometadatareplace)
-    assert isinstance(ea, MetaDataReplace)
+    assert type(ea) == MetaDataReplace
 
 def test_mosfile_detect_delete(rodelete):
     """
@@ -224,11 +224,15 @@ def test_mosfile_detect_delete(rodelete):
     EXPECT: An object of type RunningOrderEnd
     """
     rd = MosFile.from_file(rodelete)
-    assert isinstance(rd, RunningOrderEnd)
+    assert type(rd) == RunningOrderEnd
 
 def test_mosfile_detect_readytoair(roreadytoair):
     rta = MosFile.from_file(roreadytoair)
-    assert isinstance(rta, ReadyToAir)
+    assert type(rta) == ReadyToAir
+
+def test_mosfile_detect_roctrl(roctrl):
+    rc = MosFile.from_file(roctrl)
+    assert type(rc) == ControlStop
 
 def test_get_mos_object_invalid_mos_type(roinvalid):
     with pytest.raises(UnknownMosFileType):

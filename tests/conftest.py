@@ -117,6 +117,10 @@ def rodelete():
 def roreadytoair():
     return MOCK_MOS / 'roReadyToAir.mos'
 
+@pytest.fixture()
+def roctrl():
+    return MOCK_MOS / 'roCtrl.mos'
+
 
 @pytest.fixture()
 def ro_all(rocreate, rostorysend1, rostorysend2, roelementactionstoryreplace,
