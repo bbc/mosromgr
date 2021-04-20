@@ -36,65 +36,22 @@ def test_detect():
 
 def test_inspect():
     args = main.parser.parse_args(['inspect', '-f', 'roCreate.mos.xml'])
-    assert args.file == 'roCreate.mos.xml'
+    assert args.files == ['roCreate.mos.xml']
+    assert not args.bucket_name
+    assert not args.key
 
     args = main.parser.parse_args(['inspect', '--file', 'roCreate.mos.xml'])
-    assert args.file == 'roCreate.mos.xml'
-
-    with pytest.raises(SystemExit):
-        args = main.parser.parse_args(
-            ['inspect', '-f', 'roCreate.mos.xml', 'roDelete.mos.xml'])
-
-    args = main.parser.parse_args(['inspect', '-f', 'roCreate.mos.xml'])
-    assert args.file == 'roCreate.mos.xml'
+    assert args.files == ['roCreate.mos.xml']
     assert not args.bucket_name
     assert not args.key
-    assert not args.start_time
-    assert not args.duration
-    assert not args.stories
-    assert not args.items
-    assert not args.notes
 
-    args = main.parser.parse_args(
-        ['inspect', '-b', 'bucket', '-k', 'key'])
-    assert not args.file
+    args = main.parser.parse_args(['inspect', '-b', 'bucket', '-k', 'key'])
+    assert not args.files
     assert args.bucket_name == 'bucket'
     assert args.key == 'key'
-    assert not args.start_time
-    assert not args.duration
-    assert not args.stories
-    assert not args.items
-    assert not args.notes
-
-    args = main.parser.parse_args(
-        ['inspect', '-f', 'roCreate.mos.xml', '-t', '-d', '-s', '-i', '-n'])
-    assert args.file == 'roCreate.mos.xml'
-    assert not args.bucket_name
-    assert not args.key
-    assert args.start_time
-    assert args.duration
-    assert args.stories
-    assert args.items
-    assert args.notes
-
-    args = main.parser.parse_args(
-        ['inspect', '-f', 'roCreate.mos.xml', '--start-time', '--end-time',
-        '--duration', '--stories', '--items', '--notes'])
-    assert args.file == 'roCreate.mos.xml'
-    assert not args.bucket_name
-    assert not args.key
-    assert args.start_time
-    assert args.duration
-    assert args.stories
-    assert args.items
-    assert args.notes
 
 
 def test_merge():
-    # TODO
-    # with pytest.raises(SystemExit):
-    #     args = main.parser.parse_args(['merge'])
-
     args = main.parser.parse_args(['merge', '-f', 'roCreate.mos.xml'])
     assert args.files == ['roCreate.mos.xml']
 
