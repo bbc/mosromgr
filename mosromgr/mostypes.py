@@ -134,9 +134,7 @@ class MosFile:
         The base tag (:class:`xml.etree.ElementTree.Element`) within the
         :attr:`xml`, as determined by :attr:`base_tag_name`
         """
-        if self._base_tag is None:
-            self._base_tag = self.xml.find(self.base_tag_name)
-        return self._base_tag
+        return self.xml.find(self.base_tag_name)
 
     @property
     def message_id(self):
