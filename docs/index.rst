@@ -171,12 +171,14 @@ Contributors
 - `Rob French`_
 - `Lucy MacGlashan`_
 - `Dave Bevan`_
+- `Matthew Sim`_
 
 .. _Ben Nuttall: https://github.com/bennuttall
 .. _Owen Tourlamain: https://github.com/OwenTourlamain
 .. _Rob French: https://github.com/FrencR
 .. _Lucy MacGlashan: https://github.com/lannem
 .. _Dave Bevan: https://github.com/bevand10
+.. _Matthew Sim: https://github.com/MattSBBC
 
 Licence
 =======
