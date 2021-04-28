@@ -1,0 +1,26 @@
+<story>
+  <storyID>STORY1</storyID>
+  <storySlug>STORY 1</storySlug>
+  <mosExternalMetadata>
+    <mosPayload>
+      <TextTime>1</TextTime>
+      <MediaTime>2</MediaTime>
+    </mosPayload>
+  </mosExternalMetadata>
+  <p>Welcome</p>
+  <p/>
+  <item>
+    <itemID>ITEM1</itemID>
+    <itemSlug>ITEM 1</itemSlug>
+  </item>
+  <p>Welcome again</p>
+  <item>
+    <itemID>ITEM2</itemID>
+    <itemSlug>ITEM 2</itemSlug>
+  </item>
+  <p>Goodbye</p>
+  <item>
+    <itemID>ITEM3</itemID>
+    <itemSlug>ITEM 3</itemSlug>
+  </item>
+</story>

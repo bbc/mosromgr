@@ -42,6 +42,19 @@ def _get_story_duration(story_tag):
         return 0
 
 
+def _is_technical_note(p):
+    """
+    Return True if the text in a paragraph element is surrounded by round () or
+    angle <> brackets.
+    """
+    text = p.text.strip()
+    if text.startswith('(') and text.endswith(')'):
+        return True
+    if text.startswith('<') and text.endswith('>'):
+        return True
+    return False
+
+
 class MosElement:
     "Abstract base class for MOS elements"
     def __init__(self, xml, *, id=None, slug=None):
@@ -54,9 +67,9 @@ class MosElement:
     def __repr__(self):
         try:
             short_id = self.id.split(',')[-1]
-            return f'<{self.__class__.__name__} {short_id}>'
+            return f"<{self.__class__.__name__} {short_id}>"
         except AttributeError:
-            return f'<{self.__class__.__name__}>'
+            return f"<{self.__class__.__name__}>"
 
     def __str__(self):
         "The XML string"
@@ -144,7 +157,10 @@ class Story(MosElement):
         The time offset of the story in seconds (:class:`float` or ``None`` if
         not available in the XML)
         """
-        return self._story_offsets.get(self.id)
+        try:
+            return self._story_offsets.get(self.id)
+        except AttributeError:
+            return
 
     @property
     def start_time(self):
@@ -158,7 +174,13 @@ class Story(MosElement):
             start_time = mos_payload.find('StoryStarted').text
             return parse(start_time)
         except AttributeError:
-            return self._prog_start_time + timedelta(seconds=self.offset)
+            pass
+
+        prog_start_time = self._prog_start_time
+        offset = self.offset
+        if prog_start_time is None or offset is None:
+            return
+        return self._prog_start_time + timedelta(seconds=self.offset)
 
     @property
     def end_time(self):
@@ -172,7 +194,39 @@ class Story(MosElement):
             end_time = mos_payload.find('StoryEnded').text
             return parse(end_time)
         except AttributeError:
-            return self.start_time + timedelta(seconds=self.duration)
+            pass
+
+        start_time = self.start_time
+        duration = self.duration
+        if start_time is None or duration is None:
+            return
+        return self.start_time + timedelta(seconds=self.duration)
+
+    @property
+    def script(self):
+        """
+        A list of strings found in paragraph tags within the story body,
+        excluding any empty paragraphs or technical notes in brackets.
+        """
+        return [
+            p.text.strip()
+            for p in self.xml.findall('p')
+            if p.text and p.text.strip() and not _is_technical_note(p)
+        ]
+
+    @property
+    def body(self):
+        """
+        A list of elements found in the story body. Each item in the list is
+        either a string (representing a ``<p>`` tag) or an :class:`Item` object
+        (representing an ``<item>`` tag). Unlike :attr:`script`, this does not
+        exclude empty paragraph tags.
+        """
+        return [
+            Item(tag) if tag.tag == 'item' else tag.text
+            for tag in self.xml
+            if tag.tag in ('item', 'p')
+        ]
 
 
 class Item(MosElement):
