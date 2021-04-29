@@ -627,8 +627,15 @@ class StoryInsert(MosFile):
             raise MosMergeError(
                 f"{self.__class__.__name__} error in {self.message_id} - no story to insert"
             )
-        for story in stories:
-            insert_node(parent=ro.base_tag, node=story, index=target_index)
+        ro_story_ids = {story.id for story in ro.stories}
+        for new_story in stories:
+            new_story_id = new_story.find('storyID').text
+            if new_story_id in ro_story_ids:
+                msg = f"{self.__class__.__name__} error in {self.message_id} - story already found in running order"
+                logger.warning(msg)
+                warnings.warn(msg, DuplicateStoryWarning)
+                continue
+            insert_node(parent=ro.base_tag, node=new_story, index=target_index)
             target_index += 1
         return ro
 
