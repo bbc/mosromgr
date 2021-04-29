@@ -3,11 +3,13 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from pathlib import Path
+import xml.etree.ElementTree as ET
 
 import pytest
 
 HERE = Path(__file__).parent.absolute()
 MOCK_MOS = HERE / 'mock_mos'
+MOCK_XML = HERE / 'mock_xml'
 
 @pytest.fixture()
 def rocreate():
@@ -163,3 +165,11 @@ def roinvalid():
 @pytest.fixture()
 def rodelete2():
     return MOCK_MOS / 'roDelete2.mos'
+
+@pytest.fixture()
+def story_xml():
+    return ET.parse(MOCK_XML / 'story.xml').getroot()
+
+@pytest.fixture()
+def item_xml():
+    return ET.parse(MOCK_XML / 'item.xml').getroot()

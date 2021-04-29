@@ -6,6 +6,7 @@ import xml.etree.ElementTree as ET
 import logging
 import warnings
 import copy
+import itertools
 
 import xmltodict
 from dateutil.parser import parse
@@ -238,6 +239,29 @@ class RunningOrder(MosFile):
         merged (:class:`bool`)
         """
         return self.xml.find('mosromgrmeta') is not None
+
+    @property
+    def script(self):
+        """
+        A list of strings found in paragraph tags within the story bodies,
+        excluding any empty paragraphs or technical notes in brackets.
+        """
+        return list(
+            itertools.chain.from_iterable(story.script for story in self.stories)
+        )
+
+    @property
+    def body(self):
+        """
+        A list of elements found in the story bodies. Each item in the list is
+        either a string (representing a ``<p>`` tag) or an
+        :class:`~mosromgr.moselements.Item` object (representing an ``<item>``
+        tag). Unlike :attr:`script`, this does not exclude empty paragraph tags.
+        """
+        return list(
+            itertools.chain.from_iterable(story.body for story in self.stories)
+        )
+
 
     def _find_story(self, story_id):
         return [
