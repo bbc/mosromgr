@@ -18,6 +18,14 @@ Since last release
 - Corrected some singular :class:`~mosromgr.mostypes.MosFile`
   :doc:`api_moselements` properties that should have been lists (e.g.
   ``source_story`` should have been ``source_stories``)
+- Improved validation and error handling when merging various
+  :class:`~mosromgr.mostypes.MosFile` objects
+- Added :attr:`~mosromgr.moselements.Story.script` and
+  :attr:`~mosromgr.moselements.Story.body` to
+  :class:`~mosromgr.moselements.Story`
+- Added :attr:`~mosromgr.mostypes.RunningOrder.script` and
+  :attr:`~mosromgr.mostypes.RunningOrder.body` to
+  :class:`~mosromgr.mostypes.RunningOrder`
 
 Release 0.8.1 (2021-04-14)
 ==========================
