@@ -54,6 +54,15 @@ def _is_technical_note(p):
         return True
     return False
 
+def _get_tag_text(tag):
+    """
+    If a <p> tag contains text, return it, otherwise return an empty string
+    (rather than None).
+    """
+    if tag.text is not None:
+        return tag.text
+    return ''
+
 
 class MosElement:
     "Abstract base class for MOS elements"
@@ -223,7 +232,7 @@ class Story(MosElement):
         exclude empty paragraph tags.
         """
         return [
-            Item(tag) if tag.tag == 'item' else tag.text
+            Item(tag) if tag.tag == 'item' else _get_tag_text(tag)
             for tag in self.xml
             if tag.tag in ('item', 'p')
         ]

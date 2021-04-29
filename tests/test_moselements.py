@@ -33,14 +33,20 @@ def test_story_properties(story_xml):
     assert story.end_time is None
     assert type(story.script) == list
     assert len(story.script) == 3
-    p = story.script[0]
-    assert p == "Welcome"
+    for p in story.script:
+        assert type(p) == str
+    p1 = story.script[0]
+    assert p1 == "Welcome"
+    p2 = story.script[1]
+    assert p2 == "Welcome again"
     assert type(story.body) == list
     assert len(story.body) == 7
+    for p in story.body:
+        assert type(p) in (str, Item)
     body_part_1 = story.body[0]
     assert body_part_1 == "Welcome"
     body_part_2 = story.body[1]
-    assert body_part_2 is None
+    assert body_part_2 == ""
     body_part_3 = story.body[2]
     assert type(body_part_3) == Item
 
