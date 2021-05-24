@@ -30,6 +30,10 @@ class MosRoMgrWarning(Warning):
     "Base class for all warnings in mosromgr"
 
 
+class MosMergeNonStrictWarning(MosRoMgrWarning):
+    "Warning raised when a merge error occurs in non-strict mode"
+
+
 class ItemNotFoundWarning(MosRoMgrWarning):
     "Warning raised when an item cannot be found during a :class:`~mosromgr.mostypes.MosFile` merge"
 

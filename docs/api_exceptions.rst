@@ -63,6 +63,12 @@ MosRoMgrWarning
 .. autoexception:: mosromgr.exc.MosRoMgrWarning
     :show-inheritance:
 
+MosMergeNonStrictWarning
+------------------------
+
+.. autoexception:: mosromgr.exc.MosMergeNonStrictWarning
+    :show-inheritance:
+
 ItemNotFoundWarning
 -------------------
 

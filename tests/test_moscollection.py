@@ -174,8 +174,8 @@ def test_mos_collection_s3_merge(get_mos_files, get_file_contents, boto3,
 
 def test_mos_collection_merge_warning(rocreate, rostorysend3, rodelete):
     """
-    GIVEN: Running order and invalid StorySend, in list form
-    EXPECT: MosMergeError
+    GIVEN: Running order, invalid StorySend and roDelete
+    EXPECT: StoryNotFoundWarning
     """
     mos_files = [rocreate, rostorysend3, rodelete]
     mc = MosCollection.from_files(mos_files)
@@ -183,3 +183,26 @@ def test_mos_collection_merge_warning(rocreate, rostorysend3, rodelete):
         mc.merge()
     assert len(w) == 1
     assert w[0].category == StoryNotFoundWarning
+
+def test_mos_collection_merge_error(rocreate, rostoryinsert2, rodelete):
+    """
+    GIVEN: Running order, StoryInsert with unknown story, and roDelete (strict mode)
+    EXPECT: MosMergeWarning
+    """
+    mos_files = [rocreate, rostoryinsert2, rodelete]
+    mc = MosCollection.from_files(mos_files)
+    with pytest.raises(MosMergeError):
+        mc.merge()
+
+def test_mos_collection_merge_nonstrict_warning(rocreate, rostoryinsert2, rodelete):
+    """
+    GIVEN: Running order, StoryInsert with unknown story, and roDelete (non-strict mode)
+    EXPECT: MosMergeNonStrictWarning
+    """
+    mos_files = [rocreate, rostoryinsert2, rodelete]
+    mc = MosCollection.from_files(mos_files)
+    with warnings.catch_warnings(record=True) as w:
+        mc.merge(strict=False)
+    assert len(w) == 1
+    assert w[0].category == MosMergeNonStrictWarning
+    assert mc.completed
