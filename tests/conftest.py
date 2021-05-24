@@ -92,6 +92,10 @@ def rostoryinsert():
     return MOCK_MOS / 'roStoryInsert.mos.xml'
 
 @pytest.fixture()
+def rostoryinsert2():
+    return MOCK_MOS / 'roStoryInsert2.mos.xml'
+
+@pytest.fixture()
 def roiteminsert():
     return MOCK_MOS / 'roItemInsert.mos.xml'
 

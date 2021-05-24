@@ -3,10 +3,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import logging
+import warnings
 
 from .mostypes import MosFile, RunningOrder, RunningOrderEnd
 from .utils import s3
-from .exc import InvalidMosCollection
+from .exc import MosMergeError, InvalidMosCollection, MosMergeNonStrictWarning
 
 
 logger = logging.getLogger('mosromgr.moscollection')
@@ -258,11 +259,21 @@ class MosCollection:
             mr for mr in self.mos_readers if mr.mos_type != RunningOrder
         ]
 
-    def merge(self):
-        "Merge all MOS files into the collection's running order (:attr:`ro`)"
+    def merge(self, *, strict=True):
+        """
+        Merge all MOS files into the collection's running order (:attr:`ro`). If
+        *strict* is ``True`` (the default), then merge errors will be fatal. If
+        ``False``, then merge errors will be downgraded to warnings.
+        """
         logger.info("Merging %s MosReaders into RunningOrder", len(self.mos_readers))
         for mr in self.mos_readers:
             mo = mr.mos_object
             logger.info("Merging %s %s", mo.__class__.__name__, mr.message_id)
-            self._ro += mo
+            try:
+                self._ro += mo
+            except MosMergeError as e:
+                if strict:
+                    raise
+                logger.error(str(e))
+                warnings.warn(str(e), MosMergeNonStrictWarning)
         logger.info("Completed merging %s mos files", len(self.mos_readers))

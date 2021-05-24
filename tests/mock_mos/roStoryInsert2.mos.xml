@@ -1,0 +1,38 @@
+<mos>
+  <mosID>MOS ID</mosID>
+  <messageID>1027</messageID>
+  <roStoryInsert>
+    <roID>RO ID</roID>
+    <storyID>STORY2000</storyID>
+    <story>
+      <storyID>STORYNEW2000</storyID>
+      <storySlug>STORY NEW 2000</storySlug>
+      <storyNum></storyNum>
+      <mosExternalMetadata>
+        <mosPayload>
+          <TextTime>1</TextTime>
+          <MediaTime>5</MediaTime>
+        </mosPayload>
+      </mosExternalMetadata>
+      <item>
+        <itemID>ITEMNEW1</itemID>
+        <itemSlug>ITEM NEW 1</itemSlug>
+      </item>
+    </story>
+    <story>
+      <storyID>STORYNEW2</storyID>
+      <storySlug>STORY NEW 2</storySlug>
+      <storyNum></storyNum>
+      <mosExternalMetadata>
+        <mosPayload>
+          <TextTime>10</TextTime>
+          <MediaTime>5</MediaTime>
+        </mosPayload>
+      </mosExternalMetadata>
+      <item>
+        <itemID>ITEMNEW21</itemID>
+        <itemSlug>ITEM NEW 21</itemSlug>
+      </item>
+    </story>
+  </roStoryInsert>
+</mos>

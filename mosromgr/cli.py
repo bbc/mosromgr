@@ -155,6 +155,11 @@ class CLI:
             action='store_true',
             help=("Allow an incomplete collection")
         )
+        merge_cmd.add_argument(
+            "-n", "--non-strict",
+            action='store_true',
+            help=("Downgrade MOS merge errors to warnings")
+        )
         merge_cmd.set_defaults(cmd='merge', func=self.do_merge)
 
         return parser, commands.choices
@@ -255,13 +260,13 @@ class CLI:
                         bucket_name=self._args.bucket_name,
                         prefix=self._args.prefix,
                         suffix=self._args.suffix,
-                        allow_incomplete=self._args.incomplete
+                        allow_incomplete=self._args.incomplete,
                     )
                 else:
                     mc = MosCollection.from_s3(
                         bucket_name=self._args.bucket_name,
                         prefix=self._args.prefix,
-                        allow_incomplete=self._args.incomplete
+                        allow_incomplete=self._args.incomplete,
                     )
             else:
                 sys.stderr.write("Files or bucket name and prefix must be provided\n\n")
@@ -270,7 +275,8 @@ class CLI:
         except InvalidMosCollection as e:
             sys.stderr.write(f"Error: {e}\n")
             return 2
-        mc.merge()
+        strict = not self._args.non_strict
+        mc.merge(strict=strict)
         if self._args.outfile:
             with open(self._args.outfile, 'w') as f:
                 print("Writing merged running order to", self._args.outfile)
