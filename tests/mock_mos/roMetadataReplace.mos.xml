@@ -4,6 +4,6 @@
   <roMetadataReplace>
     <roID>RO ID</roID>
     <roSlug>RO SLUG NEW</roSlug>
-    <roEdStart/>
+    <roEdStart>2020-01-01T12:45:00</roEdStart>
   </roMetadataReplace>
 </mos>
