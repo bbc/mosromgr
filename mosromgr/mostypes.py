@@ -218,7 +218,8 @@ class RunningOrder(MosFile):
             ro_ed_start = self.base_tag.find('roEdStart').text
         except AttributeError:
             return
-        return parse(ro_ed_start)
+        if ro_ed_start is not None:
+            return parse(ro_ed_start)
 
     @property
     def end_time(self):
