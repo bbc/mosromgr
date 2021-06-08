@@ -1420,10 +1420,10 @@ class EAStoryInsert(ElementAction):
             story_index = len(ro.stories)
         else:
             story, story_index = find_child(parent=ro.base_tag, child_tag='story', id=self.story.id)
-        if story is None:
-            raise MosMergeError(
-                f"{self.__class__.__name__} error in {self.message_id} - target story not found"
-            )
+            if story is None:
+                raise MosMergeError(
+                    f"{self.__class__.__name__} error in {self.message_id} - target story not found"
+                )
         if len(self.stories) == 0:
             raise MosMergeError(
                 f"{self.__class__.__name__} error in {self.message_id} - no source stories given"
