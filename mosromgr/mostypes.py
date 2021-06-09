@@ -1696,14 +1696,13 @@ class EAStoryMove(ElementAction):
         running order.
         """
         if self.story.id is None:
-            raise MosMergeError(
-                f"{self.__class__.__name__} error in {self.message_id} - target story not given"
-            )
-        target_story, target_story_index = find_child(parent=ro.base_tag, child_tag='story', id=self.story.id)
-        if target_story is None:
-            raise MosMergeError(
-                f"{self.__class__.__name__} error in {self.message_id} - target story not found"
-            )
+            target_story_index = len(ro.stories)
+        else:
+            target_story, target_story_index = find_child(parent=ro.base_tag, child_tag='story', id=self.story.id)
+            if target_story is None:
+                raise MosMergeError(
+                    f"{self.__class__.__name__} error in {self.message_id} - target story not found"
+                )
 
         if len(self.stories) == 0:
             msg = f"{self.__class__.__name__} error in {self.message_id} - no source stories given"
