@@ -42,6 +42,21 @@ Example chapterised breakdown of an episode of `Newsnight`_:
 
 .. _Newsnight: https://www.bbc.co.uk/programmes/b006mk25
 
+BBC News Labs - Auto chapterisation
+===================================
+
+We were able to decorate the player timeline with chapter points in certain BBC
+TV and radio programmes:
+
+.. image:: images/newslabs-sounds-today.png
+    :align: center
+
+We used the script and story timing information extracted from the running
+order and aligned it against the transcript.
+
+.. image:: images/newslabs-sounds-today-chapters.png
+    :align: center
+
 BBC News Labs - Live Segment Notifications
 ==========================================
 
