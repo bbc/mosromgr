@@ -11,8 +11,8 @@ Changelog
     stable and may change. Once the library reaches v1.0, it will be considered
     stable. Please consider giving :doc:`feedback` to help stabilise the API.
 
-Since last release
-==================
+Release 0.9.0 (2021-06-21)
+==========================
 
 - Updated :ref:`cli_mosromgr_inspect` CLI command to work for all file types
 - Corrected some singular :class:`~mosromgr.mostypes.MosFile`
@@ -26,6 +26,10 @@ Since last release
 - Added :attr:`~mosromgr.mostypes.RunningOrder.script` and
   :attr:`~mosromgr.mostypes.RunningOrder.body` to
   :class:`~mosromgr.mostypes.RunningOrder`
+- Added non-strict mode to :class:`mosromgr.moscollection.MosCollection` merge
+  method and CLI
+- Corrected some edge cases in :class:`~mosromgr.mostypes.MosFile` subclass merge
+  implementations (e.g. empty ``storyID`` tag means move to bottom)
 
 Release 0.8.1 (2021-04-14)
 ==========================

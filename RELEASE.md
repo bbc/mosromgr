@@ -29,7 +29,7 @@ documentation builds correctly (`make doc`)
     git push --tags
     ```
 
-1. Run `make build` to create source and binary distributions
+1. Run `make build` to create source (``.tar.gz``) and binary (``.whl``) distributions in ``dist/``
 
 1. Run `make release` to release source and binary distribution files to PyPI
 
