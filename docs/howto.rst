@@ -26,10 +26,10 @@ object by using the ``+`` operator::
 
     >>> from mosromgr.mostypes import RunningOrder, StoryInsert
     >>> ro = RunningOrder.from_file('123456-roCreate.mos.xml')
-    >>> ss = StoryInsert.from_file('123457-roStoryInsert.mos.xml')
+    >>> si = StoryInsert.from_file('123457-roStoryInsert.mos.xml')
     >>> len(ro.stories)
     10
-    >>> ro += ss
+    >>> ro += si
     >>> len(ro.stories)
     11
 
