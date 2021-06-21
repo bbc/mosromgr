@@ -752,14 +752,16 @@ class StoryMove(MosFile):
         """
         Merge into the :class:`RunningOrder` object provided.
 
-        Moves the story given in the ``roStoryMove`` message to a new position
-        in the running order.
+        Moves the source story to the position above the target story.
         """
-        target_story, target_story_index = find_child(parent=ro.base_tag, child_tag='story', id=self.target_story.id)
-        if target_story is None:
-            raise MosMergeError(
-                f"{self.__class__.__name__} error in {self.message_id} - target story not found"
-            )
+        if self.target_story.id is None:
+            target_story_index = len(ro.stories)
+        else:
+            target_story, target_story_index = find_child(parent=ro.base_tag, child_tag='story', id=self.target_story.id)
+            if target_story is None:
+                raise MosMergeError(
+                    f"{self.__class__.__name__} error in {self.message_id} - target story not found"
+                )
         source_story, source_index = find_child(parent=ro.base_tag, child_tag='story', id=self.source_story.id)
         if source_story is None:
             raise MosMergeError(
