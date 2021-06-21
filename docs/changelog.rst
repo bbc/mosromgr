@@ -16,7 +16,7 @@ Release 0.9.0 (2021-06-21)
 
 - Updated :ref:`cli_mosromgr_inspect` CLI command to work for all file types
 - Corrected some singular :class:`~mosromgr.mostypes.MosFile`
-  :doc:`api_moselements` properties that should have been lists (e.g.
+  :doc:`MOS element <api_moselements>` properties that should have been lists (e.g.
   ``source_story`` should have been ``source_stories``)
 - Improved validation and error handling when merging various
   :class:`~mosromgr.mostypes.MosFile` objects
@@ -26,7 +26,7 @@ Release 0.9.0 (2021-06-21)
 - Added :attr:`~mosromgr.mostypes.RunningOrder.script` and
   :attr:`~mosromgr.mostypes.RunningOrder.body` to
   :class:`~mosromgr.mostypes.RunningOrder`
-- Added non-strict mode to :class:`mosromgr.moscollection.MosCollection` merge
+- Added non-strict mode to :meth:`mosromgr.moscollection.MosCollection.merge`
   method and CLI
 - Corrected some edge cases in :class:`~mosromgr.mostypes.MosFile` subclass merge
   implementations (e.g. empty ``storyID`` tag means move to bottom)
