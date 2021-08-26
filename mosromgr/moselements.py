@@ -262,6 +262,22 @@ class Item(MosElement):
         return super().slug
 
     @property
+    def type(self):
+        "The Item type (:class:`str` or ``None`` if not available in the XML)"
+        obj_type = self.xml.find('objType')
+        if obj_type is not None:
+            return obj_type.text
+
+    @property
+    def mos_id(self):
+        """
+        The Item's MOS ID (:class:`str` or ``None`` if not available in the XML)
+        """
+        mos_id = self.xml.find('mosID')
+        if mos_id is not None:
+            return mos_id.text
+
+    @property
     def note(self):
         "The item note text (:class:`str` or ``None`` if not found)"
         try:
