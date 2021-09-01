@@ -144,20 +144,22 @@ accessible in the :class:`~mosromgr.mostypes.RunningOrder`
     >>> len(ro.stories)
     4
 
-.. note::
-    Note that these classes should not normally be constructed by the user, but
-    instances of them can be found within :class:`~mosromgr.mostypes.MosFile`
-    objects, so the following documentation is provided as a reference to how
-    they can be used.
-
-.. note::
-    Note that additional information may be contained within the XML, and these
-    elements are simply an abstraction providing easy access to certain
-    elements. In the sprit of `escape hatches and ejector seats`_, the original
-    XML in which the element was found is accessible as an
-    :class:`xml.etree.ElementTree.Element` object for further introspection.
+Additional information may be contained within the XML, and not exposed by
+properties the way :attr:`~mosromgr.moselements.Item.slug` and
+:attr:`~mosromgr.moselements.Item.object_id` are. In the sprit of
+`escape hatches and ejector seats`_, the original XML in which the element was
+found is accessible as an :class:`xml.etree.ElementTree.Element` object for
+further introspection.
 
     .. _escape hatches and ejector seats: https://anvil.works/blog/escape-hatches-and-ejector-seats
+
+For example, if you knew some of the ``<item>`` tags in a running order
+contained an ``<areaID>`` field, and you wanted to access its value, you could
+do so by inspecting the :attr:`~mosromgr.moselements.Item.xml` property::
+
+    tag = item.xml.find('areaID')
+    if tag is not None:
+        print(tag.text)
 
 Handling Exceptions
 ===================

@@ -86,7 +86,7 @@ class MosElement:
 
     @property
     def xml(self):
-        "The parent XML element (:class:`xml.etree.ElementTree.Element`)"
+        "The XML element (:class:`xml.etree.ElementTree.Element`)"
         return self._xml
 
     @property
@@ -114,8 +114,7 @@ class Story(MosElement):
     This class represents a Story element within any
     :class:`~mosromgr.mostypes.MosFile` object, providing data relating to the
     story. The Story ID, Story slug, duration and more are exposed as
-    properties, and the parent XML element is provided for further
-    introspection.
+    properties, and the XML element is provided for further introspection.
     """
     def __init__(self, xml, *, id=None, slug=None, duration=None,
                  unknown_items=False, all_stories=None, prog_start_time=None):
@@ -241,10 +240,9 @@ class Story(MosElement):
 class Item(MosElement):
     """
     This class represents an Item element within any
-    :class:`~mosromgr.mostypes.MosFile` object, providing data relating to the
+    :class:`~mosromgr.mostypes.MosFile` object, providing data relating to an
     item within a :class:`Story`. The Item ID and Item slug are exposed as
-    properties, and the parent XML element is provided for further
-    introspection.
+    properties, and the XML element is provided for further introspection.
     """
     def __init__(self, xml, *, id=None, slug=None):
         super().__init__(xml, id=id, slug=slug)
@@ -263,10 +261,23 @@ class Item(MosElement):
 
     @property
     def type(self):
-        "The Item type (:class:`str` or ``None`` if not available in the XML)"
+        """
+        The Item's object type (:class:`str` or ``None`` if not available in the
+        XML)
+        """
         obj_type = self.xml.find('objType')
         if obj_type is not None:
             return obj_type.text
+
+    @property
+    def object_id(self):
+        """
+        The Item's Object ID (:class:`str` or ``None`` if not available in the
+        XML)
+        """
+        obj_id = self.xml.find('objID')
+        if obj_id is not None:
+            return obj_id.text
 
     @property
     def mos_id(self):

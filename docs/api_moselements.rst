@@ -17,6 +17,12 @@ as follows::
 
     from mosromgr.moselements import Story
 
+.. note::
+    Note that these classes should not normally be constructed by the user, but
+    instances of them can be found within :class:`~mosromgr.mostypes.MosFile`
+    objects, so the following documentation is provided as a reference to how
+    they can be used.
+
 Element classes
 ===============
 
