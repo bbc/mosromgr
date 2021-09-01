@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from xml.etree.ElementTree import Element
-from datetime import datetime
 
 from mosromgr.moselements import *
 
@@ -21,6 +20,7 @@ def test_story_init(story_xml):
 def test_story_properties(story_xml):
     "Test we can create a Story element and access its properties"
     story = Story(story_xml)
+    assert type(story.xml) == Element
     assert story.id == 'STORY1'
     assert story.slug == 'STORY 1'
     assert type(story.items) == list
@@ -50,14 +50,29 @@ def test_story_properties(story_xml):
     body_part_3 = story.body[2]
     assert type(body_part_3) == Item
 
-def test_item_init(item_xml):
+def test_item_init(item_mosart_xml):
     "Test we can create a Item element and access its repr"
-    item = Item(item_xml)
+    item = Item(item_mosart_xml)
     assert repr(item) == "<Item ITEM1>"
 
-def test_item_properties(item_xml):
+def test_item_properties(item_mosart_xml):
     "Test we can create a Item element and access its properties"
-    item = Item(item_xml)
+    item = Item(item_mosart_xml)
+    assert type(item.xml) == Element
     assert item.id == 'ITEM1'
     assert item.slug == 'ITEM 1'
     assert item.note is None
+    assert item.type == 'MOSART'
+    assert item.mos_id == 'MOS ID'
+    assert item.object_id == 100
+
+def test_item_properties(item_note_xml):
+    "Test we can create a Item element and access its properties"
+    item = Item(item_note_xml)
+    assert type(item.xml) == Element
+    assert item.id == 'ITEM2'
+    assert item.slug == 'ITEM 2'
+    assert item.note == 'THIS IS A NOTE'
+    assert item.type is None
+    assert item.mos_id == 'MOS ID'
+    assert item.object_id is None
