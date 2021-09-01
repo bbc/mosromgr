@@ -84,7 +84,7 @@ class CLI:
         )
         detect_cmd.add_argument(
             "-b", "--bucket-name", metavar="bucket",
-            help=("name of the S3 bucket containing the MOS files")
+            help=("The name of the S3 bucket containing the MOS files")
         )
         detect_cmd.add_argument(
             "-p", "--prefix", metavar="prefix",
@@ -110,7 +110,7 @@ class CLI:
         )
         inspect_cmd.add_argument(
             "-b", "--bucket-name", metavar="bucket",
-            help=("name of the S3 bucket containing the MOS files")
+            help=("The name of the S3 bucket containing the MOS files")
         )
         inspect_cmd.add_argument(
             "-p", "--prefix", metavar="prefix",
@@ -136,7 +136,7 @@ class CLI:
         )
         merge_cmd.add_argument(
             "-b", "--bucket-name", metavar="bucket",
-            help=("name of the S3 bucket containing MOS files")
+            help=("The name of the S3 bucket containing MOS files")
         )
         merge_cmd.add_argument(
             "-p", "--prefix", metavar="prefix",

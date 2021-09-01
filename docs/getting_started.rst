@@ -21,8 +21,8 @@ Command line interface check
 ============================
 
 After installing the module, a simple way to verify it's working is by using the
-:doc:`cli`. First of all, open a terminal and run the command ``mosromgr`` to be
-sure it's installed. You should see output like so:
+:doc:`cli/index`. First of all, open a terminal and run the command ``mosromgr``
+to be sure it's installed. You should see output like so:
 
 .. code-block:: console
 

@@ -2,9 +2,9 @@
 .. Copyright 2021 BBC
 .. SPDX-License-Identifier: Apache-2.0
 
-==================
-API - MOS Elements
-==================
+============
+MOS Elements
+============
 
 .. module:: mosromgr.moselements
 

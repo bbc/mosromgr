@@ -2,9 +2,9 @@
 .. Copyright 2021 BBC
 .. SPDX-License-Identifier: Apache-2.0
 
-===============
-API - MOS Types
-===============
+=========
+MOS Types
+=========
 
 .. module:: mosromgr.mostypes
 
@@ -31,9 +31,9 @@ or from an S3 file key::
 
     ro = RunningOrder.from_s3(bucket_name='newsnight', mos_file_key='20200101/roCreate.mos.xml')
 
-Similarly, objects constructed using these classmethods on the
-:class:`~mosromgr.mostypes.MosFile` base class will be automatically classified
-and an instance of the relevant class will be created::
+Similarly, objects constructed using these classmethods on the :class:`MosFile`
+base class will be automatically classified and an instance of the relevant
+class will be created::
 
     >>> ro = MosFile.from_file('roCreate.mos.xml')
     >>> ro
@@ -57,6 +57,11 @@ can be classified this way::
     >>> ea2 = MosFile.from_string(xml)
     >>> ea2
     <EAItemMove 1013>
+
+.. note::
+
+    Your AWS credentials must be configured to construct using the :meth:`~MosFile.from_s3`
+    classmethod. See https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html
 
 MOS message classes
 ===================
@@ -305,7 +310,7 @@ Base classes
 Since some logic is shared between MOS file management, some inheritance is used
 in the implementation:
 
-.. image:: images/class_hierarchy.*
+.. image:: ../images/class_hierarchy.*
     :align: center
 
 MosFile

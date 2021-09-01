@@ -8,8 +8,8 @@ Uses of mosromgr
 
 This section lists projects which have been known to use the *mosromgr* module.
 If you have used *mosromgr* in a project and would like to add it to the list,
-please `edit this file`_ and open a pull request, `open an issue`_, or send an
-email to bbcnewslabsteam@bbc.co.uk.
+please either `edit this file`_ and open a pull request, `open an issue`_, or
+send an email to bbcnewslabsteam@bbc.co.uk.
 
 .. _edit this file: https://github.com/bbc/mosromgr/blob/main/docs/uses.rst
 .. _open an issue: https://github.com/bbc/mosromgr/issues/new

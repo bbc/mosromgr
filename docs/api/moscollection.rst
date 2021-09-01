@@ -2,9 +2,9 @@
 .. Copyright 2021 BBC
 .. SPDX-License-Identifier: Apache-2.0
 
-====================
-API - MOS Collection
-====================
+==============
+MOS Collection
+==============
 
 .. module:: mosromgr.moscollection
 
@@ -35,6 +35,11 @@ from a list of strings::
 or from an S3 bucket::
 
     mc = MosCollection.from_s3(bucket_name=bucket_name, prefix=prefix)
+
+.. note::
+
+    Your AWS credentials must be configured to construct using the :meth:`~MosCollection.from_s3`
+    classmethod. See https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html
 
 MosCollection
 =============
