@@ -12,8 +12,8 @@ Changelog
     stable and may change. Once the library reaches v1.0, it will be considered
     stable. Please consider giving :doc:`feedback` to help stabilise the API.
 
-Release 0.9.1 (unreleased)
-===========================
+Release 0.9.1 (2021-09-02)
+==========================
 
 - Add :attr:`~mosromgr.moselements.Item.type`,
   :attr:`~mosromgr.moselements.Item.object_id`,  and
