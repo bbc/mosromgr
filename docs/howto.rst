@@ -10,12 +10,13 @@ This section is a series of helpful recipes for how to do things and solve
 particular problems with *mosromgr*.
 
 .. note::
-    These examples deal with MOS messages read from local files, but
-    :class:`~mosromgr.mostypes.MosFile` and
+
+    For simplicity, these examples deal with MOS messages read from local files,
+    but :class:`~mosromgr.mostypes.MosFile` and
     :class:`~mosromgr.moscollection.MosCollection` objects can also be
     constructed using :class:`~mosromgr.mostypes.MosFile.from_string` and
-    :class:`~mosromgr.mostypes.MosFile.from_s3`. Refer to :doc:`api_mostypes`
-    and :doc:`api_moscollection` for more information.
+    :class:`~mosromgr.mostypes.MosFile.from_s3`. Refer to :doc:`api/mostypes`
+    and :doc:`api/moscollection` for more information.
 
 Merging MOS files
 =================
@@ -211,133 +212,3 @@ If you are not interested in seeing or capturing warnings, you can either use a
         mc.merge()
 
 .. _warning filter: https://docs.python.org/3/library/warnings.html#the-warnings-filter
-
-.. _cli_howto:
-
-Using the command line interface
-================================
-
-The ``mosromgr`` command provided includes a number of subcommands. Running
-``mosromgr`` alone will show the general help message, and running a subcommand
-without arguments will show the help message for that subcommand.
-
-Detecting MOS file types
-------------------------
-
-To detect the type of a MOS file, use the :ref:`cli_mosromgr_detect` command:
-
-.. code-block:: console
-
-    $ mosromgr detect -f 123456-roCreate.mos.xml
-    123456-roCreate.mos.xml: RunningOrder
-
-Multiple files can be provided as arguments:
-
-.. code-block:: console
-
-    $ mosromgr detect -f 123456-roCreate.mos.xml 123457-roStorySend.mos.xml
-    123456-roCreate.mos.xml: RunningOrder
-    123457-roStorySend.mos.xml: StorySend
-
-Wildcards can also be used:
-
-.. code-block:: console
-
-    $ mosromgr detect *
-    123456-roCreate.mos.xml: RunningOrder
-    123457-roStorySend.mos.xml: StorySend
-    ...
-    9148627-roDelete.mos.xml: RunningOrderEnd
-    bbcProgrammeMetadata.xml: Unknown MOS file type
-    cricket: Invalid
-    FINAL.json: Invalid
-    FINAL.xml: RunningOrder (completed)
-
-You can also read files from an S3 bucket. Either a specific file by key:
-
-.. code-block:: console
-
-    $ mosromgr detect -b my-bucket -k newsnight/20210101/123456-roCreate.mos.xml
-    INFO:botocore.credentials:Found credentials in environment variables.
-    OPENMEDIA_NCS.W1.BBC.MOS/OM_10.1253459/5744992-roCreate.mos.xml: RunningOrder
-
-Or a whole folder by prefix:
-
-.. code-block:: console
-
-    $ mosromgr detect -b bbc-newslabs-slicer-mos-message-store -p newsnight/20210101/
-    INFO:botocore.credentials:Found credentials in environment variables.
-    newsnight/20210101/123456-roCreate.mos.xml: RunningOrder
-    newsnight/20210101/123457-roStorySend.mos.xml: StorySend
-    newsnight/20210101/123458-roStorySend.mos.xml: StorySend
-    newsnight/20210101/123459-roStorySend.mos.xml: StorySend
-    ...
-
-Inspecting a running order
---------------------------
-
-To inspect the contents of a ``roCreate`` file, use the
-:ref:`cli_mosromgr_inspect` command:
-
-.. code-block:: console
-
-    $ mosromgr inspect -f 123456-roCreate.mos.xml
-    22:45 NEWSNIGHT 54D CORE Thu, 08.04.2021
-
-Many options are available which allow for inspecting a file from an S3 bucket
-(``-b`` and ``-k``) instead of a local file (``-f``); and others which affect the
-output such as ``-t`` (start time), ``-d`` (duration), ``-s`` (stories):
-
-.. code-block:: console
-
-    $ mosromgr inspect -b my-bucket -k newsnight/20210804/123456-roCreate.mos.xml -tds
-    22:45 NEWSNIGHT 54D CORE Thu, 08.04.2021
-    Start time: 2021-04-08 21:46
-    Duration: 0:35:09
-
-    MENU START
-
-    MENU-PRE TITLE TEASE
-
-    MENU-TITLES
-
-    MENU-POST TITLE "ALSO TONIGHT"
-
-    NORTHERN IRELAND-INTRO
-
-    NORTHERN IRELAND-LEWIS PACKAGE
-
-    ...
-
-    END OF PROGRAMME
-
-.. note:
-    Note that this command currently only works for ``roCreate`` files,
-    but this includes ``roCreate`` files which have had additional files merged
-    into it, whether complete or not.
-
-Merging MOS files
------------------
-
-To merge a set of MOS files for a programme, use the :ref:`cli_mosromgr_merge`
-command.
-
-Merging local files:
-
-.. code-block:: console
-
-    $ mosromgr merge -f *.mos.xml -o FINAL.xml
-    ...
-    INFO:mosromgr.moscollection:Merging RunningOrderEnd 123499
-    INFO:mosromgr.moscollection:Completed merging 99 mos files
-    Writing merged running order to FINAL.xml
-
-Or files in an S3 bucket folder by prefix:
-
-.. code-block:: console
-
-    $ mosromgr merge -b my-bucket -p newsnight/20210101/ -o
-    ...
-    INFO:mosromgr.moscollection:Merging RunningOrderEnd 123499
-    INFO:mosromgr.moscollection:Completed merging 99 mos files
-    Writing merged running order to FINAL.xml

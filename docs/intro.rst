@@ -12,7 +12,7 @@ how *mosromgr* works and introduce the concepts.
 MOS Types
 =========
 
-The :doc:`api_mostypes` section of the module provides a collection of classes
+The :doc:`api/mostypes` section of the module provides a collection of classes
 for dealing with individual MOS messages. The classes provide easy access to
 some of the elements within a MOS file, such as a list of stories within a
 running order, the transmission time of a programme, or its duration.
@@ -55,7 +55,7 @@ object by using the ``+`` operator::
 MOS Elements
 ============
 
-The :doc:`api_moselements` part of the module provides a collection of classes
+The :doc:`api/moselements` part of the module provides a collection of classes
 used to provide easy access to certain elements within a
 :class:`~mosromgr.mostypes.MosFile` object, such as a list of stories within a
 running order, and the items within a story::
@@ -90,7 +90,7 @@ Here, the story contains 3 items, each of these is an
 MOS Collection
 ==============
 
-The :doc:`api_moscollection` part of the module provides a wrapper class
+The :doc:`api/moscollection` part of the module provides a wrapper class
 :class:`~mosromgr.moscollection.MosCollection` which stores references to
 specified MOS files, strings or S3 object keys so the
 :class:`~mosromgr.mostypes.MosFile` objects can be recreated when needed rather
