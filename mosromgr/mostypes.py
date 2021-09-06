@@ -1505,6 +1505,10 @@ class EAItemInsert(ElementAction):
             item_index = len(story.findall('item'))
         else:
             item, item_index = find_child(parent=story, child_tag='item', id=self.item.id)
+            if item is None:
+                raise MosMergeError(
+                    f"{self.__class__.__name__} error in {self.message_id} - item not found"
+                )
         for i, new_item in enumerate(self.items, start=item_index):
             insert_node(parent=story, node=new_item.xml, index=i)
         return ro
