@@ -38,20 +38,23 @@ Example Usage
 Command line
 ------------
 
-List the stories within a running order:
+Inspect the contents of a MOS file:
 
 .. code-block:: console
 
-    $ mosromgr inspect -f roCreate.mos.xml --stories
-    0828 MIDLANDS TODAY Wed, 11.11.2020
+    $ mosromgr inspect -f roCreate.mos.xml
+    roCreate.mos.xml: RunningOrder
+    RO: 22:30 NEWSNIGHT 54D CORE Tue, 09.11.2021
+    STORY: OPENMEDIA_NCS.W1.BBC.MOS;OM_4.15749118;OM_4.15749119,4.15749118.1
+    STORY: OPENMEDIA_NCS.W1.BBC.MOS;OM_4.15749118;OM_4.15749121,4.15749118.3
+    STORY: OPENMEDIA_NCS.W1.BBC.MOS;OM_4.15749118;OM_4.15749123,4.15749118.5
 
-    INTRODUCTION-READ
+.. code-block:: console
 
-    TESTING-OOV
-
-    WEATHER-SHORT
-
-    END OF PROGRAMME
+    $ mosromgr inspect -f roElementAction.mos.xml                                
+    roElementAction.mos.xml: EAStoryReplace
+    REPLACE STORY: OPENMEDIA_NCS.W1.BBC.MOS;OM_4.15749118;OM_4.15749156,4.15749118.67 WITH:
+      STORY: OPENMEDIA_NCS.W1.BBC.MOS;OM_4.15749118;OM_4.15749156,4.15749118.67
 
 Merge all MOS files in directory `newsnight` and save in ``FINAL.xml``:
 
