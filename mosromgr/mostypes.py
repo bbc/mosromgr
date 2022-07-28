@@ -46,7 +46,7 @@ class MosFile:
             xml = ET.parse(mos_file_path).getroot()
         except ET.ParseError as e:
             raise MosInvalidXML(e) from e
-        if cls == MosFile:
+        if cls in (MosFile, ElementAction):
             return cls._classify(xml)
         return cls(xml)
 
@@ -64,7 +64,7 @@ class MosFile:
             xml = ET.fromstring(mos_xml_string)
         except ET.ParseError as e:
             raise MosInvalidXML(e) from e
-        if cls == MosFile:
+        if cls in (MosFile, ElementAction):
             return cls._classify(xml)
         return cls(xml)
 
