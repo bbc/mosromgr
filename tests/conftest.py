@@ -64,6 +64,10 @@ def roelementactionstorymove():
     return MOCK_MOS / 'roElementActionStoryMove.mos.xml'
 
 @pytest.fixture()
+def roelementactionstorymove2():
+    return MOCK_MOS / 'roElementActionStoryMove2.mos.xml'
+
+@pytest.fixture()
 def roelementactionitemmove():
     return MOCK_MOS / 'roElementActionItemMove.mos.xml'
 

@@ -324,6 +324,34 @@ def test_element_action_move_story(rocreate, roelementactionstorymove):
     assert ro.base_tag.tag == 'roCreate'
     assert ea.base_tag.tag == 'roElementAction'
 
+def test_element_action_move_story_no_target(rocreate, roelementactionstorymove2):
+    """
+    GIVEN: Running order and EAStoryMove message (move STORY 1 to bottom)
+    EXPECT: Running order with STORY 1 at bottom
+    """
+    ro = RunningOrder.from_file(rocreate)
+    ea = EAStoryMove.from_file(roelementactionstorymove2)
+    d = ro.dict
+    assert len(d['mos']['roCreate']['story']) == 3
+    story_slug1 = d['mos']['roCreate']['story'][0]['storySlug']
+    assert story_slug1 == 'STORY 1'
+    story_slug2 = d['mos']['roCreate']['story'][1]['storySlug']
+    assert story_slug2 == 'STORY 2'
+    story_slug3 = d['mos']['roCreate']['story'][2]['storySlug']
+    assert story_slug3 == 'STORY 3'
+
+    ro += ea
+    d = ro.dict
+    assert len(d['mos']['roCreate']['story']) == 3
+    story_slug1 = d['mos']['roCreate']['story'][0]['storySlug']
+    assert story_slug1 == 'STORY 2'
+    story_slug2 = d['mos']['roCreate']['story'][1]['storySlug']
+    assert story_slug2 == 'STORY 3'
+    story_slug3 = d['mos']['roCreate']['story'][2]['storySlug']
+    assert story_slug3 == 'STORY 1'
+    assert ro.base_tag.tag == 'roCreate'
+    assert ea.base_tag.tag == 'roElementAction'
+
 def test_element_action_move_item_init(roelementactionitemmove):
     "Test we can create an EAItemMove object from a roElementAction file"
     ea = EAItemMove.from_file(roelementactionitemmove)
