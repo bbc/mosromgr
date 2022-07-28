@@ -1684,7 +1684,8 @@ class EAStoryMove(ElementAction):
         The :class:`~mosromgr.moselements.Story` object above which the other
         stories will be moved
         """
-        return Story(self.base_tag.find('element_target'), unknown_items=True)
+        if self.base_tag.find('element_target') is not None:
+            return Story(self.base_tag.find('element_target'), unknown_items=True)
 
     @property
     def stories(self):
@@ -1701,8 +1702,8 @@ class EAStoryMove(ElementAction):
         Moves story tags in ``element_source`` to the specified location in the
         running order.
         """
-        if self.story.id is None:
-            target_story_index = len(ro.stories)
+        if self.story is None:
+            target_story_index = len(ro.base_tag)
         else:
             target_story, target_story_index = find_child(parent=ro.base_tag, child_tag='story', id=self.story.id)
             if target_story is None:
@@ -1885,5 +1886,5 @@ EA_CLASS_MAP = {
     'DELETE': lambda ea: EAStoryDelete if ea.find('element_target') is None else EAItemDelete,
     'INSERT': lambda ea: EAStoryInsert if ea.find('element_target').find('itemID') is None else EAItemInsert,
     'SWAP': lambda ea: EAStorySwap if ea.find('element_target') is None else EAItemSwap,
-    'MOVE': lambda ea: EAStoryMove if ea.find('element_target').find('itemID') is None else EAItemMove,
+    'MOVE': lambda ea: EAStoryMove if ea.find('element_target') is None or ea.find('element_target').find('itemID') is None else EAItemMove,
 }
