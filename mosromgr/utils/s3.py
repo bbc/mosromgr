@@ -23,8 +23,6 @@ class S3:
             self._client = boto3.client('s3')
         return self._client
 
-s3 = S3()
-
 
 def get_mos_files(bucket_name, prefix=None, *, suffix='.mos.xml'):
     """
@@ -53,3 +51,6 @@ def get_file_contents(bucket_name, file_key):
     o = s3.resource.Object(bucket_name, file_key).get()
     b = o['Body']
     return b.read()
+
+
+s3 = S3()

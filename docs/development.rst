@@ -63,6 +63,12 @@ For more control when running tests, run ``pytest`` directly, for example
 ``pytest -vvxk story`` will run tests with ``story`` in the name (``-k story``)
 with verbose output (``-vv``), and stop at the first failure (``-x``).
 
+To run tests on multiple versions of Python, run ``tox`` which will invoke
+``make test`` for all versions of Python (included in ``tox.ini``) that you have
+installed.
+
+Tests are also automatically run against pull requests using GitHub Actions.
+
 Documentation
 =============
 
