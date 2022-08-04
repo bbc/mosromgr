@@ -89,7 +89,26 @@ class MosFile:
     @classmethod
     def _classify(cls, xml):
         "Classify the MOS type and return an instance of the relevant class"
-        for tag, subcls in TAG_CLASS_MAP.items():
+        tag_class_map = {
+            'roCreate': RunningOrder,
+            'roStorySend': StorySend,
+            'roStoryAppend': StoryAppend,
+            'roStoryDelete': StoryDelete,
+            'roStoryInsert': StoryInsert,
+            'roStoryMove': StoryMove,
+            'roStoryReplace': StoryReplace,
+            'roItemDelete': ItemDelete,
+            'roItemInsert': ItemInsert,
+            'roItemMoveMultiple': ItemMoveMultiple,
+            'roItemReplace': ItemReplace,
+            'roReplace': RunningOrderReplace,
+            'roMetadataReplace': MetaDataReplace,
+            'roReadyToAir': ReadyToAir,
+            'roDelete': RunningOrderEnd,
+            'roElementAction': ElementAction,
+            'roCtrl': RunningOrderControl,
+        }
+        for tag, subcls in tag_class_map.items():
             if xml.find(tag):
                 if subcls == ElementAction:
                     return ElementAction._classify(xml)
@@ -1131,7 +1150,31 @@ class ElementAction(MosFile):
     def _classify(cls, xml):
         "Classify the MOS type and return an instance of the relevant class"
         ea = xml.find('roElementAction')
-        subcls = EA_CLASS_MAP[ea.attrib['operation']](ea)
+        operation = ea.attrib['operation']
+        target = ea.find('element_target') is not None
+        if target:
+            item = ea.find('element_target').find('itemID') is not None
+        else:
+            item = False
+        # use the combination of operation, presence of element target and
+        # presence of item ID to determine the subclass
+        subcls = {
+            # (operation, target, item): subcls
+            ('REPLACE', True, False): EAStoryReplace,
+            ('REPLACE', True, True): EAItemReplace,
+            ('DELETE', False, False): EAStoryDelete,
+            ('DELETE', False, True): EAStoryDelete,
+            ('DELETE', True, True): EAItemDelete,
+            ('DELETE', True, False): EAItemDelete,
+            ('INSERT', True, False): EAStoryInsert,
+            ('INSERT', True, True): EAItemInsert,
+            ('SWAP', False, False): EAStorySwap,
+            ('SWAP', True, False): EAItemSwap,
+            ('MOVE', False, False): EAStoryMove,
+            ('MOVE', True, False): EAStoryMove,
+            ('MOVE', False, True): EAItemMove,
+            ('MOVE', True, True): EAItemMove,
+        }[(operation, target, item)]
         return subcls(xml)
 
     @property
@@ -1859,32 +1902,3 @@ class RunningOrderControl(MosFile):
     def inspect(self):
         "Print an outline of the key file contents"
         print("RO CTRL FOR STORY:", self.story.id)
-
-
-TAG_CLASS_MAP = {
-    'roCreate': RunningOrder,
-    'roStorySend': StorySend,
-    'roStoryAppend': StoryAppend,
-    'roStoryDelete': StoryDelete,
-    'roStoryInsert': StoryInsert,
-    'roStoryMove': StoryMove,
-    'roStoryReplace': StoryReplace,
-    'roItemDelete': ItemDelete,
-    'roItemInsert': ItemInsert,
-    'roItemMoveMultiple': ItemMoveMultiple,
-    'roItemReplace': ItemReplace,
-    'roReplace': RunningOrderReplace,
-    'roMetadataReplace': MetaDataReplace,
-    'roReadyToAir': ReadyToAir,
-    'roDelete': RunningOrderEnd,
-    'roElementAction': ElementAction,
-    'roCtrl': RunningOrderControl,
-}
-
-EA_CLASS_MAP = {
-    'REPLACE': lambda ea: EAStoryReplace if ea.find('element_target').find('itemID') is None else EAItemReplace,
-    'DELETE': lambda ea: EAStoryDelete if ea.find('element_target') is None else EAItemDelete,
-    'INSERT': lambda ea: EAStoryInsert if ea.find('element_target').find('itemID') is None else EAItemInsert,
-    'SWAP': lambda ea: EAStorySwap if ea.find('element_target') is None else EAItemSwap,
-    'MOVE': lambda ea: EAStoryMove if ea.find('element_target') is None or ea.find('element_target').find('itemID') is None else EAItemMove,
-}

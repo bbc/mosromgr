@@ -88,6 +88,7 @@ def test_item_note_properties(item_note_xml):
     assert item.object_id is None
 
 def test_is_technical_note():
+    "Test we can determine what is and is not a technical note"
     e = Element('p')
     e.text = '(test)'
     assert _is_technical_note(e)
