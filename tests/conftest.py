@@ -179,6 +179,14 @@ def story_xml():
     return ET.parse(MOCK_XML / 'story.xml').getroot()
 
 @pytest.fixture()
+def story2_xml():
+    return ET.parse(MOCK_XML / 'story2.xml').getroot()
+
+@pytest.fixture()
+def story3_xml():
+    return ET.parse(MOCK_XML / 'story3.xml').getroot()
+
+@pytest.fixture()
 def item_mosart_xml():
     return ET.parse(MOCK_XML / 'item_mosart.xml').getroot()
 

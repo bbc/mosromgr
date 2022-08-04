@@ -1,7 +1,6 @@
 <item>
   <itemID>ITEM2</itemID>
   <itemSlug>ITEM 2</itemSlug>
-  <mosID>MOS ID</mosID>
   <mosExternalMetadata>
     <mosPayload>
       <studioCommand type="note">

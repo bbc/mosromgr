@@ -34,12 +34,12 @@ def _get_story_duration(story_tag):
     except AttributeError:
         pass
 
-    try:
-        text_time = float(payload.find('TextTime').text)
-        media_time = float(payload.find('MediaTime').text)
+    text_time = payload.find('TextTime')
+    media_time = payload.find('MediaTime')
+    if text_time is not None or media_time is not None:
+        text_time = float(text_time.text) if text_time is not None else 0
+        media_time = float(media_time.text) if media_time is not None else 0
         return text_time + media_time
-    except AttributeError:
-        return 0
 
 
 def _is_technical_note(p):
@@ -204,11 +204,8 @@ class Story(MosElement):
         except AttributeError:
             pass
 
-        start_time = self.start_time
-        duration = self.duration
-        if start_time is None or duration is None:
-            return
-        return self.start_time + timedelta(seconds=self.duration)
+        if self.start_time is not None and self.duration is not None:
+            return self.start_time + timedelta(seconds=self.duration)
 
     @property
     def script(self):

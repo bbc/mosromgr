@@ -3,4 +3,5 @@
   <itemSlug>ITEM 1</itemSlug>
   <objID>100</objID>
   <mosID>MOS ID</mosID>
+  <objType>MOSART</objType>
 </item>
