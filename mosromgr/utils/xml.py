@@ -29,13 +29,11 @@ def find_child(parent, child_tag, id=None):
     or ``(None, None)`` if not found. If *id* is provided, it will be searched
     for, otherwise the first child will be returned.
     """
-    for i, child in enumerate(list(parent)):
+    for i, child in enumerate(parent):
         if child.tag == child_tag:
             if id is None:
                 return (child, i)
             child_id = child.find(f'{child_tag}ID').text
             if child_id == id:
-                return (child, i)
-            if child_id.split(',')[-1] == id.split(',')[-1]:
                 return (child, i)
     return (None, None)
