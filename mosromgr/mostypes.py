@@ -3,11 +3,16 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from functools import total_ordering
-import xml.etree.ElementTree as ET
+from xml.etree import ElementTree
+from xml.etree.ElementTree import Element, SubElement
 import logging
 import warnings
 import copy
 import itertools
+from pathlib import Path
+from typing import Optional, Union, List, Tuple
+from collections import OrderedDict
+from datetime import datetime
 
 import xmltodict
 from dateutil.parser import parse
@@ -27,33 +32,35 @@ logging.basicConfig(level=logging.INFO)
 
 @total_ordering
 class MosFile:
-    "Base class for all MOS files"
-    def __init__(self, xml):
-        if type(xml) != ET.Element:
+    """
+    Base class for all MOS files
+    """
+    def __init__(self, xml: Element):
+        if type(xml) != Element:
             raise TypeError("MosFile objects should be constructed using from_ classmethods")
         self._xml = xml
         self._base_tag = None
 
     @classmethod
-    def from_file(cls, mos_file_path):
+    def from_file(cls, mos_file_path: Union[Path, str]):
         """
         Construct from a path to a MOS file
 
         :type mos_file_path:
-            str
+            Union[pathlib.Path, str]
         :param mos_file_path:
             The MOS file path
         """
         try:
-            xml = ET.parse(mos_file_path).getroot()
-        except ET.ParseError as e:
+            xml = ElementTree.parse(mos_file_path).getroot()
+        except ElementTree.ParseError as e:
             raise MosInvalidXML(e) from e
         if cls in (MosFile, ElementAction):
             return cls._classify(xml)
         return cls(xml)
 
     @classmethod
-    def from_string(cls, mos_xml_string):
+    def from_string(cls, mos_xml_string: str):
         """
         Construct from an XML string of a MOS document
 
@@ -63,15 +70,15 @@ class MosFile:
             The XML string of the MOS document
         """
         try:
-            xml = ET.fromstring(mos_xml_string)
-        except ET.ParseError as e:
+            xml = ElementTree.fromstring(mos_xml_string)
+        except ElementTree.ParseError as e:
             raise MosInvalidXML(e) from e
         if cls in (MosFile, ElementAction):
             return cls._classify(xml)
         return cls(xml)
 
     @classmethod
-    def from_s3(cls, bucket_name, mos_file_key):
+    def from_s3(cls, bucket_name: str, mos_file_key: str):
         """
         Construct from a MOS file in an S3 bucket
 
@@ -89,8 +96,10 @@ class MosFile:
         return cls.from_string(xml)
 
     @classmethod
-    def _classify(cls, xml):
-        "Classify the MOS type and return an instance of the relevant class"
+    def _classify(cls, xml: Element):
+        """
+        Classify the MOS type and return an instance of the relevant class
+        """
         tag_class_map = {
             'roCreate': RunningOrder,
             'roStorySend': StorySend,
@@ -123,15 +132,19 @@ class MosFile:
         return f"<{self.__class__.__name__} {self.message_id}>"
 
     def __str__(self):
-        "The XML string of the MOS file"
-        return ET.tostring(self.xml, encoding='unicode')
+        """
+        The XML string of the MOS file
+        """
+        return ElementTree.tostring(self.xml, encoding='unicode')
 
-    def __lt__(self, other):
-        "Sort by :attr:`message_id` i.e. ``ro < ss`` or ``sorted([ro, ss])``"
+    def __lt__(self, other) -> bool:
+        """
+        Sort by :attr:`message_id` i.e. ``ro < ss`` or ``sorted([ro, ss])``
+        """
         return self.message_id < other.message_id
 
     @property
-    def base_tag_name(self):
+    def base_tag_name(self) -> str:
         """
         The base tag (:class:`xml.etree.ElementTree.Element`) within the
         :attr:`xml`, as determined by :attr:`base_tag_name`
@@ -139,44 +152,47 @@ class MosFile:
         return
 
     @property
-    def xml(self):
+    def xml(self) -> Element:
         """
         The XML element of the MOS file
-        (:class:`xml.etree.ElementTree.Element`)
         """
         return self._xml
 
     @property
-    def base_tag(self):
+    def base_tag(self) -> Element:
         """
-        The base tag (:class:`xml.etree.ElementTree.Element`) within the
-        :attr:`xml`, as determined by :attr:`base_tag_name`
+        The base tag within the :attr:`xml`, as determined by
+        :attr:`base_tag_name`
         """
         return self.xml.find(self.base_tag_name)
 
     @property
-    def message_id(self):
-        "The MOS file's message ID (:class:`int`)"
+    def message_id(self) -> int:
+        """
+        The MOS file's message ID
+        """
         return int(self.xml.find('messageID').text)
 
     @property
-    def ro_id(self):
-        "The running order ID (:class:`str`)"
+    def ro_id(self) -> str:
+        """
+        The running order ID
+        """
         return self.base_tag.find('roID').text
 
     @property
-    def dict(self):
+    def dict(self) -> OrderedDict:
         """
         Convert XML to dictionary using ``xmltodict`` library. Useful for
-        testing. (:class:`dict`)
+        testing.
         """
         return xmltodict.parse(str(self))
 
     @property
-    def completed(self):
+    def completed(self) -> bool:
         return False
 
-    def merge(self, ro):
+    def merge(self, other):
         raise NotImplementedError("Merge method not implemented")
 
 
@@ -189,7 +205,7 @@ class RunningOrder(MosFile):
     *Specification: Create Running Order*
     http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-32
     """
-    def __add__(self, other):
+    def __add__(self, other: MosFile):
         """
         ``RunningOrder`` objects can be merged with other MOS files which
         implement a ``merge`` method by using the ``+`` operator, for example::
@@ -203,17 +219,21 @@ class RunningOrder(MosFile):
         raise MosCompletedMergeError("Cannot merge completed MOS file")
 
     @property
-    def base_tag_name(self):
-        "The name of the base XML tag for this file type (:class:`str`)"
+    def base_tag_name(self) -> str:
+        """
+        The name of the base XML tag for this file type
+        """
         return 'roCreate'
 
     @property
-    def ro_slug(self):
-        "The running order slug (:class:`str`)"
+    def ro_slug(self) -> str:
+        """
+        The running order slug
+        """
         return self.base_tag.find('roSlug').text
 
     @property
-    def stories(self):
+    def stories(self) -> List[Story]:
         """
         A list of :class:`~mosromgr.moselements.Story` objects within the
         running order
@@ -226,10 +246,9 @@ class RunningOrder(MosFile):
         ]
 
     @property
-    def start_time(self):
+    def start_time(self) -> Optional[datetime]:
         """
-        Transmission start time (:class:`datetime.datetime`) or ``None`` if not
-        available in the XML
+        Transmission start time (if present in the XML)
         """
         try:
             ro_ed_start = self.base_tag.find('roEdStart').text
@@ -239,27 +258,33 @@ class RunningOrder(MosFile):
             return parse(ro_ed_start)
 
     @property
-    def end_time(self):
-        "Transmission end time (:class:`datetime.datetime`)"
+    def end_time(self) -> Optional[datetime]:
+        """
+        Transmission end time (if present in the XML)
+        """
         final_story = self.stories[-1]
         return final_story.end_time
 
+    @property
+    def duration(self) -> Optional[float]:
+        """
+        Total running order duration in seconds
+        """
+        try:
+            return sum(story.duration for story in self.stories)
+        except TypeError:
+            return
 
     @property
-    def duration(self):
-        "Total running order duration in seconds (:class:`int`)"
-        return sum(story.duration for story in self.stories)
-
-    @property
-    def completed(self):
+    def completed(self) -> bool:
         """
         Whether or not the running order has had a :class:`RunningOrderEnd`
-        merged (:class:`bool`)
+        merged
         """
         return self.xml.find('mosromgrmeta') is not None
 
     @property
-    def script(self):
+    def script(self) -> List[str]:
         """
         A list of strings found in paragraph tags within the story bodies,
         excluding any empty paragraphs or technical notes in brackets.
@@ -269,7 +294,7 @@ class RunningOrder(MosFile):
         )
 
     @property
-    def body(self):
+    def body(self) -> List[Union[Item, str]]:
         """
         A list of elements found in the story bodies. Each item in the list is
         either a string (representing a ``<p>`` tag) or an
@@ -280,15 +305,19 @@ class RunningOrder(MosFile):
             itertools.chain.from_iterable(story.body for story in self.stories)
         )
 
-    def _find_story(self, story_id):
-        return [
-            (story.xml, i)
-            for i, story in enumerate(self.stories)
-            if story.id == story_id
-        ][0]
+    def _find_story(self, story_id: str) -> Tuple[Element, int]:
+        """
+        Find the story with *story_id* and return a tuple of (element, index)
+        """
+        for i, story in enumerate(self.stories):
+            if story.id == story_id:
+                return (story.xml, i)
+        raise ValueError("Story not found")
 
     def inspect(self):
-        "Print an outline of the key file contents"
+        """
+        Print an outline of the key file contents
+        """
         print("RO:", self.ro_slug)
         for story in self.stories:
             print("STORY:", story.id)
@@ -308,22 +337,26 @@ class StorySend(MosFile):
     http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-49
     """
     @property
-    def base_tag_name(self):
-        "The name of the base XML tag for this file type (:class:`str`)"
+    def base_tag_name(self) -> str:
+        """
+        The name of the base XML tag for this file type
+        """
         return 'roStorySend'
 
     @property
-    def story(self):
-        "The :class:`~mosromgr.moselements.Story` object being sent"
+    def story(self) -> Story:
+        """
+        The :class:`~mosromgr.moselements.Story` object being sent
+        """
         story_tag = self._convert_story_send_to_story_tag(self.base_tag)
         return Story(story_tag)
 
-    def _convert_story_send_to_story_tag(self, ss_tag_orig):
+    def _convert_story_send_to_story_tag(self, ss_tag_orig: Element) -> Element:
         """
-        Converts <roStorySend> tag from roStorySend format to a <story> tag to
-        be merged into the roCreate, i.e:
-            <roStorySend><storyBody><storyItem>...</storyItem></storyBody></roStorySend>
-            to <story><item>...</item></story>
+        Converts ``<roStorySend>`` tag from ``roStorySend`` format to a
+        ``<story>`` tag to be merged into the roCreate, i.e:
+            ``<roStorySend><storyBody><storyItem>...</storyItem></storyBody></roStorySend>``
+            to ``<story><item>...</item></story>``
         """
         # take a copy to preserve the original
         ss_tag = copy.deepcopy(ss_tag_orig)
@@ -340,7 +373,7 @@ class StorySend(MosFile):
         remove_node(parent=ss_tag, node=story_body)
         return ss_tag
 
-    def merge(self, ro):
+    def merge(self, ro: RunningOrder) -> RunningOrder:
         """
         Merge into the :class:`RunningOrder` object provided.
 
@@ -349,7 +382,7 @@ class StorySend(MosFile):
         """
         try:
             story, story_index = ro._find_story(self.story.id)
-        except IndexError:
+        except ValueError:
             msg = f"{self.__class__.__name__} error in {self.message_id} - story not found"
             logger.warning(msg)
             warnings.warn(msg, StoryNotFoundWarning)
@@ -360,7 +393,9 @@ class StorySend(MosFile):
         return ro
 
     def inspect(self):
-        "Print an outline of the key file contents"
+        """
+        Print an outline of the key file contents
+        """
         print("SEND STORY:", self.story.id)
 
 
@@ -378,16 +413,20 @@ class MetaDataReplace(MosFile):
     http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-34
     """
     @property
-    def base_tag_name(self):
-        "The name of the base XML tag for this file type (:class:`str`)"
+    def base_tag_name(self) -> str:
+        """
+        The name of the base XML tag for this file type
+        """
         return 'roMetadataReplace'
 
     @property
-    def ro_slug(self):
-        "The running order slug (:class:`str`)"
+    def ro_slug(self) -> str:
+        """
+        The running order slug
+        """
         return self.base_tag.find('roSlug').text
 
-    def merge(self, ro):
+    def merge(self, ro: RunningOrder) -> RunningOrder:
         """
         Merge into the :class:`RunningOrder` object provided.
 
@@ -403,7 +442,9 @@ class MetaDataReplace(MosFile):
         return ro
 
     def inspect(self):
-        "Print an outline of the key file contents"
+        """
+        Print an outline of the key file contents
+        """
         print("NEW METATDATA:")
         for tag in self.base_tag:
             print(f"  {tag.tag}:", tag.text if tag.text else '')
@@ -423,19 +464,23 @@ class StoryAppend(MosFile):
     http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOS_Protocol_Version_2.8.5_Final.htm#roStoryAppend
     """
     @property
-    def base_tag_name(self):
-        "The name of the base XML tag for this file type (:class:`str`)"
+    def base_tag_name(self) -> str:
+        """
+        The name of the base XML tag for this file type
+        """
         return 'roStoryAppend'
 
     @property
-    def stories(self):
-        "A list of :class:`~mosromgr.moselements.Story` objects to be appended"
+    def stories(self) -> List[Story]:
+        """
+        A list of :class:`~mosromgr.moselements.Story` objects to be appended
+        """
         return [
             Story(story_tag)
             for story_tag in self.base_tag.findall('story')
         ]
 
-    def merge(self, ro):
+    def merge(self, ro: RunningOrder) -> RunningOrder:
         """
         Merge into the :class:`RunningOrder` object provided.
 
@@ -451,7 +496,9 @@ class StoryAppend(MosFile):
         return ro
 
     def inspect(self):
-        "Print an outline of the key file contents"
+        """
+        Print an outline of the key file contents
+        """
         for story in self.stories:
             print("ADD STORY:", story.id)
 
@@ -470,19 +517,23 @@ class StoryDelete(MosFile):
     http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOS_Protocol_Version_2.8.5_Final.htm#roStoryDelete
     """
     @property
-    def base_tag_name(self):
-        "The name of the base XML tag for this file type (:class:`str`)"
+    def base_tag_name(self) -> str:
+        """
+        The name of the base XML tag for this file type
+        """
         return 'roStoryDelete'
 
     @property
-    def stories(self):
-        "A list of :class:`~mosromgr.moselements.Story` objects to be deleted"
+    def stories(self) -> List[Story]:
+        """
+        A list of :class:`~mosromgr.moselements.Story` objects to be deleted
+        """
         return [
             Story(self.base_tag, id=story_id.text)
             for story_id in self.base_tag.findall('storyID')
         ]
 
-    def merge(self, ro):
+    def merge(self, ro: RunningOrder) -> RunningOrder:
         """
         Merge into the :class:`RunningOrder` object provided.
 
@@ -504,7 +555,9 @@ class StoryDelete(MosFile):
         return ro
 
     def inspect(self):
-        "Print an outline of the key file contents"
+        """
+        Print an outline of the key file contents
+        """
         for story in self.stories:
             print("DELETE STORY:", story.id)
 
@@ -523,12 +576,14 @@ class ItemDelete(MosFile):
     http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOS_Protocol_Version_2.8.5_Final.htm#roItemDelete
     """
     @property
-    def base_tag_name(self):
-        "The name of the base XML tag for this file type (:class:`str`)"
+    def base_tag_name(self) -> str:
+        """
+        The name of the base XML tag for this file type
+        """
         return 'roItemDelete'
 
     @property
-    def story(self):
+    def story(self) -> Story:
         """
         The :class:`~mosromgr.moselements.Story` object containing the items
         being deleted
@@ -536,7 +591,7 @@ class ItemDelete(MosFile):
         return Story(self.base_tag, unknown_items=True)
 
     @property
-    def items(self):
+    def items(self) -> Tuple[Item]:
         """
         A tuple of the two :class:`~mosromgr.moselements.Item` objects being
         deleted
@@ -546,7 +601,7 @@ class ItemDelete(MosFile):
             for item_id in self.base_tag.findall('itemID')
         )
 
-    def merge(self, ro):
+    def merge(self, ro: RunningOrder) -> RunningOrder:
         """
         Merge into the :class:`RunningOrder` object provided.
 
@@ -578,7 +633,9 @@ class ItemDelete(MosFile):
         return ro
 
     def inspect(self):
-        "Print an outline of the key file contents"
+        """
+        Print an outline of the key file contents
+        """
         print("IN STORY:", self.story.id)
         for item in self.items:
             print("  DELETE ITEM:", item.id)
@@ -598,12 +655,14 @@ class StoryInsert(MosFile):
     http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOS_Protocol_Version_2.8.5_Final.htm#roStoryInsert
     """
     @property
-    def base_tag_name(self):
-        "The name of the base XML tag for this file type (:class:`str`)"
+    def base_tag_name(self) -> str:
+        """
+        The name of the base XML tag for this file type
+        """
         return 'roStoryInsert'
 
     @property
-    def target_story(self):
+    def target_story(self) -> Story:
         """
         The :class:`~mosromgr.moselements.Story` object above which the source
         stories are to be inserted
@@ -611,14 +670,16 @@ class StoryInsert(MosFile):
         return Story(self.base_tag, unknown_items=True)
 
     @property
-    def source_stories(self):
-        "A list of :class:`~mosromgr.moselements.Story` objects to be inserted"
+    def source_stories(self) -> List[Story]:
+        """
+        A list of :class:`~mosromgr.moselements.Story` objects to be inserted
+        """
         return [
             Story(story_tag)
             for story_tag in self.base_tag.findall('story')
         ]
 
-    def merge(self, ro):
+    def merge(self, ro: RunningOrder) -> RunningOrder:
         """
         Merge into the :class:`RunningOrder` object provided.
 
@@ -649,7 +710,9 @@ class StoryInsert(MosFile):
         return ro
 
     def inspect(self):
-        "Print an outline of the key file contents"
+        """
+        Print an outline of the key file contents
+        """
         print("AFTER STORY:", self.target_story.id)
         for story in self.source_stories:
             print("  INSERT STORY:", story.id)
@@ -669,12 +732,14 @@ class ItemInsert(MosFile):
     http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOS_Protocol_Version_2.8.5_Final.htm#roItemInsert
     """
     @property
-    def base_tag_name(self):
-        "The name of the base XML tag for this file type (:class:`str`)"
+    def base_tag_name(self) -> str:
+        """
+        The name of the base XML tag for this file type
+        """
         return 'roItemInsert'
 
     @property
-    def story(self):
+    def story(self) -> Story:
         """
         The :class:`~mosromgr.moselements.Story` object into which the items are
         to be inserted
@@ -682,7 +747,7 @@ class ItemInsert(MosFile):
         return Story(self.base_tag, unknown_items=True)
 
     @property
-    def item(self):
+    def item(self) -> Item:
         """
         The :class:`~mosromgr.moselements.Item` object above which the items
         are to be inserted
@@ -690,14 +755,16 @@ class ItemInsert(MosFile):
         return Item(self.base_tag)
 
     @property
-    def items(self):
-        "A list of :class:`~mosromgr.moselements.Item` objects to be inserted"
+    def items(self) -> List[Item]:
+        """
+        A list of :class:`~mosromgr.moselements.Item` objects to be inserted
+        """
         return [
             Item(item)
             for item in self.base_tag.findall('item')
         ]
 
-    def merge(self, ro):
+    def merge(self, ro: RunningOrder) -> RunningOrder:
         """
         Merge into the :class:`RunningOrder` object provided.
 
@@ -726,7 +793,9 @@ class ItemInsert(MosFile):
         return ro
 
     def inspect(self):
-        "Print an outline of the key file contents"
+        """
+        Print an outline of the key file contents
+        """
         print("IN STORY:", self.story.id)
         for item in self.items:
             print("INSERT ITEM:", item.id)
@@ -746,12 +815,14 @@ class StoryMove(MosFile):
     http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOS_Protocol_Version_2.8.5_Final.htm#roStoryMove
     """
     @property
-    def base_tag_name(self):
-        "The name of the base XML tag for this file type (:class:`str`)"
+    def base_tag_name(self) -> str:
+        """
+        The name of the base XML tag for this file type
+        """
         return 'roStoryMove'
 
     @property
-    def target_story(self):
+    def target_story(self) -> Story:
         """
         The :class:`~mosromgr.moselements.Story` object above which the source
         story is to be moved
@@ -760,12 +831,14 @@ class StoryMove(MosFile):
         return Story(self.base_tag, id=target.text, unknown_items=True)
 
     @property
-    def source_story(self):
-        "The :class:`~mosromgr.moselements.Story` object to be moved"
+    def source_story(self) -> Story:
+        """
+        The :class:`~mosromgr.moselements.Story` object to be moved
+        """
         source, target = self.base_tag.findall('storyID')
         return Story(self.base_tag, id=source.text)
 
-    def merge(self, ro):
+    def merge(self, ro: RunningOrder) -> RunningOrder:
         """
         Merge into the :class:`RunningOrder` object provided.
 
@@ -789,7 +862,9 @@ class StoryMove(MosFile):
         return ro
 
     def inspect(self):
-        "Print an outline of the key file contents"
+        """
+        Print an outline of the key file contents
+        """
         print("MOVE STORY:", self.source_story.id)
 
 
@@ -807,12 +882,14 @@ class ItemMoveMultiple(MosFile):
     http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOS_Protocol_Version_2.8.5_Final.htm#roItemMoveMultiple
     """
     @property
-    def base_tag_name(self):
-        "The name of the base XML tag for this file type (:class:`str`)"
+    def base_tag_name(self) -> str:
+        """
+        The name of the base XML tag for this file type
+        """
         return 'roItemMoveMultiple'
 
     @property
-    def story(self):
+    def story(self) -> Story:
         """
         The :class:`~mosromgr.moselements.Story` object containing the items
         being moved
@@ -820,7 +897,7 @@ class ItemMoveMultiple(MosFile):
         return Story(self.base_tag, unknown_items=True)
 
     @property
-    def item(self):
+    def item(self) -> Item:
         """
         The :class:`~mosromgr.moselements.Item` object above which the items
         will be moved
@@ -829,15 +906,17 @@ class ItemMoveMultiple(MosFile):
         return Item(self.base_tag, id=target.text)
 
     @property
-    def items(self):
-        "A list of :class:`~mosromgr.moselements.Item` objects to be moved"
+    def items(self) -> List[Item]:
+        """
+        A list of :class:`~mosromgr.moselements.Item` objects to be moved
+        """
         items = self.base_tag.findall('itemID')[:-1]
         return [
             Item(self.base_tag, id=item.text)
             for item in items
         ]
 
-    def merge(self, ro):
+    def merge(self, ro: RunningOrder) -> RunningOrder:
         """
         Merge into the :class:`RunningOrder` object provided.
 
@@ -875,7 +954,9 @@ class ItemMoveMultiple(MosFile):
         return ro
 
     def inspect(self):
-        "Print an outline of the key file contents"
+        """
+        Print an outline of the key file contents
+        """
         print("IN STORY:", self.story.id)
         for item in self.items:
             print("  MOVE ITEM:", item.id)
@@ -895,24 +976,30 @@ class StoryReplace(MosFile):
     http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOS_Protocol_Version_2.8.5_Final.htm#roStoryReplace
     """
     @property
-    def base_tag_name(self):
-        "The name of the base XML tag for this file type (:class:`str`)"
+    def base_tag_name(self) -> str:
+        """
+        The name of the base XML tag for this file type
+        """
         return 'roStoryReplace'
 
     @property
-    def story(self):
-        "The :class:`~mosromgr.moselements.Story` object being replaced"
+    def story(self) -> Story:
+        """
+        The :class:`~mosromgr.moselements.Story` object being replaced
+        """
         return Story(self.base_tag, unknown_items=True)
 
     @property
-    def stories(self):
-        "A list of replacement :class:`~mosromgr.moselements.Story` objects"
+    def stories(self) -> List[Story]:
+        """
+        A list of replacement :class:`~mosromgr.moselements.Story` objects
+        """
         return [
             Story(story_tag)
             for story_tag in self.base_tag.findall('story')
         ]
 
-    def merge(self, ro):
+    def merge(self, ro: RunningOrder) -> RunningOrder:
         """
         Merge into the :class:`RunningOrder` object provided.
 
@@ -938,7 +1025,9 @@ class StoryReplace(MosFile):
         return ro
 
     def inspect(self):
-        "Print an outline of the key file contents"
+        """
+        Print an outline of the key file contents
+        """
         print("REPLACE STORY:", self.story.id, "WITH:")
         for story in self.stories:
             print("  STORY:", story.id)
@@ -958,12 +1047,14 @@ class ItemReplace(MosFile):
     http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOS_Protocol_Version_2.8.5_Final.htm#roItemReplace
     """
     @property
-    def base_tag_name(self):
-        "The name of the base XML tag for this file type (:class:`str`)"
+    def base_tag_name(self) -> str:
+        """
+        The name of the base XML tag for this file type
+        """
         return 'roItemReplace'
 
     @property
-    def story(self):
+    def story(self) -> Story:
         """
         The :class:`~mosromgr.moselements.Story` object containing the item
         being replaced
@@ -971,19 +1062,23 @@ class ItemReplace(MosFile):
         return Story(self.base_tag, unknown_items=True)
 
     @property
-    def item(self):
-        "The :class:`~mosromgr.moselements.Item` object being replaced"
+    def item(self) -> Item:
+        """
+        The :class:`~mosromgr.moselements.Item` object being replaced
+        """
         return Item(self.base_tag)
 
     @property
-    def items(self):
-        "A list of replacement :class:`~mosromgr.moselements.Item` objects"
+    def items(self) -> List[Item]:
+        """
+        A list of replacement :class:`~mosromgr.moselements.Item` objects
+        """
         return [
             Item(item_tag)
             for item_tag in self.base_tag.findall('item')
         ]
 
-    def merge(self, ro):
+    def merge(self, ro: RunningOrder) -> RunningOrder:
         """
         Merge into the :class:`RunningOrder` object provided.
 
@@ -1018,7 +1113,9 @@ class ItemReplace(MosFile):
         return ro
 
     def inspect(self):
-        "Print an outline of the key file contents"
+        """
+        Print an outline of the key file contents
+        """
         print("IN STORY:", self.story.id)
         print("REPLACE ITEM:", self.item.id, "WITH:")
         for item in self.items:
@@ -1039,11 +1136,13 @@ class ReadyToAir(MosFile):
     http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-41
     """
     @property
-    def base_tag_name(self):
-        "The name of the base XML tag for this file type (:class:`str`)"
+    def base_tag_name(self) -> str:
+        """
+        The name of the base XML tag for this file type
+        """
         return 'roReadyToAir'
 
-    def merge(self, ro):
+    def merge(self, ro: RunningOrder) -> RunningOrder:
         """
         Merge into the :class:`RunningOrder` object provided.
 
@@ -1053,7 +1152,9 @@ class ReadyToAir(MosFile):
         return ro
 
     def inspect(self):
-        "Print an outline of the key file contents"
+        """
+        Print an outline of the key file contents
+        """
         print("READY TO AIR")
 
 
@@ -1071,11 +1172,13 @@ class RunningOrderReplace(RunningOrder):
     http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-33
     """
     @property
-    def base_tag_name(self):
-        "The name of the base XML tag for this file type (:class:`str`)"
+    def base_tag_name(self) -> str:
+        """
+        The name of the base XML tag for this file type
+        """
         return 'roReplace'
 
-    def merge(self, ro):
+    def merge(self, ro: RunningOrder) -> RunningOrder:
         """
         Merge into the :class:`RunningOrder` object provided.
 
@@ -1094,7 +1197,9 @@ class RunningOrderReplace(RunningOrder):
         return ro
 
     def inspect(self):
-        "Print an outline of the key file contents"
+        """
+        Print an outline of the key file contents
+        """
         print("REPLACE RO:")
         for tag in self.base_tag:
             if tag.text.strip():
@@ -1118,32 +1223,34 @@ class RunningOrderEnd(MosFile):
     http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-35
     """
     @property
-    def base_tag_name(self):
-        "The name of the base XML tag for this file type (:class:`str`)"
+    def base_tag_name(self) -> str:
+        """
+        The name of the base XML tag for this file type
+        """
         return 'roDelete'
 
-    @property
-    def completed(self):
-        return False
-
-    def merge(self, ro):
+    def merge(self, ro: RunningOrder) -> RunningOrder:
         """
         Merge into the :class:`RunningOrder` object provided.
 
         Adds a ``mosromgrmeta`` tag containing the ``roDelete`` tag from the
         ``roDelete`` message to the ``roCreate`` tag in the running order.
         """
-        mosromgrmeta = ET.SubElement(ro.xml, 'mosromgrmeta')
+        mosromgrmeta = SubElement(ro.xml, 'mosromgrmeta')
         mosromgrmeta.append(self.base_tag)
         return ro
 
     def inspect(self):
-        "Print an outline of the key file contents"
+        """
+        Print an outline of the key file contents
+        """
         print("RO DELETE:", self.ro_id)
 
 
 class ElementAction(MosFile):
-    "Base class for various ``roElementAction`` MOS files"
+    """
+    Base class for various ``roElementAction`` MOS files
+    """
     @classmethod
     def _classify(cls, xml):
         "Classify the MOS type and return an instance of the relevant class"
@@ -1176,8 +1283,10 @@ class ElementAction(MosFile):
         return subcls(xml)
 
     @property
-    def base_tag_name(self):
-        "The name of the base XML tag for this file type (:class:`str`)"
+    def base_tag_name(self) -> str:
+        """
+        The name of the base XML tag for this file type
+        """
         return 'roElementAction'
 
 
@@ -1195,19 +1304,23 @@ class EAStoryReplace(ElementAction):
     http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-43
     """
     @property
-    def story(self):
-        "The :class:`~mosromgr.moselements.Story` object being replaced"
+    def story(self) -> Story:
+        """
+        The :class:`~mosromgr.moselements.Story` object being replaced
+        """
         return Story(self.base_tag.find('element_target'), unknown_items=True)
 
     @property
-    def stories(self):
-        "A list of replacement :class:`~mosromgr.moselements.Story` objects"
+    def stories(self) -> List[Story]:
+        """
+        A list of replacement :class:`~mosromgr.moselements.Story` objects
+        """
         return [
             Story(story_tag)
             for story_tag in self.base_tag.find('element_source').findall('story')
         ]
 
-    def merge(self, ro):
+    def merge(self, ro: RunningOrder) -> RunningOrder:
         """
         Merge into the :class:`RunningOrder` object provided.
 
@@ -1230,7 +1343,9 @@ class EAStoryReplace(ElementAction):
         return ro
 
     def inspect(self):
-        "Print an outline of the key file contents"
+        """
+        Print an outline of the key file contents
+        """
         print("REPLACE STORY:", self.story.id, "WITH:")
         for story in self.stories:
             print("  STORY:", story.id)
@@ -1250,7 +1365,7 @@ class EAItemReplace(ElementAction):
     http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-43
     """
     @property
-    def story(self):
+    def story(self) -> Story:
         """
         The :class:`~mosromgr.moselements.Story` object containing the item
         being replaced
@@ -1258,19 +1373,23 @@ class EAItemReplace(ElementAction):
         return Story(self.base_tag.find('element_target'), unknown_items=True)
 
     @property
-    def item(self):
-        "The :class:`~mosromgr.moselements.Item` object being replaced"
+    def item(self) -> Item:
+        """
+        The :class:`~mosromgr.moselements.Item` object being replaced
+        """
         return Item(self.base_tag.find('element_target'))
 
     @property
-    def items(self):
-        "A list of replacement :class:`~mosromgr.moselements.Item` objects"
+    def items(self) -> List[Item]:
+        """
+        A list of replacement :class:`~mosromgr.moselements.Item` objects
+        """
         return [
             Item(item_tag)
             for item_tag in self.base_tag.find('element_source').findall('item')
         ]
 
-    def merge(self, ro):
+    def merge(self, ro: RunningOrder) -> RunningOrder:
         """
         Merge into the :class:`RunningOrder` object provided.
 
@@ -1305,7 +1424,9 @@ class EAItemReplace(ElementAction):
         return ro
 
     def inspect(self):
-        "Print an outline of the key file contents"
+        """
+        Print an outline of the key file contents
+        """
         print("IN STORY:", self.story.id)
         print("REPLACE ITEM:", self.item.id, "WITH:")
         for item in self.items:
@@ -1326,14 +1447,16 @@ class EAStoryDelete(ElementAction):
     http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-43
     """
     @property
-    def stories(self):
-        "A list of :class:`~mosromgr.moselements.Story` objects to be deleted"
+    def stories(self) -> List[Story]:
+        """
+        A list of :class:`~mosromgr.moselements.Story` objects to be deleted
+        """
         return [
             Story(story_tag)
             for story_tag in self.base_tag.findall('element_source')
         ]
 
-    def merge(self, ro):
+    def merge(self, ro: RunningOrder) -> RunningOrder:
         """
         Merge into the :class:`RunningOrder` object provided.
 
@@ -1355,7 +1478,9 @@ class EAStoryDelete(ElementAction):
         return ro
 
     def inspect(self):
-        "Print an outline of the key file contents"
+        """
+        Print an outline of the key file contents
+        """
         for story in self.stories:
             print("DELETE STORY:", story.id)
 
@@ -1374,7 +1499,7 @@ class EAItemDelete(ElementAction):
     http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-43
     """
     @property
-    def story(self):
+    def story(self) -> Story:
         """
         The :class:`~mosromgr.moselements.Story` object containing the items
         being deleted
@@ -1382,14 +1507,16 @@ class EAItemDelete(ElementAction):
         return Story(self.base_tag.find('element_target'), unknown_items=True)
 
     @property
-    def items(self):
-        "A list of :class:`~mosromgr.moselements.Item` objects being deleted"
+    def items(self) -> List[Item]:
+        """
+        A list of :class:`~mosromgr.moselements.Item` objects being deleted
+        """
         return [
             Item(item_tag)
             for item_tag in self.base_tag.findall('element_source')
         ]
 
-    def merge(self, ro):
+    def merge(self, ro: RunningOrder) -> RunningOrder:
         """
         Merge into the :class:`RunningOrder` object provided.
 
@@ -1417,7 +1544,9 @@ class EAItemDelete(ElementAction):
         return ro
 
     def inspect(self):
-        "Print an outline of the key file contents"
+        """
+        Print an outline of the key file contents
+        """
         print("IN STORY:", self.story.id)
         for item in self.items:
             print("  DELETE ITEM:", item.id)
@@ -1437,7 +1566,7 @@ class EAStoryInsert(ElementAction):
     http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-43
     """
     @property
-    def story(self):
+    def story(self) -> Story:
         """
         The :class:`~mosromgr.moselements.Story` object above which the source
         story will be inserted
@@ -1445,14 +1574,16 @@ class EAStoryInsert(ElementAction):
         return Story(self.base_tag.find('element_target'), unknown_items=True)
 
     @property
-    def stories(self):
-        "The :class:`~mosromgr.moselements.Story` objects to be inserted"
+    def stories(self) -> List[Story]:
+        """
+        The :class:`~mosromgr.moselements.Story` objects to be inserted
+        """
         return [
             Story(story_tag)
             for story_tag in self.base_tag.find('element_source').findall('story')
         ]
 
-    def merge(self, ro):
+    def merge(self, ro: RunningOrder) -> RunningOrder:
         """
         Merge into the :class:`RunningOrder` object provided.
 
@@ -1482,7 +1613,9 @@ class EAStoryInsert(ElementAction):
         return ro
 
     def inspect(self):
-        "Print an outline of the key file contents"
+        """
+        Print an outline of the key file contents
+        """
         print("AFTER STORY:", self.story.id)
         for story in self.stories:
             print("  INSERT STORY:", story.id)
@@ -1502,7 +1635,7 @@ class EAItemInsert(ElementAction):
     http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-43
     """
     @property
-    def story(self):
+    def story(self) -> Story:
         """
         The :class:`~mosromgr.moselements.Story` object into which the item is
         to be inserted
@@ -1510,7 +1643,7 @@ class EAItemInsert(ElementAction):
         return Story(self.base_tag.find('element_target'), unknown_items=True)
 
     @property
-    def item(self):
+    def item(self) -> Item:
         """
         The :class:`~mosromgr.moselements.Item` object above which the source
         item is to be be inserted
@@ -1518,14 +1651,16 @@ class EAItemInsert(ElementAction):
         return Item(self.base_tag.find('element_target'))
 
     @property
-    def items(self):
-        "A list of :class:`~mosromgr.moselements.Item` objects to be inserted"
+    def items(self) -> List[Item]:
+        """
+        A list of :class:`~mosromgr.moselements.Item` objects to be inserted
+        """
         return [
             Item(item_tag)
             for item_tag in self.base_tag.find('element_source').findall('item')
         ]
 
-    def merge(self, ro):
+    def merge(self, ro: RunningOrder) -> RunningOrder:
         """
         Merge into the :class:`RunningOrder` object provided.
 
@@ -1555,7 +1690,9 @@ class EAItemInsert(ElementAction):
         return ro
 
     def inspect(self):
-        "Print an outline of the key file contents"
+        """
+        Print an outline of the key file contents
+        """
         print("IN STORY:", self.story.id)
         print("  BEFORE ITEM:", self.story.id)
         for item in self.items:
@@ -1576,7 +1713,7 @@ class EAStorySwap(ElementAction):
     http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-43
     """
     @property
-    def stories(self):
+    def stories(self) -> Tuple[Story]:
         """
         A tuple of the two :class:`~mosromgr.moselements.Story` objects to be
         swapped
@@ -1587,7 +1724,7 @@ class EAStorySwap(ElementAction):
             for story_id in source.findall('storyID')
         )
 
-    def merge(self, ro):
+    def merge(self, ro: RunningOrder) -> RunningOrder:
         """
         Merge into the :class:`RunningOrder` object provided.
 
@@ -1620,7 +1757,9 @@ class EAStorySwap(ElementAction):
         return ro
 
     def inspect(self):
-        "Print an outline of the key file contents"
+        """
+        Print an outline of the key file contents
+        """
         story1, story2 = self.stories
         print("SWAP STORY:", story1.id)
         print("WITH STORY:", story2.id)
@@ -1640,7 +1779,7 @@ class EAItemSwap(ElementAction):
     http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-43
     """
     @property
-    def story(self):
+    def story(self) -> Story:
         """
         The :class:`~mosromgr.moselements.Story` object containing the items
         being swapped
@@ -1648,15 +1787,17 @@ class EAItemSwap(ElementAction):
         return Story(self.base_tag.find('element_target'), unknown_items=True)
 
     @property
-    def items(self):
-        "A tuple of the two :class:`~mosromgr.moselements.Item` objects to be swapped"
+    def items(self) -> Tuple[Item]:
+        """
+        A tuple of the two :class:`~mosromgr.moselements.Item` objects to be swapped
+        """
         source = self.base_tag.find('element_source')
         return tuple(
             Item(source, id=item_id.text)
             for item_id in source.findall('itemID')
         )
 
-    def merge(self, ro):
+    def merge(self, ro: RunningOrder) -> RunningOrder:
         """
         Merge into the :class:`RunningOrder` object provided.
 
@@ -1699,7 +1840,9 @@ class EAItemSwap(ElementAction):
         return ro
 
     def inspect(self):
-        "Print an outline of the key file contents"
+        """
+        Print an outline of the key file contents
+        """
         print("IN STORY:", self.story.id)
         item1, item2 = self.items
         print("  SWAP ITEM:", item1.id)
@@ -1720,7 +1863,7 @@ class EAStoryMove(ElementAction):
     http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-43
     """
     @property
-    def story(self):
+    def story(self) -> Story:
         """
         The :class:`~mosromgr.moselements.Story` object above which the other
         stories will be moved
@@ -1729,14 +1872,16 @@ class EAStoryMove(ElementAction):
             return Story(self.base_tag.find('element_target'), unknown_items=True)
 
     @property
-    def stories(self):
-        "A list of :class:`~mosromgr.moselements.Story` objects being moved"
+    def stories(self) -> List[Story]:
+        """
+        A list of :class:`~mosromgr.moselements.Story` objects being moved
+        """
         return [
             Story(story_tag)
             for story_tag in self.base_tag.findall('element_source')
         ]
 
-    def merge(self, ro):
+    def merge(self, ro: RunningOrder) -> RunningOrder:
         """
         Merge into the :class:`RunningOrder` object provided.
 
@@ -1768,7 +1913,9 @@ class EAStoryMove(ElementAction):
         return ro
 
     def inspect(self):
-        "Print an outline of the key file contents"
+        """
+        Print an outline of the key file contents
+        """
         for story in self.stories:
             print("MOVE STORY:", story.id)
 
@@ -1787,7 +1934,7 @@ class EAItemMove(ElementAction):
     http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-43
     """
     @property
-    def story(self):
+    def story(self) -> Story:
         """
         The :class:`~mosromgr.moselements.Story` object containing the item
         being replaced
@@ -1795,7 +1942,7 @@ class EAItemMove(ElementAction):
         return Story(self.base_tag.find('element_target'), unknown_items=True)
 
     @property
-    def item(self):
+    def item(self) -> Item:
         """
         The :class:`~mosromgr.moselements.Item` object above which the
         source items will be moved
@@ -1803,7 +1950,7 @@ class EAItemMove(ElementAction):
         return Item(self.base_tag.find('element_target'))
 
     @property
-    def items(self):
+    def items(self) -> List[Item]:
         "A list of :class:`~mosromgr.moselements.Item` objects to be moved"
         source = self.base_tag.find('element_source')
         return [
@@ -1811,7 +1958,7 @@ class EAItemMove(ElementAction):
             for item in source.findall('itemID')
         ]
 
-    def merge(self, ro):
+    def merge(self, ro: RunningOrder) -> RunningOrder:
         """
         Merge into the :class:`RunningOrder` object provided.
 
@@ -1843,7 +1990,9 @@ class EAItemMove(ElementAction):
         return ro
 
     def inspect(self):
-        "Print an outline of the key file contents"
+        """
+        Print an outline of the key file contents
+        """
         print("IN STORY:", self.story.id)
         for item in self.items:
             print("  MOVE ITEM:", item.id)
@@ -1861,16 +2010,20 @@ class RunningOrderControl(MosFile):
     TODO: generalise this class #20
     """
     @property
-    def base_tag_name(self):
-        "The name of the base XML tag for this file type (:class:`str`)"
+    def base_tag_name(self) -> str:
+        """
+        The name of the base XML tag for this file type
+        """
         return 'roCtrl'
 
     @property
-    def story(self):
-        "The story to which this roCtrl message relates"
+    def story(self) -> Story:
+        """
+        The story to which this roCtrl message relates
+        """
         return Story(xml=self.base_tag)
 
-    def merge(self, ro):
+    def merge(self, ro: RunningOrder) -> RunningOrder:
         """
         Merge into the :class:`RunningOrder` object provided.
 
@@ -1898,5 +2051,7 @@ class RunningOrderControl(MosFile):
         return ro
 
     def inspect(self):
-        "Print an outline of the key file contents"
+        """
+        Print an outline of the key file contents
+        """
         print("RO CTRL FOR STORY:", self.story.id)

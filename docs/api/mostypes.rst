@@ -76,7 +76,7 @@ RunningOrder
     :show-inheritance:
     :members:
     :inherited-members:
-    :special-members: __add__, __lt__, __gt__, __str__
+    :special-members: __add__, __lt__, __str__
 
 StorySend
 ---------
@@ -85,7 +85,7 @@ StorySend
     :show-inheritance:
     :members:
     :inherited-members:
-    :special-members: __add__, __lt__, __gt__, __str__
+    :special-members: __add__, __lt__, __str__
 
 StoryReplace
 ------------
@@ -94,7 +94,7 @@ StoryReplace
     :show-inheritance:
     :members:
     :inherited-members:
-    :special-members: __add__, __lt__, __gt__, __str__
+    :special-members: __add__, __lt__, __str__
 
 StoryInsert
 -----------
@@ -103,7 +103,7 @@ StoryInsert
     :show-inheritance:
     :members:
     :inherited-members:
-    :special-members: __add__, __lt__, __gt__, __str__
+    :special-members: __add__, __lt__, __str__
 
 StoryAppend
 -----------
@@ -112,7 +112,7 @@ StoryAppend
     :show-inheritance:
     :members:
     :inherited-members:
-    :special-members: __add__, __lt__, __gt__, __str__
+    :special-members: __add__, __lt__, __str__
 
 StoryMove
 ---------
@@ -121,7 +121,7 @@ StoryMove
     :show-inheritance:
     :members:
     :inherited-members:
-    :special-members: __add__, __lt__, __gt__, __str__
+    :special-members: __add__, __lt__, __str__
 
 StoryDelete
 -----------
@@ -130,7 +130,7 @@ StoryDelete
     :show-inheritance:
     :members:
     :inherited-members:
-    :special-members: __add__, __lt__, __gt__, __str__
+    :special-members: __add__, __lt__, __str__
 
 MetaDataReplace
 ---------------
@@ -139,7 +139,7 @@ MetaDataReplace
     :show-inheritance:
     :members:
     :inherited-members:
-    :special-members: __add__, __lt__, __gt__, __str__
+    :special-members: __add__, __lt__, __str__
 
 ItemDelete
 ----------
@@ -148,7 +148,7 @@ ItemDelete
     :show-inheritance:
     :members:
     :inherited-members:
-    :special-members: __add__, __lt__, __gt__, __str__
+    :special-members: __add__, __lt__, __str__
 
 ItemInsert
 ----------
@@ -157,7 +157,7 @@ ItemInsert
     :show-inheritance:
     :members:
     :inherited-members:
-    :special-members: __add__, __lt__, __gt__, __str__
+    :special-members: __add__, __lt__, __str__
 
 ItemMoveMultiple
 ----------------
@@ -166,7 +166,7 @@ ItemMoveMultiple
     :show-inheritance:
     :members:
     :inherited-members:
-    :special-members: __add__, __lt__, __gt__, __str__
+    :special-members: __add__, __lt__, __str__
 
 ItemReplace
 -----------
@@ -175,7 +175,7 @@ ItemReplace
     :show-inheritance:
     :members:
     :inherited-members:
-    :special-members: __add__, __lt__, __gt__, __str__
+    :special-members: __add__, __lt__, __str__
 
 ReadyToAir
 ----------
@@ -184,7 +184,7 @@ ReadyToAir
     :show-inheritance:
     :members:
     :inherited-members:
-    :special-members: __add__, __lt__, __gt__, __str__
+    :special-members: __add__, __lt__, __str__
 
 EAStoryReplace
 --------------
@@ -193,7 +193,7 @@ EAStoryReplace
     :show-inheritance:
     :members:
     :inherited-members:
-    :special-members: __add__, __lt__, __gt__, __str__
+    :special-members: __add__, __lt__, __str__
 
 EAItemReplace
 -------------
@@ -202,7 +202,7 @@ EAItemReplace
     :show-inheritance:
     :members:
     :inherited-members:
-    :special-members: __add__, __lt__, __gt__, __str__
+    :special-members: __add__, __lt__, __str__
 
 EAStoryDelete
 -------------
@@ -211,7 +211,7 @@ EAStoryDelete
     :show-inheritance:
     :members:
     :inherited-members:
-    :special-members: __add__, __lt__, __gt__, __str__
+    :special-members: __add__, __lt__, __str__
 
 EAItemDelete
 ------------
@@ -220,7 +220,7 @@ EAItemDelete
     :show-inheritance:
     :members:
     :inherited-members:
-    :special-members: __add__, __lt__, __gt__, __str__
+    :special-members: __add__, __lt__, __str__
 
 EAStoryInsert
 -------------
@@ -229,7 +229,7 @@ EAStoryInsert
     :show-inheritance:
     :members:
     :inherited-members:
-    :special-members: __add__, __lt__, __gt__, __str__
+    :special-members: __add__, __lt__, __str__
 
 EAItemInsert
 ------------
@@ -238,7 +238,7 @@ EAItemInsert
     :show-inheritance:
     :members:
     :inherited-members:
-    :special-members: __add__, __lt__, __gt__, __str__
+    :special-members: __add__, __lt__, __str__
 
 EAStorySwap
 -----------
@@ -247,7 +247,7 @@ EAStorySwap
     :show-inheritance:
     :members:
     :inherited-members:
-    :special-members: __add__, __lt__, __gt__, __str__
+    :special-members: __add__, __lt__, __str__
 
 EAItemSwap
 ----------
@@ -256,7 +256,7 @@ EAItemSwap
     :show-inheritance:
     :members:
     :inherited-members:
-    :special-members: __add__, __lt__, __gt__, __str__
+    :special-members: __add__, __lt__, __str__
 
 EAStoryMove
 -----------
@@ -265,7 +265,7 @@ EAStoryMove
     :show-inheritance:
     :members:
     :inherited-members:
-    :special-members: __add__, __lt__, __gt__, __str__
+    :special-members: __add__, __lt__, __str__
 
 EAItemMove
 ----------
@@ -274,7 +274,7 @@ EAItemMove
     :show-inheritance:
     :members:
     :inherited-members:
-    :special-members: __add__, __lt__, __gt__, __str__
+    :special-members: __add__, __lt__, __str__
 
 RunningOrderReplace
 -------------------
@@ -284,7 +284,7 @@ RunningOrderReplace
     :members:
     :inherited-members:
     :exclude-members: completed
-    :special-members: __add__, __lt__, __gt__, __str__
+    :special-members: __add__, __lt__, __str__
 
 RunningOrderEnd
 ---------------
@@ -293,7 +293,7 @@ RunningOrderEnd
     :show-inheritance:
     :members:
     :inherited-members:
-    :special-members: __add__, __lt__, __gt__, __str__
+    :special-members: __add__, __lt__, __str__
 
 RunningOrderControl
 -------------------
@@ -302,7 +302,7 @@ RunningOrderControl
     :show-inheritance:
     :members:
     :inherited-members:
-    :special-members: __add__, __lt__, __gt__, __str__
+    :special-members: __add__, __lt__, __str__
 
 Base classes
 ============

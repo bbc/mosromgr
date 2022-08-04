@@ -2,11 +2,15 @@
 # Copyright 2021 BBC
 # SPDX-License-Identifier: Apache-2.0
 
+from typing import Optional, List
+
 import boto3
 
 
 class S3:
-    "Class to defer initialising S3 resources until needed"
+    """
+    Class to defer initialising S3 resources until needed
+    """
     def __init__(self):
         self._resource = None
         self._client = None
@@ -24,7 +28,12 @@ class S3:
         return self._client
 
 
-def get_mos_files(bucket_name, prefix=None, *, suffix='.mos.xml'):
+def get_mos_files(
+        bucket_name: str,
+        prefix: Optional[str] = None,
+        *,
+        suffix: str = '.mos.xml'
+    ) -> List[str]:
     """
     Retrieve MOS files from given S3 bucket in location defined by *prefix*.
     Returns a list of file keys.
@@ -47,7 +56,9 @@ def get_mos_files(bucket_name, prefix=None, *, suffix='.mos.xml'):
 
 
 def get_file_contents(bucket_name, file_key):
-    "Open the S3 file and return its contents as a string"
+    """
+    Open the S3 file and return its contents as a string
+    """
     o = s3.resource.Object(bucket_name, file_key).get()
     b = o['Body']
     return b.read()
