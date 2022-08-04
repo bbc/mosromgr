@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from pathlib import Path
-import xml.etree.ElementTree as ET
+from xml.etree import ElementTree
 
 import pytest
 
@@ -176,20 +176,20 @@ def rodelete2():
 
 @pytest.fixture()
 def story_xml():
-    return ET.parse(MOCK_XML / 'story.xml').getroot()
+    return ElementTree.parse(MOCK_XML / 'story.xml').getroot()
 
 @pytest.fixture()
 def story2_xml():
-    return ET.parse(MOCK_XML / 'story2.xml').getroot()
+    return ElementTree.parse(MOCK_XML / 'story2.xml').getroot()
 
 @pytest.fixture()
 def story3_xml():
-    return ET.parse(MOCK_XML / 'story3.xml').getroot()
+    return ElementTree.parse(MOCK_XML / 'story3.xml').getroot()
 
 @pytest.fixture()
 def item_mosart_xml():
-    return ET.parse(MOCK_XML / 'item_mosart.xml').getroot()
+    return ElementTree.parse(MOCK_XML / 'item_mosart.xml').getroot()
 
 @pytest.fixture()
 def item_note_xml():
-    return ET.parse(MOCK_XML / 'item_note.xml').getroot()
+    return ElementTree.parse(MOCK_XML / 'item_note.xml').getroot()

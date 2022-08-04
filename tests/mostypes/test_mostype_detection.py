@@ -19,9 +19,8 @@ def test_mosfile_detect_rocreate_contents(rocreate):
     GIVEN: A path to a roCreate MOS file
     EXPECT: An object of type RunningOrder
     """
-    with open(rocreate) as f:
-        contents = f.read()
-    rc = MosFile.from_string(contents)
+    xml = rocreate.read_text()
+    rc = MosFile.from_string(xml)
     assert isinstance(rc, RunningOrder)
 
 def test_mosfile_detect_rocreate(rocreate):

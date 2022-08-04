@@ -23,8 +23,7 @@ def test_running_order_init(rocreate):
 
 def test_running_order_init_str(rocreate):
     "Test we can create a RunningOrder object from a string representation of a roCreate file"
-    with open(rocreate) as f:
-        xml = f.read()
+    xml = rocreate.read_text()
     ro = RunningOrder.from_string(xml)
     assert repr(ro) == '<RunningOrder 1000>'
     assert ro.ro_id == 'RO ID'

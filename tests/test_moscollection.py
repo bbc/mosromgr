@@ -197,12 +197,9 @@ def test_mos_collection_s3_merge(get_mos_files, get_file_contents, boto3,
     GIVEN: Bucket prefix matching a roCreate and ElementAction (StoryInsert)
     EXPECT: Running order summary, with story from EAStoryInsert added
     """
-    with open(rocreate) as f:
-        rc = f.read()
-    with open(roelementactionstoryinsert) as f:
-        ea = f.read()
-    with open(rodelete) as f:
-        rd = f.read()
+    rc = rocreate.read_text()
+    ea = roelementactionstoryinsert.read_text()
+    rd = rodelete.read_text()
 
     get_mos_files.return_value = [rc, ea, rd]
     get_file_contents.side_effect = [rc, ea, rd, rc, ea, rd]
