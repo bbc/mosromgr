@@ -2,6 +2,7 @@
 # Copyright 2021 BBC
 # SPDX-License-Identifier: Apache-2.0
 
+from functools import total_ordering
 import logging
 import warnings
 
@@ -14,6 +15,7 @@ logger = logging.getLogger('mosromgr.moscollection')
 logging.basicConfig(level=logging.INFO)
 
 
+@total_ordering
 class MosReader:
     """
     Internal construct for opening and inspecting a MOS file for the purposes of
@@ -57,9 +59,6 @@ class MosReader:
 
     def __lt__(self, other):
         return self.message_id < other.message_id
-
-    def __gt__(self, other):
-        return self.message_id > other.message_id
 
     @property
     def message_id(self):
@@ -133,10 +132,10 @@ class MosCollection:
         """
         Construct from a list of MOS document XML strings
 
-        :type mos_file_paths:
+        :type mos_file_strings:
             list
-        :param mos_file_paths:
-            A list of paths to MOS files
+        :param mos_file_strings:
+            A list of strings containing MOS file contents
 
         :type allow_incomplete:
             bool

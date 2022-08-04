@@ -2,6 +2,7 @@
 # Copyright 2021 BBC
 # SPDX-License-Identifier: Apache-2.0
 
+from functools import total_ordering
 import xml.etree.ElementTree as ET
 import logging
 import warnings
@@ -24,6 +25,7 @@ logger = logging.getLogger('mosromgr.mostypes')
 logging.basicConfig(level=logging.INFO)
 
 
+@total_ordering
 class MosFile:
     "Base class for all MOS files"
     def __init__(self, xml):
@@ -127,10 +129,6 @@ class MosFile:
     def __lt__(self, other):
         "Sort by :attr:`message_id` i.e. ``ro < ss`` or ``sorted([ro, ss])``"
         return self.message_id < other.message_id
-
-    def __gt__(self, other):
-        "Sort by :attr:`message_id` i.e. ``ss > ro`` or ``sorted([ro, ss])``"
-        return self.message_id > other.message_id
 
     @property
     def base_tag_name(self):
