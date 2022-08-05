@@ -144,12 +144,11 @@ class MosFile:
         return self.message_id < other.message_id
 
     @property
-    def base_tag_name(self) -> str:
+    def base_tag_name(self):
         """
         The base tag (:class:`xml.etree.ElementTree.Element`) within the
         :attr:`xml`, as determined by :attr:`base_tag_name`
         """
-        return
 
     @property
     def xml(self) -> Element:
@@ -262,8 +261,11 @@ class RunningOrder(MosFile):
         """
         Transmission end time (if present in the XML)
         """
-        final_story = self.stories[-1]
-        return final_story.end_time
+        try:
+            final_story = self.stories[-1]
+            return final_story.end_time
+        except IndexError:
+            return
 
     @property
     def duration(self) -> Optional[float]:

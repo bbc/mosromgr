@@ -22,6 +22,7 @@ def test_running_order(rocreate):
     assert len(ro.stories) == 3
     assert ro.duration == 31
     assert isinstance(ro.start_time, datetime)
+    assert isinstance(ro.end_time, datetime)
 
     story1 = ro.stories[0]
     assert repr(story1) == '<Story STORY1>'
@@ -35,6 +36,8 @@ def test_running_order(rocreate):
     assert story1.duration == 3
     assert isinstance(story1.start_time, datetime)
     assert story1.start_time == ro.start_time
+    assert isinstance(story1.end_time, datetime)
+    assert story1.end_time > ro.start_time
 
     assert isinstance(story1.items, list)
     assert len(story1.items) == 3
@@ -77,6 +80,19 @@ def test_running_order_with_note(rocreate3):
     ro = RunningOrder.from_file(rocreate3)
     assert ro.stories[0].items[0].note == 'BB1'
     assert ro.stories[1].items[0].note == 'BB2'
+
+def test_running_order_no_roedstart(rocreate4, rocreate5):
+    """
+    Test we can access the (null) start_time and end_time properties of a
+    RunningOrder object created from a roCreate file with an empty or missing
+    roEdStart tag
+    """
+    ro4 = RunningOrder.from_file(rocreate4)
+    assert ro4.start_time is None
+    assert ro4.end_time is None
+    ro5 = RunningOrder.from_file(rocreate5)
+    assert ro5.start_time is None
+    assert ro5.end_time is None
 
 def test_story_send(rostorysend1):
     """

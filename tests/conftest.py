@@ -12,12 +12,31 @@ MOCK_MOS = HERE / 'mock_mos'
 MOCK_XML = HERE / 'mock_xml'
 
 @pytest.fixture()
+def invalid_xml():
+    return MOCK_XML / 'invalid.xml'
+
+@pytest.fixture()
 def rocreate():
     return MOCK_MOS / 'roCreate.mos.xml'
 
 @pytest.fixture()
 def rocreate2():
     return MOCK_MOS / 'roCreate2.mos.xml'
+    
+# roCreate with notes
+@pytest.fixture()
+def rocreate3():
+    return MOCK_MOS / 'roCreate3.mos.xml'
+    
+# roCreate with no roEdStart
+@pytest.fixture()
+def rocreate4():
+    return MOCK_MOS / 'roCreate4.mos.xml'
+    
+# roCreate with empty roEdStart
+@pytest.fixture()
+def rocreate5():
+    return MOCK_MOS / 'roCreate5.mos.xml'
 
 @pytest.fixture()
 def rostorysend1():
@@ -141,12 +160,6 @@ def ro_all(rocreate, rostorysend1, rostorysend2, roelementactionstoryreplace,
             roelementactioniteminsert, roelementactionstoryswap,
             roelementactionitemswap, roelementactionstorymove,
             roelementactionitemmove, rometadatareplace, roreadytoair, rodelete]
-
-
-# roCreate with notes
-@pytest.fixture()
-def rocreate3():
-    return MOCK_MOS / 'roCreate3.mos.xml'
 
 # Various invalid MOS files
 
