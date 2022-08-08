@@ -4,7 +4,7 @@
   <roElementAction operation="REPLACE">
     <roID>RO ID</roID>
     <element_target>
-      <storyID>STORY1</storyID>
+      <storyID>STORY10</storyID>
       <itemID>ITEM1</itemID>
     </element_target>
     <element_source>

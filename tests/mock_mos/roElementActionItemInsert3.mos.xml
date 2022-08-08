@@ -5,7 +5,7 @@
     <roID>RO ID</roID>
     <element_target>
       <storyID>STORY1</storyID>
-      <itemID>ITEM2</itemID>
+      <itemID></itemID>
     </element_target>
     <element_source>
         <item>

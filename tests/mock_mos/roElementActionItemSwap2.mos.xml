@@ -1,0 +1,14 @@
+<mos>
+  <mosID>MOS ID</mosID>
+  <messageID>1010</messageID>
+  <roElementAction operation="SWAP">
+    <roID>RO ID</roID>
+    <element_target>
+      <storyID>STORY10</storyID>
+    </element_target>
+    <element_source>
+      <itemID>ITEM1</itemID>
+      <itemID>ITEM2</itemID>
+    </element_source>
+  </roElementAction>
+</mos>

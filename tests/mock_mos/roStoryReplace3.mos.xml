@@ -1,0 +1,8 @@
+<mos>
+  <mosID>MOS ID</mosID>
+  <messageID>1018</messageID>
+  <roStoryReplace>
+    <roID>RO ID</roID>
+    <storyID>STORY1</storyID>
+  </roStoryReplace>
+</mos>

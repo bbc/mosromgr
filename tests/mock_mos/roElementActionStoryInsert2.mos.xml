@@ -4,7 +4,7 @@
   <roElementAction operation="INSERT">
     <roID>RO ID</roID>
     <element_target>
-      <storyID>STORY2</storyID>
+      <storyID></storyID>
     </element_target>
     <element_source>
       <story>

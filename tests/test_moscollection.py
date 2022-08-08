@@ -173,12 +173,12 @@ def test_mos_collection_unsupported_mos_type(rocreate, roinvalid, rodelete):
     with pytest.raises(UnknownMosFileType):
         MosCollection.from_files(mos_files)
 
-def test_mos_collection_merge(rocreate, roelementactionstoryinsert, rodelete):
+def test_mos_collection_merge(rocreate, eastoryinsert, rodelete):
     """
     GIVEN: Running order and EAStoryInsert paths
     EXPECT: Running order summary, with story from EAStoryInsert added
     """
-    mos_files = [rocreate, roelementactionstoryinsert, rodelete]
+    mos_files = [rocreate, eastoryinsert, rodelete]
     mc = MosCollection.from_files(mos_files)
     assert len(mc.mos_readers) == 2
     d = mc.ro.dict
@@ -192,13 +192,13 @@ def test_mos_collection_merge(rocreate, roelementactionstoryinsert, rodelete):
 @patch('mosromgr.utils.s3.get_file_contents')
 @patch('mosromgr.utils.s3.get_mos_files')
 def test_mos_collection_s3_merge(get_mos_files, get_file_contents, boto3,
-    rocreate, roelementactionstoryinsert, rodelete):
+    rocreate, eastoryinsert, rodelete):
     """
     GIVEN: Bucket prefix matching a roCreate and ElementAction (StoryInsert)
     EXPECT: Running order summary, with story from EAStoryInsert added
     """
     rc = rocreate.read_text()
-    ea = roelementactionstoryinsert.read_text()
+    ea = eastoryinsert.read_text()
     rd = rodelete.read_text()
 
     get_mos_files.return_value = [rc, ea, rd]

@@ -23,6 +23,19 @@ def test_running_order(rocreate):
     assert ro.duration == 31
     assert isinstance(ro.start_time, datetime)
     assert isinstance(ro.end_time, datetime)
+    script = ro.script
+    assert type(script) is list
+    text = script[0]
+    assert type(text) is str
+    assert text == 'This is story 1'
+    body = ro.body
+    assert type(body) is list
+    text = body[0]
+    assert type(text) is str
+    assert text == 'This is story 1'
+    item = body[1]
+    assert type(item) is Item
+    assert item.id == 'ITEM1'
 
     story1 = ro.stories[0]
     assert repr(story1) == '<Story STORY1>'
@@ -38,6 +51,13 @@ def test_running_order(rocreate):
     assert story1.start_time == ro.start_time
     assert isinstance(story1.end_time, datetime)
     assert story1.end_time > ro.start_time
+    assert type(story1.script) is list
+    script = story1.script
+    assert type(script) is list
+    text = script[0]
+    assert type(text) is str
+    assert text == 'This is story 1'
+    ro.inspect()  # test this?
 
     assert isinstance(story1.items, list)
     assert len(story1.items) == 3
@@ -94,6 +114,13 @@ def test_running_order_no_roedstart(rocreate4, rocreate5):
     assert ro5.start_time is None
     assert ro5.end_time is None
 
+def test_running_order_no_story_durations(rocreate6):
+    """
+    Test the RO duration is None when story duration is not given
+    """
+    ro = RunningOrder.from_file(rocreate6)
+    assert ro.duration is None
+
 def test_story_send(rostorysend1):
     """
     Test we can access the elements of a StorySend object created from a
@@ -106,6 +133,7 @@ def test_story_send(rostorysend1):
     assert ss.story.id == 'STORY1'
     assert ss.story.slug == 'STORY 1'
     assert ss.story.duration == 30
+    ss.inspect()  # test this?
 
     assert isinstance(ss.story.items, list)
     assert len(ss.story.items) == 1
@@ -147,6 +175,7 @@ def test_story_append(rostoryappend):
     assert isinstance(sa.stories, list)
     assert len(sa.stories) == 2
     story1, story2 = sa.stories
+    sa.inspect()  # test this?
 
     assert isinstance(story1, Story)
     assert isinstance(story1.xml, Element)
@@ -177,6 +206,7 @@ def test_story_delete(rostorydelete):
     roStoryDelete file
     """
     sd = StoryDelete.from_file(rostorydelete)
+    sd.inspect()  # test this?
     assert isinstance(sd.xml, Element)
     assert isinstance(sd.stories, list)
     assert len(sd.stories) == 2
@@ -186,7 +216,7 @@ def test_story_delete(rostorydelete):
     assert isinstance(story1.xml, Element)
     assert story1.id == 'STORY1'
     assert story1.slug is None
-    assert story1.duration == 0
+    assert story1.duration is None
     assert isinstance(story1.items, list)
     assert len(story1.items) == 0
 
@@ -194,7 +224,7 @@ def test_story_delete(rostorydelete):
     assert isinstance(story2.xml, Element)
     assert story2.id == 'STORY2'
     assert story2.slug is None
-    assert story2.duration == 0
+    assert story2.duration is None
     assert isinstance(story2.items, list)
     assert len(story2.items) == 0
 
@@ -204,34 +234,35 @@ def test_story_insert(rostoryinsert):
     roStoryInsert file
     """
     si = StoryInsert.from_file(rostoryinsert)
+    si.inspect()  # test this?
     assert isinstance(si.xml, Element)
     assert isinstance(si.target_story, Story)
     assert si.target_story.id == 'STORY2'
     assert si.target_story.slug is None
-    assert si.target_story.duration == 0
+    assert si.target_story.duration is None
     assert isinstance(si.source_stories, list)
     assert len(si.source_stories) == 2
     story1, story2 = si.source_stories
 
     assert isinstance(story1, Story)
-    assert story1.id == 'STORYNEW1'
-    assert story1.slug == 'STORY NEW 1'
+    assert story1.id == 'STORY4'
+    assert story1.slug == 'STORY 4'
     assert story1.duration == 6
     assert isinstance(story1.items, list)
     assert len(story1.items) == 1
     item1 = story1.items[0]
-    assert item1.id == 'ITEMNEW1'
-    assert item1.slug == 'ITEM NEW 1'
+    assert item1.id == 'ITEM4'
+    assert item1.slug == 'ITEM 4'
 
     assert isinstance(story2, Story)
-    assert story2.id == 'STORYNEW2'
-    assert story2.slug == 'STORY NEW 2'
+    assert story2.id == 'STORY5'
+    assert story2.slug == 'STORY 5'
     assert story2.duration == 15
     assert isinstance(story2.items, list)
     assert len(story2.items) == 1
     item2 = story2.items[0]
-    assert item2.id == 'ITEMNEW21'
-    assert item2.slug == 'ITEM NEW 21'
+    assert item2.id == 'ITEM5'
+    assert item2.slug == 'ITEM 5'
 
 def test_story_move(rostorymove):
     """
@@ -243,6 +274,7 @@ def test_story_move(rostorymove):
     assert sm.target_story.id == 'STORY1'
     assert isinstance(sm.target_story.xml, Element)
     assert sm.target_story.items is None
+    sm.inspect()  # test this?
 
     assert isinstance(sm.source_story, Story)
     assert sm.source_story.id == 'STORY3'
@@ -260,6 +292,7 @@ def test_story_replace(rostoryreplace):
     assert isinstance(sr.story.xml, Element)
     assert sr.story.id == 'STORY1'
     assert sr.story.items is None
+    sr.inspect()  # test this?
 
     assert isinstance(sr.stories, list)
     story = sr.stories[0]
@@ -284,6 +317,7 @@ def test_ro_replace(roreplace):
     assert isinstance(ror.stories, list)
     assert len(ror.stories) == 3
     assert ror.duration == 53
+    ror.inspect()  # test this?
 
     story1 = ror.stories[0]
     assert isinstance(story1, Story)
@@ -317,6 +351,7 @@ def test_metadata_replace(rometadatareplace):
     mdr = MetaDataReplace.from_file(rometadatareplace)
     assert isinstance(mdr.xml, Element)
     assert mdr.ro_slug == 'RO SLUG NEW'
+    mdr.inspect()  # test this?
 
 def test_item_insert(roiteminsert):
     """
@@ -328,8 +363,9 @@ def test_item_insert(roiteminsert):
     assert isinstance(ii.story, Story)
     assert ii.story.id == 'STORY1'
     assert ii.story.slug is None
-    assert ii.story.duration == 0
+    assert ii.story.duration is None
     assert ii.story.items is None
+    ii.inspect()  # test this?
 
     assert isinstance(ii.item, Item)
     assert ii.item.id == 'ITEM2'
@@ -338,10 +374,10 @@ def test_item_insert(roiteminsert):
     assert len(ii.items) == 2
 
     item1, item2 = ii.items
-    assert item1.id == 'ITEMNEW1'
-    assert item1.slug == 'ITEM NEW 1'
-    assert item2.id == 'ITEMNEW2'
-    assert item2.slug == 'ITEM NEW 2'
+    assert item1.id == 'ITEM4'
+    assert item1.slug == 'ITEM 4'
+    assert item2.id == 'ITEM5'
+    assert item2.slug == 'ITEM 5'
 
 def test_item_delete(roitemdelete):
     """
@@ -353,12 +389,13 @@ def test_item_delete(roitemdelete):
     assert isinstance(id.story, Story)
     assert id.story.id == 'STORY1'
     assert id.story.slug is None
-    assert id.story.duration == 0
+    assert id.story.duration is None
     assert id.story.items is None
+    id.inspect()  # test this?
 
-    assert isinstance(id.items, tuple)
+    assert isinstance(id.items, list)
     assert len(id.items) == 2
-    assert {item.id for item in id.items} == {'ITEM1', 'ITEM2'}
+    assert [item.id for item in id.items] == ['ITEM1', 'ITEM2']
 
 def test_item_move_multiple(roitemmovemultiple):
     """
@@ -370,8 +407,9 @@ def test_item_move_multiple(roitemmovemultiple):
     assert isinstance(imm.story, Story)
     assert imm.story.id == 'STORY1'
     assert imm.story.slug is None
-    assert imm.story.duration == 0
+    assert imm.story.duration is None
     assert imm.story.items is None
+    imm.inspect()  # test this?
 
     assert isinstance(imm.item, Item)
     assert imm.item.id == 'ITEM1'
@@ -391,11 +429,12 @@ def test_item_replace(roitemreplace):
     roItemReplace file
     """
     ir = ItemReplace.from_file(roitemreplace)
+    ir.inspect()  # test this?
     assert isinstance(ir.xml, Element)
     assert isinstance(ir.story, Story)
     assert ir.story.id == 'STORY2'
     assert ir.story.slug is None
-    assert ir.story.duration == 0
+    assert ir.story.duration is None
     assert ir.story.items is None
 
     assert isinstance(ir.item, Item)
@@ -403,221 +442,31 @@ def test_item_replace(roitemreplace):
     assert ir.item.slug is None
 
     assert isinstance(ir.items, list)
-    item = ir.items[0]
-    assert isinstance(item, Item)
-    item = ir.items[0]
-    assert item.id == 'ITEM21'
-    assert item.slug == 'NEW ITEM 21'
+    assert len(ir.items) == 2
+    item1, item2 = ir.items
 
-def test_element_action_replace_story(roelementactionstoryreplace):
-    """
-    Test we can access the elements of an EAStoryReplace object created from a
-    roElementAction file
-    """
-    ea = EAStoryReplace.from_file(roelementactionstoryreplace)
-    assert isinstance(ea.xml, Element)
-
-    assert isinstance(ea.story, Story)
-    assert isinstance(ea.story.xml, Element)
-    assert ea.story.id == 'STORY1'
-    assert ea.story.slug is None
-    assert ea.story.duration == 0
-    assert ea.story.items is None
-
-    assert isinstance(ea.stories, list)
-    story = ea.stories[0]
-    assert isinstance(story, Story)
-    assert isinstance(story.xml, Element)
-    assert story.id == 'STORY1'
-    assert story.slug == 'STORY ONE'
-    assert story.duration == 30
-    assert isinstance(story.items, list)
-    assert len(story.items) == 1
-    item = story.items[0]
-    assert item.id == 'ITEM1'
-    assert item.slug == 'ITEM ONE'
-
-def test_element_action_delete_story(roelementactionstorydelete):
-    """
-    Test we can access the elements of an EAStoryDelete object created from a
-    roElementAction file
-    """
-    ea = EAStoryDelete.from_file(roelementactionstorydelete)
-    assert isinstance(ea.xml, Element)
-    assert isinstance(ea.stories, list)
-    story = ea.stories[0]
-    assert isinstance(story, Story)
-    assert isinstance(story.xml, Element)
-    assert story.id == 'STORY1'
-    assert story.slug is None
-    assert story.duration == 0
-    assert isinstance(story.items, list)
-    assert len(story.items) == 0
-
-def test_element_action_insert_story(roelementactionstoryinsert):
-    """
-    Test we can access the elements of an EAStoryInsert object created from a
-    roElementAction file
-    """
-    ea = EAStoryInsert.from_file(roelementactionstoryinsert)
-    assert isinstance(ea.xml, Element)
-
-    assert isinstance(ea.story, Story)
-    assert isinstance(ea.story.xml, Element)
-    assert ea.story.id == 'STORY2'
-    assert ea.story.slug is None
-    assert ea.story.duration == 0
-    assert ea.story.items is None
-
-    assert isinstance(ea.stories, list)
-    story = ea.stories[0]
-    assert isinstance(story, Story)
-    assert isinstance(story.xml, Element)
-    assert story.id == 'STORYNEW'
-    assert story.slug == 'STORY NEW'
-    assert story.duration == 0
-    assert isinstance(story.items, list)
-    assert len(story.items) == 1
-    item = story.items[0]
-    assert item.id == 'ITEMNEW'
-    assert item.slug == 'ITEM NEW'
-
-def test_element_action_swap_story(roelementactionstoryswap):
-    """
-    Test we can access the elements of an EAStorySwap object created from a
-    roElementAction file
-    """
-    ea = EAStorySwap.from_file(roelementactionstoryswap)
-
-    assert isinstance(ea.stories, tuple)
-    assert {story.id for story in ea.stories} == {'STORY1', 'STORY2'}
-    story1, story2 = ea.stories
-
-    assert isinstance(story1, Story)
-    assert isinstance(story1.xml, Element)
-    assert isinstance(story1.items, list)
-    assert len(story1.items) == 0
-
-    assert isinstance(story2, Story)
-    assert isinstance(story2.xml, Element)
-    assert isinstance(story2.items, list)
-    assert len(story2.items) == 0
-
-def test_element_action_move_story(roelementactionstorymove):
-    """
-    Test we can access the elements of an EAStoryMove object created from a
-    roElementAction file
-    """
-    ea = EAStoryMove.from_file(roelementactionstorymove)
-    assert isinstance(ea.xml, Element)
-    assert isinstance(ea.story, Story)
-    assert isinstance(ea.story.xml, Element)
-    assert ea.story.id == 'STORY1'
-    assert ea.story.items is None
-
-    assert isinstance(ea.stories, list)
-    story = ea.stories[0]
-    assert isinstance(story, Story)
-    assert isinstance(story.xml, Element)
-    assert story.id == 'STORY3'
-    assert isinstance(story.items, list)
-    assert len(story.items) == 0
-
-def test_element_action_replace_item(roelementactionitemreplace):
-    """
-    Test we can access the elements of an EAItemReplace object created from a
-    roElementAction file
-    """
-    ea = EAItemReplace.from_file(roelementactionitemreplace)
-    assert isinstance(ea.xml, Element)
-    assert isinstance(ea.story, Story)
-    assert ea.story.id == 'STORY2'
-    assert ea.story.slug is None
-    assert ea.story.items is None
-
-    assert isinstance(ea.item, Item)
-    assert ea.item.id == 'ITEM21'
-    assert ea.item.slug is None
-
-    assert isinstance(ea.items, list)
-    item = ea.items[0]
-    assert isinstance(item, Item)
-    assert item.id == 'ITEM21'
-    assert item.slug == 'NEW ITEM 21'
-
-def test_element_action_delete_item(roelementactionitemdelete):
-    """
-    Test we can access the elements of an EAItemDelete object created from a
-    roElementAction file
-    """
-    ea = EAItemDelete.from_file(roelementactionitemdelete)
-    assert isinstance(ea.xml, Element)
-    assert isinstance(ea.story, Story)
-    assert ea.story.id == 'STORY1'
-    assert ea.story.slug is None
-    assert ea.story.items is None
-
-    assert isinstance(ea.items, list)
-    source_item = ea.items[0]
-    assert isinstance(source_item, Item)
-    assert source_item.id == 'ITEM1'
-    assert source_item.slug is None
-
-def test_element_action_insert_item(roelementactioniteminsert):
-    """
-    Test we can access the elements of an EAItemInsert object created from a
-    roElementAction file
-    """
-    ea = EAItemInsert.from_file(roelementactioniteminsert)
-    assert isinstance(ea.xml, Element)
-    assert isinstance(ea.story, Story)
-    assert ea.story.id == 'STORY1'
-    assert ea.story.slug is None
-    assert ea.story.items is None
-
-    assert isinstance(ea.item, Item)
-    assert ea.item.id == 'ITEM2'
-    assert ea.item.slug is None
-
-    assert isinstance(ea.items, list)
-    item = ea.items[0]
-    assert isinstance(item, Item)
-    assert item.id == 'ITEMNEW'
-    assert item.slug == 'ITEM NEW'
-
-def test_element_action_swap_item(roelementactionitemswap):
-    """
-    Test we can access the elements of an EAItemSwap object created from a
-    roElementAction file
-    """
-    ea = EAItemSwap.from_file(roelementactionitemswap)
-    assert isinstance(ea.xml, Element)
-    assert isinstance(ea.story, Story)
-    assert ea.story.items is None
-    assert isinstance(ea.items, tuple)
-    item1, item2 = ea.items
     assert isinstance(item1, Item)
+    assert item1.id == 'ITEM24'
+    assert item1.slug == 'NEW ITEM 24'
+
     assert isinstance(item2, Item)
-    assert {item.id for item in ea.items} == {'ITEM1', 'ITEM2'}
+    assert item2.id == 'ITEM25'
+    assert item2.slug == 'NEW ITEM 25'
 
-def test_element_action_move_item(roelementactionitemmove):
+def test_ready_to_air(roreadytoair):
     """
-    Test we can access the elements of an EAItemMove object created from a
-    roElementAction file
+    Test we can access the elements of a ReadyToAir object created from a
+    roReadyToAir file
     """
-    ea = EAItemMove.from_file(roelementactionitemmove)
-    assert isinstance(ea.xml, Element)
-    assert isinstance(ea.story, Story)
-    assert ea.story.id == 'STORY1'
-    assert ea.story.slug is None
-    assert ea.story.items is None
+    rta = ReadyToAir.from_file(roreadytoair)
+    rta.inspect()  # test this?
+    assert isinstance(rta.xml, Element)
 
-    assert isinstance(ea.item, Item)
-    assert ea.item.id == 'ITEM1'
-    assert ea.item.slug is None
-
-    assert isinstance(ea.items, list)
-    item = ea.items[0]
-    assert isinstance(item, Item)
-    assert item.id == 'ITEM3'
-    assert item.slug is None
+def test_rodelete(rodelete):
+    """
+    Test we can access the elements of a RunningOrderAir object created from a
+    roDelete file
+    """
+    rd = RunningOrderEnd.from_file(rodelete)
+    rd.inspect()  # test this?
+    assert isinstance(rd.xml, Element)

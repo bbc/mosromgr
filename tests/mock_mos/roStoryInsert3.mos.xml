@@ -1,0 +1,23 @@
+<mos>
+  <mosID>MOS ID</mosID>
+  <messageID>1016</messageID>
+  <roStoryInsert>
+    <roID>RO ID</roID>
+    <storyID>STORY2</storyID>
+    <story>
+      <storyID>STORY1</storyID>
+      <storySlug>STORY 1</storySlug>
+      <storyNum></storyNum>
+      <mosExternalMetadata>
+        <mosPayload>
+          <TextTime>1</TextTime>
+          <MediaTime>5</MediaTime>
+        </mosPayload>
+      </mosExternalMetadata>
+      <item>
+        <itemID>ITEM1</itemID>
+        <itemSlug>ITEM 1</itemSlug>
+      </item>
+    </story>
+  </roStoryInsert>
+</mos>

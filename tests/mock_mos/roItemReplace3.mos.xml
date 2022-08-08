@@ -4,11 +4,7 @@
   <roItemReplace>
     <roID>RO ID</roID>
     <storyID>STORY2</storyID>
-    <itemID>ITEM21</itemID>
-    <item>
-      <itemID>ITEM24</itemID>
-      <itemSlug>NEW ITEM 24</itemSlug>
-    </item>
+    <itemID>ITEM30</itemID>
     <item>
       <itemID>ITEM25</itemID>
       <itemSlug>NEW ITEM 25</itemSlug>

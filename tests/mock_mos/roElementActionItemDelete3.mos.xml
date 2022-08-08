@@ -1,17 +1,13 @@
 <mos>
   <mosID>MOS ID</mosID>
-  <messageID>1004</messageID>
-  <roElementAction operation="REPLACE">
+  <messageID>1006</messageID>
+  <roElementAction operation="DELETE">
     <roID>RO ID</roID>
     <element_target>
       <storyID>STORY1</storyID>
-      <itemID>ITEM1</itemID>
     </element_target>
     <element_source>
-      <item>
-        <itemID>ITEM21</itemID>
-        <itemSlug>NEW ITEM 21</itemSlug>
-      </item>
+      <itemID>ITEM10</itemID>
     </element_source>
   </roElementAction>
 </mos>

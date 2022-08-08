@@ -35,7 +35,7 @@ clean:
 lint:
 	pylint -E mosromgr
 
-test: lint
+test:
 	coverage run --rcfile coverage.cfg -m pytest -v tests
 	coverage report --rcfile coverage.cfg
 

@@ -31,7 +31,7 @@ def _get_story_duration(story_tag: Element) -> Optional[float]:
         metadata = story_tag.find('mosExternalMetadata')
         payload = metadata.find('mosPayload')
     except AttributeError:
-        return float(0)
+        return
 
     try:
         return float(payload.find('StoryDuration').text)
@@ -100,12 +100,15 @@ class MosElement:
         return self._xml
 
     @property
-    def id(self) -> str:
+    def id(self) -> Optional[str]:
         """
-        The element ID
+        The element ID (if present in the XML)
         """
         if self._id is None:
-            self._id = self.xml.find(self._id_tag).text
+            try:
+                self._id = self.xml.find(self._id_tag).text
+            except AttributeError:
+                self._id = None
         return self._id
 
     @property
@@ -128,15 +131,15 @@ class Item(MosElement):
     exposed as properties, and the XML element is provided for further
     introspection.
     """
-    def __init__(self, xml: Element, *, id: str = None, slug: str = None):
+    def __init__(self, xml: Element, *, id: Optional[str] = None, slug: Optional[str] = None):
         super().__init__(xml, id=id, slug=slug)
         self._id_tag = 'itemID'
         self._slug_tag = 'itemSlug'
 
     @property
-    def id(self) -> str:
+    def id(self) -> Optional[str]:
         """
-        The Item ID (:class:`str`)
+        The Item ID (if present in the XML)
         """
         return super().id
 
@@ -214,9 +217,9 @@ class Story(MosElement):
         self._story_offsets = _get_story_offsets(all_stories)
 
     @property
-    def id(self) -> str:
+    def id(self) -> Optional[str]:
         """
-        The Story ID
+        The Story ID (if present in the XML)
         """
         return super().id
 

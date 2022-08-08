@@ -16,11 +16,10 @@ def test_sort_two(rocreate, rodelete):
     assert sorted([ro, rd]) == [ro, rd]
     assert sorted([rd, ro]) == [ro, rd]
 
-def test_sort_all(rocreate, rostorysend1, rostorysend2, roelementactionstoryreplace,
-    roelementactionitemreplace, roelementactionstorydelete, roelementactionitemdelete,
-    roelementactionstoryinsert, roelementactioniteminsert,
-    roelementactionstoryswap, roelementactionitemswap, roelementactionstorymove,
-    roelementactionitemmove, rometadatareplace, rodelete):
+def test_sort_all(rocreate, rostorysend1, rostorysend2, eastoryreplace,
+    eaitemreplace, eastorydelete, eaitemdelete, eastoryinsert, eaiteminsert,
+    eastoryswap, eaitemswap, eastorymove, eaitemmove, rometadatareplace,
+    rodelete):
     """
     GIVEN: A list of MOS objects
     EXPECT: The MOS objects sorted by their message ID
@@ -28,16 +27,16 @@ def test_sort_all(rocreate, rostorysend1, rostorysend2, roelementactionstoryrepl
     ro = RunningOrder.from_file(rocreate)
     ss1 = StorySend.from_file(rostorysend1)
     ss2 = StorySend.from_file(rostorysend2)
-    ea1 = EAStoryReplace.from_file(roelementactionstoryreplace)
-    ea2 = EAItemReplace.from_file(roelementactionitemreplace)
-    ea3 = EAStoryDelete.from_file(roelementactionstorydelete)
-    ea4 = EAItemDelete.from_file(roelementactionitemdelete)
-    ea5 = EAStoryInsert.from_file(roelementactionstoryinsert)
-    ea6 = EAItemInsert.from_file(roelementactioniteminsert)
-    ea7 = EAStorySwap.from_file(roelementactionstoryswap)
-    ea8 = EAItemSwap.from_file(roelementactionitemswap)
-    ea9 = EAStoryMove.from_file(roelementactionstorymove)
-    ea10 = EAItemMove.from_file(roelementactionitemmove)
+    ea1 = EAStoryReplace.from_file(eastoryreplace)
+    ea2 = EAItemReplace.from_file(eaitemreplace)
+    ea3 = EAStoryDelete.from_file(eastorydelete)
+    ea4 = EAItemDelete.from_file(eaitemdelete)
+    ea5 = EAStoryInsert.from_file(eastoryinsert)
+    ea6 = EAItemInsert.from_file(eaiteminsert)
+    ea7 = EAStorySwap.from_file(eastoryswap)
+    ea8 = EAItemSwap.from_file(eaitemswap)
+    ea9 = EAStoryMove.from_file(eastorymove)
+    ea10 = EAItemMove.from_file(eaitemmove)
     mdr = MetaDataReplace.from_file(rometadatareplace)
     rd = RunningOrderEnd.from_file(rodelete)
 

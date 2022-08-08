@@ -27,276 +27,9 @@ def test_story_send(rocreate, rostorysend1):
     assert ro.base_tag.tag == 'roCreate'
     assert ss.base_tag.tag == 'roStorySend'
 
-def test_element_action_replace_story(rocreate, roelementactionstoryreplace):
-    """
-    GIVEN: Running order and EAStoryReplace message (STORY 1 for STORY ONE)
-    EXPECT: Running order with STORY ONE and no STORY 1
-    """
-    ro = RunningOrder.from_file(rocreate)
-    ea = EAStoryReplace.from_file(roelementactionstoryreplace)
-    d = ro.dict
-    assert len(d['mos']['roCreate']['story']) == 3
-    story_slug = d['mos']['roCreate']['story'][0]['storySlug']
-    assert story_slug == 'STORY 1'
-    item_slug = d['mos']['roCreate']['story'][0]['item'][0]['itemSlug']
-    assert item_slug == 'ITEM 1'
-
-    ro += ea
-    d = ro.dict
-    assert len(d['mos']['roCreate']['story']) == 3
-    story_slug = d['mos']['roCreate']['story'][0]['storySlug']
-    assert story_slug == 'STORY ONE'
-    item_slug = d['mos']['roCreate']['story'][0]['item']['itemSlug']
-    assert item_slug == 'ITEM ONE'
-    assert ro.base_tag.tag == 'roCreate'
-    assert ea.base_tag.tag == 'roElementAction'
-
-def test_element_action_replace_item(rocreate, roelementactionitemreplace):
-    """
-    GIVEN: Running order and EAItemReplace message (ITEM 21 for NEW ITEM 21)
-    EXPECT: Running order with NEW ITEM 21 in STORY 2
-    """
-    ro = RunningOrder.from_file(rocreate)
-    ea = EAItemReplace.from_file(roelementactionitemreplace)
-    ro += ea
-    d = ro.dict
-    assert len(d['mos']['roCreate']['story']) == 3
-    story_slug = d['mos']['roCreate']['story'][1]['storySlug']
-    assert story_slug == 'STORY 2'
-    item_slug = d['mos']['roCreate']['story'][1]['item'][0]['itemSlug']
-    assert item_slug == 'NEW ITEM 21'
-    assert ro.base_tag.tag == 'roCreate'
-    assert ea.base_tag.tag == 'roElementAction'
-
-def test_element_action_delete_story(rocreate, roelementactionstorydelete):
-    """
-    GIVEN: Running order and EAStoryDelete message (delete STORY 1)
-    EXPECT: Running order with no STORY 1
-    """
-    ro = RunningOrder.from_file(rocreate)
-    ea = EAStoryDelete.from_file(roelementactionstorydelete)
-    d = ro.dict
-    assert len(d['mos']['roCreate']['story']) == 3
-    story_slug1 = d['mos']['roCreate']['story'][0]['storySlug']
-    assert story_slug1 == 'STORY 1'
-    story_slug2 = d['mos']['roCreate']['story'][1]['storySlug']
-    assert story_slug2 == 'STORY 2'
-
-    ro += ea
-    d = ro.dict
-    assert len(d['mos']['roCreate']['story']) == 2
-    story_slug = d['mos']['roCreate']['story'][0]['storySlug']
-    assert story_slug == 'STORY 2'
-    assert ro.base_tag.tag == 'roCreate'
-    assert ea.base_tag.tag == 'roElementAction'
-
-def test_element_action_delete_item(rocreate, roelementactionitemdelete):
-    """
-    GIVEN: Running order and EAItemDelete message (delete ITEM 1 in STORY 1)
-    EXPECT: Running order with no ITEM 1 in STORY 1
-    """
-    ro = RunningOrder.from_file(rocreate)
-    ea = EAItemDelete.from_file(roelementactionitemdelete)
-    d = ro.dict
-    assert len(d['mos']['roCreate']['story'][0]['item']) == 3
-
-    ro += ea
-    d = ro.dict
-    assert len(d['mos']['roCreate']['story'][0]['item']) == 2
-    item_slug_1 = d['mos']['roCreate']['story'][0]['item'][0]['itemSlug']
-    assert item_slug_1 == "ITEM 2"
-    item_slug_2 = d['mos']['roCreate']['story'][0]['item'][1]['itemSlug']
-    assert item_slug_2 == "ITEM 3"
-    assert ro.base_tag.tag == 'roCreate'
-    assert ea.base_tag.tag == 'roElementAction'
-
-def test_element_action_insert_story(rocreate, roelementactionstoryinsert):
-    """
-    GIVEN: Running order and EAStoryInsert message (insert STORY NEW)
-    EXPECT: Running order with STORY NEW between STORY 1 and 2
-    """
-    ro = RunningOrder.from_file(rocreate)
-    ea = EAStoryInsert.from_file(roelementactionstoryinsert)
-    d = ro.dict
-    assert len(d['mos']['roCreate']['story']) == 3
-    story_slug1 = d['mos']['roCreate']['story'][0]['storySlug']
-    assert story_slug1 == 'STORY 1'
-    story_slug2 = d['mos']['roCreate']['story'][1]['storySlug']
-    assert story_slug2 == 'STORY 2'
-    assert ro.base_tag.tag == 'roCreate'
-    assert ea.base_tag.tag == 'roElementAction'
-
-    ro += ea
-    d = ro.dict
-    assert len(d['mos']['roCreate']['story']) == 4
-    story_slug1 = d['mos']['roCreate']['story'][0]['storySlug']
-    assert story_slug1 == 'STORY 1'
-    story_slug_new = d['mos']['roCreate']['story'][1]['storySlug']
-    assert story_slug_new == 'STORY NEW'
-    story_slug2 = d['mos']['roCreate']['story'][2]['storySlug']
-    assert story_slug2 == 'STORY 2'
-
-def test_element_action_insert_item(rocreate, roelementactioniteminsert):
-    """
-    GIVEN: Running order and EAItemInsert message (insert ITEM NEW in STORY 1)
-    EXPECT: Running order with ITEM NEW between ITEM 1 and 2 in STORY 1
-    """
-    ro = RunningOrder.from_file(rocreate)
-    ea = EAItemInsert.from_file(roelementactioniteminsert)
-    d = ro.dict
-    assert len(d['mos']['roCreate']['story'][0]['item']) == 3
-    item_slug1 = d['mos']['roCreate']['story'][0]['item'][0]['itemSlug']
-    assert item_slug1 == 'ITEM 1'
-    item_slug2 = d['mos']['roCreate']['story'][0]['item'][1]['itemSlug']
-    assert item_slug2 == 'ITEM 2'
-
-    ro += ea
-    d = ro.dict
-    assert len(d['mos']['roCreate']['story'][0]['item']) == 4
-    item_slug1 = d['mos']['roCreate']['story'][0]['item'][0]['itemSlug']
-    assert item_slug1 == 'ITEM 1'
-    item_slug_new = d['mos']['roCreate']['story'][0]['item'][1]['itemSlug']
-    assert item_slug_new == 'ITEM NEW'
-    item_slug2 = d['mos']['roCreate']['story'][0]['item'][2]['itemSlug']
-    assert item_slug2 == 'ITEM 2'
-    assert ro.base_tag.tag == 'roCreate'
-    assert ea.base_tag.tag == 'roElementAction'
-
-def test_element_action_swap_story(rocreate, roelementactionstoryswap):
-    """
-    GIVEN: Running order and EAStorySwap message (swap STORY 1 STORY 2)
-    EXPECT: Running order with positions of STORY 1 and 2 swapped
-    """
-    ro = RunningOrder.from_file(rocreate)
-    ea = EAStorySwap.from_file(roelementactionstoryswap)
-    d = ro.dict
-    assert len(d['mos']['roCreate']['story'][0]['item']) == 3
-    story_slug1 = d['mos']['roCreate']['story'][0]['storySlug']
-    assert story_slug1 == 'STORY 1'
-    story_slug2 = d['mos']['roCreate']['story'][1]['storySlug']
-    assert story_slug2 == 'STORY 2'
-
-    ro += ea
-    d = ro.dict
-    assert len(d['mos']['roCreate']['story'][0]['item']) == 3
-    story_slug1 = d['mos']['roCreate']['story'][0]['storySlug']
-    assert story_slug1 == 'STORY 2'
-    story_slug2 = d['mos']['roCreate']['story'][1]['storySlug']
-    assert story_slug2 == 'STORY 1'
-    assert ro.base_tag.tag == 'roCreate'
-    assert ea.base_tag.tag == 'roElementAction'
-
-def test_element_action_swap_item(rocreate, roelementactionitemswap):
-    """
-    GIVEN: Running order and EAItemSwap message (swap ITEM 1 and ITEM 2)
-    EXPECT: Running order with positions of ITEM 1 and 2 swapped in STORY 1
-    """
-    ro = RunningOrder.from_file(rocreate)
-    ea = EAItemSwap.from_file(roelementactionitemswap)
-    d = ro.dict
-    assert len(d['mos']['roCreate']['story'][0]['item']) == 3
-    item_slug1 = d['mos']['roCreate']['story'][0]['item'][0]['itemSlug']
-    assert item_slug1 == 'ITEM 1'
-    item_slug2 = d['mos']['roCreate']['story'][0]['item'][1]['itemSlug']
-    assert item_slug2 == 'ITEM 2'
-
-    ro += ea
-    d = ro.dict
-    assert len(d['mos']['roCreate']['story'][0]['item']) == 3
-    item_slug1 = d['mos']['roCreate']['story'][0]['item'][0]['itemSlug']
-    assert item_slug1 == 'ITEM 2'
-    item_slug2 = d['mos']['roCreate']['story'][0]['item'][1]['itemSlug']
-    assert item_slug2 == 'ITEM 1'
-    assert ro.base_tag.tag == 'roCreate'
-    assert ea.base_tag.tag == 'roElementAction'
-
-def test_element_action_move_story(rocreate, roelementactionstorymove):
-    """
-    GIVEN: Running order and EAStoryMove message (move STORY 3 to top)
-    EXPECT: Running order with STORY 3 at top, above STORY 1
-    """
-    ro = RunningOrder.from_file(rocreate)
-    ea = EAStoryMove.from_file(roelementactionstorymove)
-    d = ro.dict
-    assert len(d['mos']['roCreate']['story']) == 3
-    story_slug1 = d['mos']['roCreate']['story'][0]['storySlug']
-    assert story_slug1 == 'STORY 1'
-    story_slug2 = d['mos']['roCreate']['story'][1]['storySlug']
-    assert story_slug2 == 'STORY 2'
-    story_slug3 = d['mos']['roCreate']['story'][2]['storySlug']
-    assert story_slug3 == 'STORY 3'
-
-    ro += ea
-    d = ro.dict
-    assert len(d['mos']['roCreate']['story']) == 3
-    story_slug1 = d['mos']['roCreate']['story'][0]['storySlug']
-    assert story_slug1 == 'STORY 3'
-    story_slug2 = d['mos']['roCreate']['story'][1]['storySlug']
-    assert story_slug2 == 'STORY 1'
-    story_slug3 = d['mos']['roCreate']['story'][2]['storySlug']
-    assert story_slug3 == 'STORY 2'
-    assert ro.base_tag.tag == 'roCreate'
-    assert ea.base_tag.tag == 'roElementAction'
-
-def test_element_action_move_story_no_target(rocreate, roelementactionstorymove2):
-    """
-    GIVEN: Running order and EAStoryMove message (move STORY 1 to bottom)
-    EXPECT: Running order with STORY 1 at bottom
-    """
-    ro = RunningOrder.from_file(rocreate)
-    ea = EAStoryMove.from_file(roelementactionstorymove2)
-    d = ro.dict
-    assert len(d['mos']['roCreate']['story']) == 3
-    story_slug1 = d['mos']['roCreate']['story'][0]['storySlug']
-    assert story_slug1 == 'STORY 1'
-    story_slug2 = d['mos']['roCreate']['story'][1]['storySlug']
-    assert story_slug2 == 'STORY 2'
-    story_slug3 = d['mos']['roCreate']['story'][2]['storySlug']
-    assert story_slug3 == 'STORY 3'
-
-    ro += ea
-    d = ro.dict
-    assert len(d['mos']['roCreate']['story']) == 3
-    story_slug1 = d['mos']['roCreate']['story'][0]['storySlug']
-    assert story_slug1 == 'STORY 2'
-    story_slug2 = d['mos']['roCreate']['story'][1]['storySlug']
-    assert story_slug2 == 'STORY 3'
-    story_slug3 = d['mos']['roCreate']['story'][2]['storySlug']
-    assert story_slug3 == 'STORY 1'
-    assert ro.base_tag.tag == 'roCreate'
-    assert ea.base_tag.tag == 'roElementAction'
-
-def test_element_action_move_item(rocreate, roelementactionitemmove):
-    """
-    GIVEN: Running order and EAItemMove message (move ITEM 3 to top)
-    EXPECT: Running order with ITEM 3 at top of STORY 1
-    """
-    ro = RunningOrder.from_file(rocreate)
-    ea = EAItemMove.from_file(roelementactionitemmove)
-    d = ro.dict
-    assert len(d['mos']['roCreate']['story'][0]['item']) == 3
-    story_slug1 = d['mos']['roCreate']['story'][0]['item'][0]['itemSlug']
-    assert story_slug1 == 'ITEM 1'
-    story_slug2 = d['mos']['roCreate']['story'][0]['item'][1]['itemSlug']
-    assert story_slug2 == 'ITEM 2'
-    story_slug3 = d['mos']['roCreate']['story'][0]['item'][2]['itemSlug']
-    assert story_slug3 == 'ITEM 3'
-
-    ro += ea
-    d = ro.dict
-    assert len(d['mos']['roCreate']['story']) == 3
-    story_slug1 = d['mos']['roCreate']['story'][0]['item'][0]['itemSlug']
-    assert story_slug1 == 'ITEM 3'
-    story_slug2 = d['mos']['roCreate']['story'][0]['item'][1]['itemSlug']
-    assert story_slug2 == 'ITEM 1'
-    story_slug3 = d['mos']['roCreate']['story'][0]['item'][2]['itemSlug']
-    assert story_slug3 == 'ITEM 2'
-    assert ro.base_tag.tag == 'roCreate'
-    assert ea.base_tag.tag == 'roElementAction'
-
 def test_metadata_replace(rocreate, rometadatareplace):
     """
-    GIVEN: Running order and MetadataReplace message (with updated roSlug field)
+    GIVEN: Running order and roMetadataReplace message (with updated roSlug field)
     EXPECT: Running order with roSlug field: RO SLUG NEW
     """
     ro = RunningOrder.from_file(rocreate)
@@ -305,9 +38,10 @@ def test_metadata_replace(rocreate, rometadatareplace):
     assert d['mos']['roCreate']['roEdStart'] == '2020-01-01T12:30:00'
     assert len(d['mos']['roCreate']['story'][0]['item']) == 3
     ro_id = d['mos']['roCreate']['roID']
-    assert ro_id == "RO ID"
+    assert ro_id == 'RO ID'
     ro_id = d['mos']['roCreate']['roSlug']
-    assert ro_id == "RO SLUG"
+    assert ro_id == 'RO SLUG'
+    assert 'roChannel' not in d['mos']['roCreate']
 
     ro += mdr
     d = ro.dict
@@ -319,10 +53,12 @@ def test_metadata_replace(rocreate, rometadatareplace):
     assert ro_id == "RO SLUG NEW"
     assert ro.base_tag.tag == 'roCreate'
     assert mdr.base_tag.tag == 'roMetadataReplace'
+    assert 'roChannel' in d['mos']['roCreate']
+    assert d['mos']['roCreate']['roChannel'] == 'bbcnews'
 
-def test_story_append_item(rocreate, rostoryappend):
+def test_story_append(rocreate, rostoryappend):
     """
-    GIVEN: Running order and storyAppend message (add STORYNEW1 and STORYNEW2)
+    GIVEN: Running order and roStoryAppend message (add STORYNEW1 and STORYNEW2)
     EXPECT: Running order with STORYNEW1 and STORYNEW2 added to the end
     """
     ro = RunningOrder.from_file(rocreate)
@@ -340,7 +76,7 @@ def test_story_append_item(rocreate, rostoryappend):
 
 def test_story_delete(rocreate, rostorydelete):
     """
-    GIVEN: Running order and storyDelete message (delete STORY1 and STORY2)
+    GIVEN: Running order and roStoryDelete message (delete STORY1 and STORY2)
     EXPECT: Running order with just STORY3 in
     """
     ro = RunningOrder.from_file(rocreate)
@@ -356,44 +92,159 @@ def test_story_delete(rocreate, rostorydelete):
     assert ro.base_tag.tag == 'roCreate'
     assert sd.base_tag.tag == 'roStoryDelete'
 
+def test_story_delete_no_matching_stories(rocreate, rostorydelete2):
+    """
+    GIVEN: Running order and roStoryDelete message with no matching stories
+    EXPECT: Running order unaltered, with merge error
+    """
+    ro = RunningOrder.from_file(rocreate)
+    sd = StoryDelete.from_file(rostorydelete2)
+    d_before = ro.dict
+
+    with warnings.catch_warnings(record=True) as w:
+        ro += sd
+    assert len(w) == 1
+    assert w[0].category == StoryNotFoundWarning
+
+    d_after = ro.dict
+    assert d_before == d_after
+
 def test_story_insert(rocreate, rostoryinsert):
     """
-    GIVEN: Running order and storyDelete message (delete STORY1 and STORY2)
-    EXPECT: Running order with just STORY3 in
+    GIVEN: Running order and roStoryInsert message (insert 2 new stories)
+    EXPECT: Running order new stories added
     """
     ro = RunningOrder.from_file(rocreate)
     si = StoryInsert.from_file(rostoryinsert)
     d = ro.dict
-    assert len(d['mos']['roCreate']['story']) == 3
+    stories = d['mos']['roCreate']['story']
+    assert len(stories) == 3
+    story_ids = [i['storyID'] for i in stories]
+    assert story_ids == ['STORY1', 'STORY2', 'STORY3']
 
     ro += si
     d = ro.dict
-    assert len(d['mos']['roCreate']['story']) == 5
-    assert d['mos']['roCreate']['story'][0]['storyID'] == 'STORY1'
-    assert d['mos']['roCreate']['story'][1]['storyID'] == 'STORYNEW1'
-    assert d['mos']['roCreate']['story'][2]['storyID'] == 'STORYNEW2'
-    assert d['mos']['roCreate']['story'][3]['storyID'] == 'STORY2'
-    assert d['mos']['roCreate']['story'][4]['storyID'] == 'STORY3'
+    stories = d['mos']['roCreate']['story']
+    assert len(stories) == 5
+    story_ids = [s['storyID'] for s in stories]
+    assert story_ids == ['STORY1', 'STORY4', 'STORY5', 'STORY2', 'STORY3']
     assert ro.base_tag.tag == 'roCreate'
     assert si.base_tag.tag == 'roStoryInsert'
 
+def test_story_insert_with_no_target_story(rocreate, rostoryinsert2):
+    """
+    GIVEN: Running order and roStoryInsert message with no target story
+    EXPECT: Running order unchanged, and a merge error
+    """
+    ro = RunningOrder.from_file(rocreate)
+    si = StoryInsert.from_file(rostoryinsert2)
+    d_before = ro.dict
+
+    with pytest.raises(MosMergeError):
+        ro += si
+    
+    d_after = ro.dict
+    assert d_before == d_after
+
+def test_story_insert_with_known_target_story(rocreate, rostoryinsert3):
+    """
+    GIVEN: Running order and roStoryInsert message with already known source story
+    EXPECT: Running order unchanged, and a warning
+    """
+    ro = RunningOrder.from_file(rocreate)
+    si = StoryInsert.from_file(rostoryinsert3)
+    d_before = ro.dict
+
+    with warnings.catch_warnings(record=True) as w:
+        ro += si
+    assert len(w) == 1
+    assert w[0].category == DuplicateStoryWarning
+
+    d_after = ro.dict
+    assert d_before == d_after
+
 def test_story_move(rocreate, rostorymove):
     """
-    GIVEN: Running order and storyDelete message (delete STORY1 and STORY2)
-    EXPECT: Running order with just STORY3 in
+    GIVEN: Running order and roStoryMove message (move STORY1 above STORY3)
+    EXPECT: Running order with STORY3 at the top
     """
     ro = RunningOrder.from_file(rocreate)
     sm = StoryMove.from_file(rostorymove)
     d = ro.dict
-    assert d['mos']['roCreate']['story'][0]['storyID'] == 'STORY1'
-    assert d['mos']['roCreate']['story'][2]['storyID'] == 'STORY3'
+    stories = d['mos']['roCreate']['story']
+    story_ids = [s['storyID'] for s in stories]
+    assert story_ids == ['STORY1', 'STORY2', 'STORY3']
 
     ro += sm
     d = ro.dict
-    assert d['mos']['roCreate']['story'][0]['storyID'] == 'STORY3'
-    assert d['mos']['roCreate']['story'][1]['storyID'] == 'STORY1'
+    stories = d['mos']['roCreate']['story']
+    story_ids = [s['storyID'] for s in stories]
+    assert story_ids == ['STORY3', 'STORY1', 'STORY2']
     assert ro.base_tag.tag == 'roCreate'
     assert sm.base_tag.tag == 'roStoryMove'
+
+def test_story_move_to_bottom(rocreate, rostorymove2):
+    """
+    GIVEN: Running order and roStoryMove message (move STORY1 above STORY3)
+    EXPECT: Running order with STORY1 at the bottom
+    """
+    ro = RunningOrder.from_file(rocreate)
+    sm = StoryMove.from_file(rostorymove2)
+    d = ro.dict
+    stories = d['mos']['roCreate']['story']
+    story_ids = [s['storyID'] for s in stories]
+    assert story_ids == ['STORY1', 'STORY2', 'STORY3']
+
+    ro += sm
+    d = ro.dict
+    stories = d['mos']['roCreate']['story']
+    story_ids = [s['storyID'] for s in stories]
+    assert story_ids == ['STORY2', 'STORY3', 'STORY1']
+
+def test_story_move_no_stories(rocreate, rostorymove3):
+    """
+    GIVEN: Running order and roStoryMove message with no stories
+    EXPECT: Running order unchanged, with a merge error
+    """
+    ro = RunningOrder.from_file(rocreate)
+    sm = StoryMove.from_file(rostorymove3)
+    d_before = ro.dict
+
+    with pytest.raises(MosMergeError):
+        ro += sm
+
+    d_after = ro.dict
+    assert d_before == d_after
+
+def test_story_move_with_unknown_source_story(rocreate, rostorymove4):
+    """
+    GIVEN: Running order and roStoryMove message with an unknown source story
+    EXPECT: Running order unchanged, with a merge error
+    """
+    ro = RunningOrder.from_file(rocreate)
+    sm = StoryMove.from_file(rostorymove4)
+    d_before = ro.dict
+
+    with pytest.raises(MosMergeError):
+        ro += sm
+
+    d_after = ro.dict
+    assert d_before == d_after
+
+def test_story_move_with_unknown_target_story(rocreate, rostorymove5):
+    """
+    GIVEN: Running order and roStoryMove message with an unknown target story
+    EXPECT: Running order unchanged, with a merge error
+    """
+    ro = RunningOrder.from_file(rocreate)
+    sm = StoryMove.from_file(rostorymove5)
+    d_before = ro.dict
+
+    with pytest.raises(MosMergeError):
+        ro += sm
+
+    d_after = ro.dict
+    assert d_before == d_after
 
 def test_story_replace(rocreate, rostoryreplace):
     """
@@ -419,6 +270,36 @@ def test_story_replace(rocreate, rostoryreplace):
     assert ro.base_tag.tag == 'roCreate'
     assert sr.base_tag.tag == 'roStoryReplace'
 
+def test_story_replace_unknown_story(rocreate, rostoryreplace2):
+    """
+    GIVEN: Running order and roStoryReplace message with an unknown story
+    EXPECT: Running order unchanged, with a merge error
+    """
+    ro = RunningOrder.from_file(rocreate)
+    sr = StoryReplace.from_file(rostoryreplace2)
+    d_before = ro.dict
+
+    with pytest.raises(MosMergeError):
+       ro += sr
+
+    d_after = ro.dict
+    assert d_before == d_after
+
+def test_story_replace_no_stories(rocreate, rostoryreplace3):
+    """
+    GIVEN: Running order and roStoryReplace message with no stories
+    EXPECT: Running order unchanged, with a merge error
+    """
+    ro = RunningOrder.from_file(rocreate)
+    sr = StoryReplace.from_file(rostoryreplace3)
+    d_before = ro.dict
+
+    with pytest.raises(MosMergeError):
+       ro += sr
+
+    d_after = ro.dict
+    assert d_before == d_after
+
 def test_item_delete(rocreate, roitemdelete):
     """
     GIVEN: Running order and roItemDelete message (STORY 1 for STORY ONE)
@@ -436,25 +317,111 @@ def test_item_delete(rocreate, roitemdelete):
     assert ro.base_tag.tag == 'roCreate'
     assert id.base_tag.tag == 'roItemDelete'
 
+def test_item_delete_no_story(rocreate, roitemdelete2):
+    """
+    GIVEN: Running order and roItemDelete message (STORY 1 for STORY ONE)
+    EXPECT: Running order unchanged, and a merge error
+    """
+    ro = RunningOrder.from_file(rocreate)
+    id = ItemDelete.from_file(roitemdelete2)
+    d = ro.dict
+    assert len(d['mos']['roCreate']['story'][0]['item']) == 3
+
+    with pytest.raises(MosMergeError):
+        ro += id
+    d = ro.dict
+    
+    assert len(d['mos']['roCreate']['story'][0]['item']) == 3
+
+def test_item_delete_item_not_found(rocreate, roitemdelete3):
+    """
+    GIVEN: Running order and roItemDelete message (STORY 1 for STORY ONE)
+    EXPECT: Running order unchanged, with a warning
+    """
+    ro = RunningOrder.from_file(rocreate)
+    id = ItemDelete.from_file(roitemdelete3)
+    d = ro.dict
+    assert len(d['mos']['roCreate']['story'][0]['item']) == 3
+
+    with warnings.catch_warnings(record=True) as w:
+        ro += id
+    assert len(w) == 1
+    assert w[0].category == ItemNotFoundWarning
+
+    d = ro.dict
+    assert len(d['mos']['roCreate']['story'][0]['item']) == 3
+
 def test_item_insert(rocreate, roiteminsert):
     """
-    GIVEN: Running order and roItemInsert message (ITEMNEW1 and ITEMNEW2)
-    EXPECT: Running order with ITEMNEW1 and ITEMNEW2 above ITEM2
+    GIVEN: Running order and roItemInsert message (ITEM4 and ITEM5)
+    EXPECT: Running order with ITEM4 and ITEM5 above ITEM2
     """
     ro = RunningOrder.from_file(rocreate)
     ii = ItemInsert.from_file(roiteminsert)
     d = ro.dict
-    assert len(d['mos']['roCreate']['story'][0]['item']) == 3
+    items = d['mos']['roCreate']['story'][0]['item']
+    assert len(items) == 3
+    item_ids = [i['itemID'] for i in items]
+    assert item_ids == ['ITEM1', 'ITEM2', 'ITEM3']
 
     ro += ii
     d = ro.dict
-    assert len(d['mos']['roCreate']['story'][0]['item']) == 5
-    item_id1 = d['mos']['roCreate']['story'][0]['item'][1]['itemID']
-    assert item_id1 == 'ITEMNEW1'
-    item_id2 = d['mos']['roCreate']['story'][0]['item'][2]['itemID']
-    assert item_id2 == 'ITEMNEW2'
+    items = d['mos']['roCreate']['story'][0]['item']
+    assert len(items) == 5
+    item_ids = [i['itemID'] for i in items]
+    assert item_ids == ['ITEM1', 'ITEM4', 'ITEM5', 'ITEM2', 'ITEM3']
     assert ro.base_tag.tag == 'roCreate'
     assert ii.base_tag.tag == 'roItemInsert'
+
+def test_item_insert_with_unknown_story(rocreate, roiteminsert2):
+    """
+    GIVEN: Running order and roItemInsert message with unknown story
+    EXPECT: Running order unchanged, an a merge error
+    """
+    ro = RunningOrder.from_file(rocreate)
+    ii = ItemInsert.from_file(roiteminsert2)
+    d_before = ro.dict
+
+    with pytest.raises(MosMergeError):
+        ro += ii
+    
+    d_after = ro.dict
+    assert d_before == d_after
+
+def test_item_insert_with_unknown_item(rocreate, roiteminsert3):
+    """
+    GIVEN: Running order and roItemInsert message with an unknown item
+    EXPECT: Running order unchanged, with a merge error
+    """
+    ro = RunningOrder.from_file(rocreate)
+    ii = ItemInsert.from_file(roiteminsert3)
+    d_before = ro.dict
+
+    with pytest.raises(MosMergeError):
+        ro += ii
+
+    d_after = ro.dict
+    assert d_before == d_after
+
+def test_item_insert_move_to_bottom(rocreate, roiteminsert4):
+    """
+    GIVEN: Running order and roItemInsert message with no target item ID
+    EXPECT: Running order with ITEM4 and ITEM5 at the bottom
+    """
+    ro = RunningOrder.from_file(rocreate)
+    ii = ItemInsert.from_file(roiteminsert4)
+    d = ro.dict
+    items = d['mos']['roCreate']['story'][0]['item']
+    assert len(items) == 3
+    item_ids = [i['itemID'] for i in items]
+    assert item_ids == ['ITEM1', 'ITEM2', 'ITEM3']
+
+    ro += ii
+    d = ro.dict
+    items = d['mos']['roCreate']['story'][0]['item']
+    assert len(items) == 5
+    item_ids = [i['itemID'] for i in items]
+    assert item_ids == ['ITEM1', 'ITEM2', 'ITEM3', 'ITEM4', 'ITEM5']
 
 def test_item_move_multiple(rocreate, roitemmovemultiple):
     """
@@ -464,19 +431,131 @@ def test_item_move_multiple(rocreate, roitemmovemultiple):
     ro = RunningOrder.from_file(rocreate)
     imm = ItemMoveMultiple.from_file(roitemmovemultiple)
     d = ro.dict
-    assert len(d['mos']['roCreate']['story'][0]['item']) == 3
-    assert d['mos']['roCreate']['story'][0]['item'][0]['itemID'] == 'ITEM1'
-    assert d['mos']['roCreate']['story'][0]['item'][1]['itemID'] == 'ITEM2'
-    assert d['mos']['roCreate']['story'][0]['item'][2]['itemID'] == 'ITEM3'
+    items = d['mos']['roCreate']['story'][0]['item']
+    assert len(items) == 3
+    item_ids = [i['itemID'] for i in items]
+    assert item_ids == ['ITEM1', 'ITEM2', 'ITEM3']
 
     ro += imm
     d = ro.dict
-    assert len(d['mos']['roCreate']['story'][0]['item']) == 3
-    assert d['mos']['roCreate']['story'][0]['item'][0]['itemID'] == 'ITEM2'
-    assert d['mos']['roCreate']['story'][0]['item'][1]['itemID'] == 'ITEM3'
-    assert d['mos']['roCreate']['story'][0]['item'][2]['itemID'] == 'ITEM1'
+    items = d['mos']['roCreate']['story'][0]['item']
+    assert len(items) == 3
+    item_ids = [i['itemID'] for i in items]
+    assert item_ids == ['ITEM2', 'ITEM3', 'ITEM1']
     assert ro.base_tag.tag == 'roCreate'
     assert imm.base_tag.tag == 'roItemMoveMultiple'
+
+def test_item_move_multiple_no_story_id(rocreate, roitemmovemultiple2):
+    """
+    GIVEN: Running order and roItemMoveMultiple message with no story id
+    EXPECT: Running order unchanged, and a merge error
+    """
+    ro = RunningOrder.from_file(rocreate)
+    imm = ItemMoveMultiple.from_file(roitemmovemultiple2)
+    d_before = ro.dict
+
+    with pytest.raises(MosMergeError):
+        ro += imm
+
+    d_after = ro.dict
+    assert d_before == d_after
+
+def test_item_move_multiple_no_story(rocreate, roitemmovemultiple3):
+    """
+    GIVEN: Running order and roItemMoveMultiple message with no story tag
+    EXPECT: Running order unchanged, and a merge error
+    """
+    ro = RunningOrder.from_file(rocreate)
+    imm = ItemMoveMultiple.from_file(roitemmovemultiple3)
+    d_before = ro.dict
+
+    with pytest.raises(MosMergeError):
+        ro += imm
+
+    d_after = ro.dict
+    assert d_before == d_after
+
+def test_item_move_multiple_unknown_story(rocreate, roitemmovemultiple4):
+    """
+    GIVEN: Running order and roItemMoveMultiple message with an unknown story
+    EXPECT: Running order unchanged, and a merge error
+    """
+    ro = RunningOrder.from_file(rocreate)
+    imm = ItemMoveMultiple.from_file(roitemmovemultiple4)
+    d_before = ro.dict
+
+    with pytest.raises(MosMergeError):
+        ro += imm
+
+    d_after = ro.dict
+    assert d_before == d_after
+
+def test_item_move_multiple_unknown_story(rocreate, roitemmovemultiple5):
+    """
+    GIVEN: Running order and roItemMoveMultiple message (ITEM2 and ITEM3 above
+    ITEM1 in STORY1)
+    EXPECT: Running order with STORY1 items in order (ITEM2, ITEM3, ITEM1)
+    """
+    ro = RunningOrder.from_file(rocreate)
+    imm = ItemMoveMultiple.from_file(roitemmovemultiple5)
+    d_before = ro.dict
+
+    with pytest.raises(MosMergeError):
+        ro += imm
+        
+    d_after = ro.dict
+    assert d_before == d_after
+
+def test_item_move_multiple_move_to_bottom(rocreate, roitemmovemultiple6):
+    """
+    GIVEN: Running order and roItemMoveMultiple message (ITEM1 and ITEM2 to
+    bottom of STORY1)
+    EXPECT: Running order with STORY1 items in order (ITEM3, ITEM1, ITEM2)
+    """
+    ro = RunningOrder.from_file(rocreate)
+    imm = ItemMoveMultiple.from_file(roitemmovemultiple6)
+    d = ro.dict
+    items = d['mos']['roCreate']['story'][0]['item']
+    assert len(items) == 3
+    item_ids = [i['itemID'] for i in items]
+    assert item_ids == ['ITEM1', 'ITEM2', 'ITEM3']
+
+    ro += imm
+    d = ro.dict
+    items = d['mos']['roCreate']['story'][0]['item']
+    assert len(items) == 3
+    item_ids = [i['itemID'] for i in items]
+    assert item_ids == ['ITEM3', 'ITEM1', 'ITEM2']
+
+def test_item_move_multiple_unknown_target_item(rocreate, roitemmovemultiple7):
+    """
+    GIVEN: Running order and roItemMoveMultiple message with unknown target item
+    EXPECT: Running order unchanged, and a merge error
+    """
+    ro = RunningOrder.from_file(rocreate)
+    imm = ItemMoveMultiple.from_file(roitemmovemultiple7)
+    d_before = ro.dict
+
+    with pytest.raises(MosMergeError):
+        ro += imm
+        
+    d_after = ro.dict
+    assert d_before == d_after
+
+def test_item_move_multiple_unknown_source_item(rocreate, roitemmovemultiple8):
+    """
+    GIVEN: Running order and roItemMoveMultiple message with unknown source item
+    EXPECT: Running order unchanged, and a merge error
+    """
+    ro = RunningOrder.from_file(rocreate)
+    imm = ItemMoveMultiple.from_file(roitemmovemultiple8)
+    d_before = ro.dict
+
+    with pytest.raises(MosMergeError):
+        ro += imm
+        
+    d_after = ro.dict
+    assert d_before == d_after
 
 def test_item_replace(rocreate, roitemreplace):
     """
@@ -486,15 +565,49 @@ def test_item_replace(rocreate, roitemreplace):
     ro = RunningOrder.from_file(rocreate)
     ir = ItemReplace.from_file(roitemreplace)
     d = ro.dict
-    assert len(d['mos']['roCreate']['story'][1]['item']) == 3
-    assert d['mos']['roCreate']['story'][1]['item'][0]['itemSlug'] == 'ITEM 21'
+    items = d['mos']['roCreate']['story'][1]['item']
+    assert len(items) == 3
+    item_ids = [i['itemID'] for i in items]
+    assert item_ids == ['ITEM21', 'ITEM22', 'ITEM23']
 
     ro += ir
     d = ro.dict
-    assert len(d['mos']['roCreate']['story'][1]['item']) == 3
-    assert d['mos']['roCreate']['story'][1]['item'][0]['itemSlug'] == 'NEW ITEM 21'
+    items = d['mos']['roCreate']['story'][1]['item']
+    assert len(items) == 4
+    item_ids = [i['itemID'] for i in items]
+    assert item_ids == ['ITEM24', 'ITEM25', 'ITEM22', 'ITEM23']
     assert ro.base_tag.tag == 'roCreate'
     assert ir.base_tag.tag == 'roItemReplace'
+
+def test_item_replace_unknown_story(rocreate, roitemreplace2):
+    """
+    GIVEN: Running order and roItemReplace message with unknown story
+    EXPECT: Running order unchanged, and a merge error
+    """
+    ro = RunningOrder.from_file(rocreate)
+    ir = ItemReplace.from_file(roitemreplace2)
+    d_before = ro.dict
+
+    with pytest.raises(MosMergeError):
+        ro += ir
+    
+    d_after = ro.dict
+    assert d_before == d_after
+
+def test_item_replace_unknown_item(rocreate, roitemreplace3):
+    """
+    GIVEN: Running order and roItemReplace message with unknown story
+    EXPECT: Running order unchanged, and a merge error
+    """
+    ro = RunningOrder.from_file(rocreate)
+    ir = ItemReplace.from_file(roitemreplace3)
+    d_before = ro.dict
+
+    with pytest.raises(MosMergeError):
+        ro += ir
+    
+    d_after = ro.dict
+    assert d_before == d_after
 
 def test_ro_replace(rocreate, roreplace):
     """

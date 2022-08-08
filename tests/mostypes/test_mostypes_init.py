@@ -38,63 +38,63 @@ def test_story_send_init(rostorysend1):
     assert str(ss).startswith('<mos>')
     assert str(ss).endswith('</mos>')
 
-def test_element_action_replace_story_init(roelementactionstoryreplace):
+def test_element_action_replace_story_init(eastoryreplace):
     "Test we can create an EAStoryReplace object from a roElementAction file"
-    ea = EAStoryReplace.from_file(roelementactionstoryreplace)
+    ea = EAStoryReplace.from_file(eastoryreplace)
     assert repr(ea) == '<EAStoryReplace 1003>'
     assert ea.ro_id == 'RO ID'
 
-def test_element_action_replace_item_init(roelementactionitemreplace):
+def test_element_action_replace_item_init(eaitemreplace):
     "Test we can create an EAItemReplace object from a roElementAction file"
-    ea = EAItemReplace.from_file(roelementactionitemreplace)
+    ea = EAItemReplace.from_file(eaitemreplace)
     assert repr(ea) == '<EAItemReplace 1004>'
     assert ea.ro_id == 'RO ID'
 
-def test_element_action_delete_story_init(roelementactionstorydelete):
+def test_element_action_delete_story_init(eastorydelete):
     "Test we can create an EAStoryDelete object from a roElementAction file"
-    ea = EAStoryDelete.from_file(roelementactionstorydelete)
+    ea = EAStoryDelete.from_file(eastorydelete)
     assert repr(ea) == '<EAStoryDelete 1005>'
     assert ea.ro_id == 'RO ID'
 
-def test_element_action_delete_item_init(roelementactionitemdelete):
+def test_element_action_delete_item_init(eaitemdelete):
     "Test we can create an EAItemDelete object from a roElementAction file"
-    ea = EAItemDelete.from_file(roelementactionitemdelete)
+    ea = EAItemDelete.from_file(eaitemdelete)
     assert repr(ea) == '<EAItemDelete 1006>'
     assert ea.ro_id == 'RO ID'
 
-def test_element_action_insert_story_init(roelementactionstoryinsert):
+def test_element_action_insert_story_init(eastoryinsert):
     "Test we can create an EAStoryInsert object from a roElementAction file"
-    ea = EAStoryInsert.from_file(roelementactionstoryinsert)
+    ea = EAStoryInsert.from_file(eastoryinsert)
     assert repr(ea) == '<EAStoryInsert 1007>'
     assert ea.ro_id == 'RO ID'
 
-def test_element_action_insert_item_init(roelementactioniteminsert):
+def test_element_action_insert_item_init(eaiteminsert):
     "Test we can create an EAItemInsert object from a roElementAction file"
-    ea = EAItemInsert.from_file(roelementactioniteminsert)
+    ea = EAItemInsert.from_file(eaiteminsert)
     assert repr(ea) == '<EAItemInsert 1008>'
     assert ea.ro_id == 'RO ID'
 
-def test_element_action_swap_story_init(roelementactionstoryswap):
+def test_element_action_swap_story_init(eastoryswap):
     "Test we can create an EAStorySwap object from a roElementAction file"
-    ea = EAStorySwap.from_file(roelementactionstoryswap)
+    ea = EAStorySwap.from_file(eastoryswap)
     assert repr(ea) == '<EAStorySwap 1009>'
     assert ea.ro_id == 'RO ID'
 
-def test_element_action_swap_item_init(roelementactionitemswap):
+def test_element_action_swap_item_init(eaitemswap):
     "Test we can create an EAItemSwap object from a roElementAction file"
-    ea = EAItemSwap.from_file(roelementactionitemswap)
+    ea = EAItemSwap.from_file(eaitemswap)
     assert repr(ea) == '<EAItemSwap 1010>'
     assert ea.ro_id == 'RO ID'
 
-def test_element_action_move_story_init(roelementactionstorymove):
+def test_element_action_move_story_init(eastorymove):
     "Test we can create an EAStoryMove object from a roElementAction file"
-    ea = EAStoryMove.from_file(roelementactionstorymove)
+    ea = EAStoryMove.from_file(eastorymove)
     assert repr(ea) == '<EAStoryMove 1011>'
     assert ea.ro_id == 'RO ID'
 
-def test_element_action_move_item_init(roelementactionitemmove):
+def test_element_action_move_item_init(eaitemmove):
     "Test we can create an EAItemMove object from a roElementAction file"
-    ea = EAItemMove.from_file(roelementactionitemmove)
+    ea = EAItemMove.from_file(eaitemmove)
     assert repr(ea) == '<EAItemMove 1012>'
     assert ea.ro_id == 'RO ID'
 

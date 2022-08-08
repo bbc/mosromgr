@@ -4,7 +4,7 @@
   <roItemInsert>
     <roID>RO ID</roID>
     <storyID>STORY1</storyID>
-    <itemID>ITEM2</itemID>
+    <itemID></itemID>
     <item>
       <itemID>ITEM4</itemID>
       <itemSlug>ITEM 4</itemSlug>
