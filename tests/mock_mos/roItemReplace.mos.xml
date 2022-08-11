@@ -6,8 +6,12 @@
     <storyID>STORY2</storyID>
     <itemID>ITEM21</itemID>
     <item>
-      <itemID>ITEM21</itemID>
-      <itemSlug>NEW ITEM 21</itemSlug>
+      <itemID>ITEM24</itemID>
+      <itemSlug>NEW ITEM 24</itemSlug>
+    </item>
+    <item>
+      <itemID>ITEM25</itemID>
+      <itemSlug>NEW ITEM 25</itemSlug>
     </item>
   </roItemReplace>
 </mos>

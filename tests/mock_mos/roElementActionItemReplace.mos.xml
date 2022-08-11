@@ -4,14 +4,14 @@
   <roElementAction operation="REPLACE">
     <roID>RO ID</roID>
     <element_target>
-      <storyID>STORY2</storyID>
-      <itemID>ITEM21</itemID>
+      <storyID>STORY1</storyID>
+      <itemID>ITEM1</itemID>
     </element_target>
     <element_source>
-        <item>
-          <itemID>ITEM21</itemID>
-          <itemSlug>NEW ITEM 21</itemSlug>
-        </item>
+      <item>
+        <itemID>ITEM21</itemID>
+        <itemSlug>NEW ITEM 21</itemSlug>
+      </item>
     </element_source>
   </roElementAction>
 </mos>

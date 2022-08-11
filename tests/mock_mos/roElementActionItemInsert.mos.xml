@@ -9,8 +9,8 @@
     </element_target>
     <element_source>
         <item>
-          <itemID>ITEMNEW</itemID>
-          <itemSlug>ITEM NEW</itemSlug>
+          <itemID>ITEM5</itemID>
+          <itemSlug>ITEM 5</itemSlug>
         </item>
     </element_source>
   </roElementAction>

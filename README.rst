@@ -29,20 +29,14 @@ Usage
 Command line
 ------------
 
-List the stories within a running order:
+Inspect a MOS file:
 
 .. code-block:: console
 
-    $ mosromgr inspect -f roCreate.mos.xml --stories
-    0828 MIDLANDS TODAY Wed, 11.11.2020
-
-    INTRODUCTION-READ
-
-    TESTING-OOV
-
-    WEATHER-SHORT
-
-    END OF PROGRAMME
+    $ mosromgr inspect -f 53783448-roStoryReplace.mos.xml
+    53783448-roStoryReplace.mos.xml: StoryReplace
+    REPLACE STORY: OM_5.765650;OM_5.765654,5.765650.7 WITH:
+        STORY: OM_5.765650;OM_5.765654,5.765650.7
 
 Merge all MOS files in directory `newsnight` and save in ``FINAL.xml``:
 

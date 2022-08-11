@@ -2,8 +2,12 @@
 # Copyright 2021 BBC
 # SPDX-License-Identifier: Apache-2.0
 
+from functools import total_ordering
 import logging
 import warnings
+from collections.abc import Callable
+from typing import Union, Tuple, List
+from pathlib import Path
 
 from .mostypes import MosFile, RunningOrder, RunningOrderEnd
 from .utils import s3
@@ -14,6 +18,7 @@ logger = logging.getLogger('mosromgr.moscollection')
 logging.basicConfig(level=logging.INFO)
 
 
+@total_ordering
 class MosReader:
     """
     Internal construct for opening and inspecting a MOS file for the purposes of
@@ -21,7 +26,7 @@ class MosReader:
     means to reconstruct the :class:`~mosromgr.mostypes.MosFile` instance when
     needed in order to preserve memory usage.
     """
-    def __init__(self, mo, *, restore_fn, restore_args):
+    def __init__(self, mo: MosFile, *, restore_fn: Callable, restore_args: Tuple):
         self._message_id = mo.message_id
         self._ro_id = mo.ro_id
         self._mos_type = mo.__class__
@@ -29,7 +34,7 @@ class MosReader:
         self._restore_args = restore_args
 
     @classmethod
-    def from_file(cls, mos_file_path):
+    def from_file(cls, mos_file_path: Union[Path, str]):
         mo = MosFile.from_file(mos_file_path)
         # store a method of restoring the mos object from the determined class
         return cls(mo,
@@ -37,7 +42,7 @@ class MosReader:
                    restore_args=(mos_file_path, ))
 
     @classmethod
-    def from_string(cls, mos_file_contents):
+    def from_string(cls, mos_file_contents: str):
         mo = MosFile.from_string(mos_file_contents)
         # store a method of restoring the mos object from the determined class
         return cls(mo,
@@ -45,7 +50,7 @@ class MosReader:
                    restore_args=(mos_file_contents, ))
 
     @classmethod
-    def from_s3(cls, bucket_name, mos_file_key):
+    def from_s3(cls, bucket_name: str, mos_file_key: str):
         mo = MosFile.from_s3(bucket_name=bucket_name, mos_file_key=mos_file_key)
         # store a method of restoring the mos object from the determined class
         return cls(mo,
@@ -58,21 +63,22 @@ class MosReader:
     def __lt__(self, other):
         return self.message_id < other.message_id
 
-    def __gt__(self, other):
-        return self.message_id > other.message_id
-
     @property
-    def message_id(self):
-        "The message ID of the MOS file (:class:`str`)"
+    def message_id(self) -> str:
+        """
+        The message ID of the MOS file
+        """
         return self._message_id
 
     @property
-    def ro_id(self):
-        "The MOS file's running order ID (:class:`str`)"
+    def ro_id(self) -> str:
+        """
+        The MOS file's running order ID
+        """
         return self._ro_id
 
     @property
-    def mos_type(self):
+    def mos_type(self) -> MosFile:
         """
         The :class:`~mosromgr.mostypes.MosFile` subclass this object was
         classified as (returns the class object, not an instance or a string)
@@ -80,10 +86,9 @@ class MosReader:
         return self._mos_type
 
     @property
-    def mos_object(self):
+    def mos_object(self) -> MosFile:
         """
         Restore the MOS object and return it
-        (:class:`~mosromgr.mostypes.MosFile`)
         """
         return self._restore_fn(*self._restore_args)
 
@@ -93,7 +98,7 @@ class MosCollection:
     Wrapper for a collection of MOS files representing a partial or complete
     programme
     """
-    def __init__(self, mos_readers, *, allow_incomplete=False):
+    def __init__(self, mos_readers: List[MosReader], *, allow_incomplete: bool = False):
         logger.info("Making MosCollection from %s MosReaders", len(mos_readers))
         self._mos_readers = mos_readers
         self._ro = None
@@ -103,7 +108,7 @@ class MosCollection:
             raise InvalidMosCollection(f"Failed to validate MosCollection: {e}") from e
 
     @classmethod
-    def from_files(cls, mos_file_paths, *, allow_incomplete=False):
+    def from_files(cls, mos_file_paths: List[Union[Path, str]], *, allow_incomplete: bool = False):
         """
         Construct from a list of MOS file paths
 
@@ -129,14 +134,14 @@ class MosCollection:
         return cls(mos_readers, allow_incomplete=allow_incomplete)
 
     @classmethod
-    def from_strings(cls, mos_file_strings, *, allow_incomplete=False):
+    def from_strings(cls, mos_file_strings: List[str], *, allow_incomplete: bool = False):
         """
         Construct from a list of MOS document XML strings
 
-        :type mos_file_paths:
+        :type mos_file_strings:
             list
-        :param mos_file_paths:
-            A list of paths to MOS files
+        :param mos_file_strings:
+            A list of strings containing MOS file contents
 
         :type allow_incomplete:
             bool
@@ -155,7 +160,14 @@ class MosCollection:
         return cls(mos_readers, allow_incomplete=allow_incomplete)
 
     @classmethod
-    def from_s3(cls, *, bucket_name, prefix, suffix='.mos.xml', allow_incomplete=False):
+    def from_s3(
+            cls,
+            *,
+            bucket_name: str,
+            prefix: str,
+            suffix: str = '.mos.xml',
+            allow_incomplete: bool = False
+        ):
         """
         Construct from a list of MOS files in an S3 bucket
 
@@ -206,7 +218,7 @@ class MosCollection:
         return str(self.ro)
 
     @property
-    def mos_readers(self):
+    def mos_readers(self) -> List[MosReader]:
         """
         A list of :class:`MosReader` objects representing all MOS files in the
         collection, except the :class:`~mosromgr.mostypes.RunningOrder`
@@ -215,29 +227,35 @@ class MosCollection:
         return self._mos_readers
 
     @property
-    def ro(self):
-        "The collection's :class:`~mosromgr.mostypes.RunningOrder` object"
+    def ro(self) -> RunningOrder:
+        """
+        The collection's :class:`~mosromgr.mostypes.RunningOrder` object
+        """
         return self._ro
 
     @property
-    def ro_id(self):
-        "The running order ID"
+    def ro_id(self) -> str:
+        """
+        The running order ID
+        """
         return self.ro.ro_id
 
     @property
-    def ro_slug(self):
-        "The running order slug"
+    def ro_slug(self) -> str:
+        """
+        The running order slug
+        """
         return self.ro.ro_slug
 
     @property
-    def completed(self):
+    def completed(self) -> bool:
         """
         Whether or not the running order has had a
         :class:`~mosromgr.mostypes.RunningOrderEnd` merged (:class:`bool`)
         """
         return self.ro.completed
 
-    def _validate(self, allow_incomplete=False):
+    def _validate(self, allow_incomplete: bool = False):
         """
         Check a single roCreate is present, and if *allow_incomplete* is True,
         also check a single roDelete is present.
@@ -259,7 +277,7 @@ class MosCollection:
             mr for mr in self.mos_readers if mr.mos_type != RunningOrder
         ]
 
-    def merge(self, *, strict=True):
+    def merge(self, *, strict: bool = True):
         """
         Merge all MOS files into the collection's running order (:attr:`ro`). If
         *strict* is ``True`` (the default), then merge errors will be fatal. If

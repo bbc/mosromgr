@@ -52,8 +52,7 @@ The test suite uses `pytest`_. Tests are organised mirroring the source code.
 Running the tests
 -----------------
 
-To run the linter, test suite and coverage analysis, activate the environment
-and run:
+To run the test suite and coverage analysis, activate the environment and run:
 
 .. code-block:: console
 
@@ -62,6 +61,12 @@ and run:
 For more control when running tests, run ``pytest`` directly, for example
 ``pytest -vvxk story`` will run tests with ``story`` in the name (``-k story``)
 with verbose output (``-vv``), and stop at the first failure (``-x``).
+
+To run tests on multiple versions of Python, run ``tox`` which will invoke
+``make test`` for all versions of Python (included in ``tox.ini``) that you have
+installed.
+
+Tests are also automatically run against pull requests using GitHub Actions.
 
 Documentation
 =============

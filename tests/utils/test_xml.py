@@ -24,7 +24,7 @@ TESTXMLSTRINGBASE = """
         <child>child 6 text</child>
     </top>
     <top>
-        <topID>ID4,1234</topID>
+        <topID>ID4</topID>
         <child>child 7 text</child>
         <child>child 8 text</child>
     </top>
@@ -34,9 +34,9 @@ TESTXMLSTRINGBASE = """
 TESTXMLSTRINGNEW = """
 <xml>
     <top>
-        <topID>ID4</topID>
-        <child>child 7 text</child>
+        <topID>ID5</topID>
         <child>child 8 text</child>
+        <child>child 9 text</child>
     </top>
 </xml>
 """
@@ -70,10 +70,11 @@ def test_replace_node():
     assert root.findall('top')[0].find('topID').text == "ID1"
     assert root.findall('top')[1].find('topID').text == "ID2"
     assert root.findall('top')[2].find('topID').text == "ID3"
+    assert root.findall('top')[3].find('topID').text == "ID4"
 
     replace_node(root, node_to_replace, new_node, index)
     assert len(root.findall('top')) == 4
-    assert root.findall('top')[0].find('topID').text == "ID4"
+    assert root.findall('top')[0].find('topID').text == "ID5"
     assert root.findall('top')[1].find('topID').text == "ID2"
     assert root.findall('top')[2].find('topID').text == "ID3"
 
@@ -83,7 +84,6 @@ def test_insert_node():
     EXPECT: The parent with the new node inserted at the correct place
     """
     root = ET.fromstring(TESTXMLSTRINGBASE)
-    index = 0
     new_root = ET.fromstring(TESTXMLSTRINGNEW)
     node_to_insert = new_root.find('top')
     assert len(root.findall('top')) == 4
@@ -93,10 +93,29 @@ def test_insert_node():
 
     insert_node(root, node_to_insert, 0)
     assert len(root.findall('top')) == 5
-    assert root.findall('top')[0].find('topID').text == "ID4"
+    assert root.findall('top')[0].find('topID').text == "ID5"
     assert root.findall('top')[1].find('topID').text == "ID1"
     assert root.findall('top')[2].find('topID').text == "ID2"
     assert root.findall('top')[3].find('topID').text == "ID3"
+
+def test_append_node():
+    """
+    GIVEN: A parent and a new node to append
+    EXPECT: The new node added to the end of the parent
+    """
+    root = ET.fromstring(TESTXMLSTRINGBASE)
+    new_root = ET.fromstring(TESTXMLSTRINGNEW)
+    node_to_append = new_root.find('top')
+    assert len(root.findall('top')) == 4
+    assert root.findall('top')[0].find('topID').text == "ID1"
+    assert root.findall('top')[-2].find('topID').text == "ID3"
+    assert root.findall('top')[-1].find('topID').text == "ID4"
+
+    append_node(root, node_to_append)
+    assert len(root.findall('top')) == 5
+    assert root.findall('top')[0].find('topID').text == "ID1"
+    assert root.findall('top')[-2].find('topID').text == "ID4"
+    assert root.findall('top')[-1].find('topID').text == "ID5"
 
 def test_find_child_with_id():
     """
@@ -114,9 +133,9 @@ def test_find_child_with_partial_id():
     EXPECT: The first instance of the child node and its index within the parent
     """
     root = ET.fromstring(TESTXMLSTRINGBASE)
-    child, child_index = find_child(root, 'top', 'ID5,1234')
+    child, child_index = find_child(root, 'top', 'ID4')
     assert child_index == 3
-    assert child.find('topID').text == 'ID4,1234'
+    assert child.find('topID').text == 'ID4'
 
 def test_find_child_without_id():
     """

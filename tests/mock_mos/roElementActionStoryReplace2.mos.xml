@@ -1,0 +1,27 @@
+<mos>
+  <mosID>MOS ID</mosID>
+  <messageID>1003</messageID>
+  <roElementAction operation="REPLACE">
+    <roID>RO ID</roID>
+    <element_target>
+      <storyID>STORY10</storyID>
+    </element_target>
+    <element_source>
+      <story>
+        <storyID>STORY5</storyID>
+        <storySlug>STORY 5</storySlug>
+        <storyNum></storyNum>
+        <mosExternalMetadata>
+          <mosPayload>
+            <TextTime>10</TextTime>
+            <MediaTime>20</MediaTime>
+          </mosPayload>
+        </mosExternalMetadata>
+        <item>
+          <itemID>ITEM1</itemID>
+          <itemSlug>ITEM ONE</itemSlug>
+        </item>
+      </story>
+    </element_source>
+  </roElementAction>
+</mos>

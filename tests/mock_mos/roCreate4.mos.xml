@@ -1,0 +1,8 @@
+<mos>
+  <mosID>MOS ID</mosID>
+  <messageID>1000</messageID>
+  <roCreate>
+    <roID>RO ID</roID>
+    <roSlug>RO SLUG</roSlug>
+  </roCreate>
+</mos>

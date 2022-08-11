@@ -4,6 +4,6 @@ __pycache__
 build
 dist
 *.egg-info
-.coverage
+.coverage*
 .idea
 .vscode

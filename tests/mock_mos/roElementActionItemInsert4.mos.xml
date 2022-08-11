@@ -1,0 +1,17 @@
+<mos>
+  <mosID>MOS ID</mosID>
+  <messageID>1008</messageID>
+  <roElementAction operation="INSERT">
+    <roID>RO ID</roID>
+    <element_target>
+      <storyID>STORY1</storyID>
+      <itemID>ITEM10</itemID>
+    </element_target>
+    <element_source>
+        <item>
+          <itemID>ITEM5</itemID>
+          <itemSlug>ITEM 5</itemSlug>
+        </item>
+    </element_source>
+  </roElementAction>
+</mos>

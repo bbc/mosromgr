@@ -2,8 +2,9 @@
 # Copyright 2021 BBC
 # SPDX-License-Identifier: Apache-2.0
 
-from mosromgr.cli import main
 import pytest
+
+from mosromgr.cli import main
 
 
 def test_args_incorrect():

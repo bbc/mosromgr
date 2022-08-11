@@ -2,14 +2,18 @@
 # Copyright 2021 BBC
 # SPDX-License-Identifier: Apache-2.0
 
-import xml.etree.ElementTree as ET
-from datetime import timedelta
+from xml.etree import ElementTree
+from xml.etree.ElementTree import Element
+from datetime import datetime, timedelta
+from typing import Optional, Union, List, Dict
 
 from dateutil.parser import parse
 
 
-def _get_story_offsets(all_stories):
-    "Create a dict of {story_id: story_offset}"
+def _get_story_offsets(all_stories: Optional[List[Element]]) -> Optional[Dict[str, float]]:
+    """
+    Create a dict of {story_id: story_offset}
+    """
     story_offsets = {}
     if all_stories:
         t = 0
@@ -19,7 +23,7 @@ def _get_story_offsets(all_stories):
         return story_offsets
 
 
-def _get_story_duration(story_tag):
+def _get_story_duration(story_tag: Element) -> Optional[float]:
     """
     Return the sum of the text time and media time, or return None if not found
     """
@@ -27,25 +31,25 @@ def _get_story_duration(story_tag):
         metadata = story_tag.find('mosExternalMetadata')
         payload = metadata.find('mosPayload')
     except AttributeError:
-        return 0
+        return
 
     try:
         return float(payload.find('StoryDuration').text)
     except AttributeError:
         pass
 
-    try:
-        text_time = float(payload.find('TextTime').text)
-        media_time = float(payload.find('MediaTime').text)
+    text_time = payload.find('TextTime')
+    media_time = payload.find('MediaTime')
+    if text_time is not None or media_time is not None:
+        text_time = float(text_time.text) if text_time is not None else 0
+        media_time = float(media_time.text) if media_time is not None else 0
         return text_time + media_time
-    except AttributeError:
-        return 0
 
 
-def _is_technical_note(p):
+def _is_technical_note(p: Element) -> bool:
     """
-    Return True if the text in a paragraph element is surrounded by round () or
-    angle <> brackets.
+    Return ``True`` if the text in a paragraph element is surrounded by round
+    ``()`` or angle ``<>`` brackets.
     """
     text = p.text.strip()
     if text.startswith('(') and text.endswith(')'):
@@ -54,10 +58,10 @@ def _is_technical_note(p):
         return True
     return False
 
-def _get_tag_text(tag):
+def _get_tag_text(tag: Element) -> str:
     """
-    If a <p> tag contains text, return it, otherwise return an empty string
-    (rather than None).
+    If a ``<p>`` tag contains text, return it, otherwise return an empty string
+    (rather than ``None``).
     """
     if tag.text is not None:
         return tag.text
@@ -65,8 +69,10 @@ def _get_tag_text(tag):
 
 
 class MosElement:
-    "Abstract base class for MOS elements"
-    def __init__(self, xml, *, id=None, slug=None):
+    """
+    Abstract base class for MOS elements
+    """
+    def __init__(self, xml: Element, *, id: Optional[str] = None, slug: Optional[str] = None):
         self._xml = xml
         self._id = id
         self._slug = slug
@@ -81,32 +87,108 @@ class MosElement:
             return f"<{self.__class__.__name__}>"
 
     def __str__(self):
-        "The XML string"
-        return ET.tostring(self.xml, encoding='unicode')
+        """
+        The XML string
+        """
+        return ElementTree.tostring(self.xml, encoding='unicode')
 
     @property
-    def xml(self):
-        "The XML element (:class:`xml.etree.ElementTree.Element`)"
+    def xml(self) -> Element:
+        """
+        The XML element
+        """
         return self._xml
 
     @property
-    def id(self):
-        "The element ID (:class:`str`)"
+    def id(self) -> Optional[str]:
+        """
+        The element ID (if present in the XML)
+        """
         if self._id is None:
-            self._id = self.xml.find(self._id_tag).text
+            try:
+                self._id = self.xml.find(self._id_tag).text
+            except AttributeError:
+                self._id = None
         return self._id
 
     @property
-    def slug(self):
+    def slug(self) -> Optional[str]:
         """
-        The element slug (:class:`str` or ``None`` if not available in the
-        XML)
+        The element slug (if present in the XML)
         """
         try:
             self._slug = self.xml.find(self._slug_tag).text
         except AttributeError:
             return
         return self._slug
+
+
+class Item(MosElement):
+    """
+    This class represents an Item element within any
+    :class:`~mosromgr.mostypes.MosFile` object, providing data relating to an
+    item within a :class:`Story`. The Item ID and Item slug (and more) are
+    exposed as properties, and the XML element is provided for further
+    introspection.
+    """
+    def __init__(self, xml: Element, *, id: Optional[str] = None, slug: Optional[str] = None):
+        super().__init__(xml, id=id, slug=slug)
+        self._id_tag = 'itemID'
+        self._slug_tag = 'itemSlug'
+
+    @property
+    def id(self) -> Optional[str]:
+        """
+        The Item ID (if present in the XML)
+        """
+        return super().id
+
+    @property
+    def slug(self) -> Optional[str]:
+        """
+        The Item slug (if present in the XML)
+        """
+        return super().slug
+
+    @property
+    def type(self) -> Optional[str]:
+        """
+        The Item's object type (if present in the XML)
+        """
+        obj_type = self.xml.find('objType')
+        if obj_type is not None:
+            return obj_type.text
+
+    @property
+    def object_id(self) -> Optional[str]:
+        """
+        The Item's Object ID (if present in the XML)
+        """
+        obj_id = self.xml.find('objID')
+        if obj_id is not None:
+            return obj_id.text
+
+    @property
+    def mos_id(self) -> Optional[str]:
+        """
+        The Item's MOS ID (if present in the XML)
+        """
+        mos_id = self.xml.find('mosID')
+        if mos_id is not None:
+            return mos_id.text
+
+    @property
+    def note(self) -> Optional[str]:
+        """
+        The item note text (if present in the XML)
+        """
+        try:
+            metadata = self.xml.find('mosExternalMetadata')
+            mos_payload = metadata.find('mosPayload')
+            note = mos_payload.find(".//studioCommand[@type='note']")
+            return note.find('text').text
+        except AttributeError:
+            return
 
 
 class Story(MosElement):
@@ -116,8 +198,16 @@ class Story(MosElement):
     story. The Story ID, Story slug, duration and more are exposed as
     properties, and the XML element is provided for further introspection.
     """
-    def __init__(self, xml, *, id=None, slug=None, duration=None,
-                 unknown_items=False, all_stories=None, prog_start_time=None):
+    def __init__(self,
+        xml: Element,
+        *,
+        id: Optional[str] = None,
+        slug: Optional[str] = None,
+        duration: Optional[float] = None,
+        unknown_items: bool = False,
+        all_stories: Optional[List[Element]] = None,
+        prog_start_time: Optional[datetime] = None
+    ):
         super().__init__(xml, id=id, slug=slug)
         self._id_tag = 'storyID'
         self._slug_tag = 'storySlug'
@@ -127,19 +217,21 @@ class Story(MosElement):
         self._story_offsets = _get_story_offsets(all_stories)
 
     @property
-    def id(self):
+    def id(self) -> Optional[str]:
         """
-        The Story ID (:class:`str`)
+        The Story ID (if present in the XML)
         """
         return super().id
 
     @property
-    def slug(self):
-        "The Story slug (:class:`str` or ``None`` if not available in the XML)"
+    def slug(self) -> Optional[str]:
+        """
+        The Story slug (if present in the XML)
+        """
         return super().slug
 
     @property
-    def items(self):
+    def items(self) -> Optional[List[Item]]:
         """
         List of :class:`Item` elements found within the story (can be ``None``
         if not available in the XML)
@@ -152,18 +244,17 @@ class Story(MosElement):
         ]
 
     @property
-    def duration(self):
+    def duration(self) -> float:
         """
         The story duration (the sum of the text time and media time found
-        within ``mosExternalMetadata->mosPayload``), in seconds (:class:`float`)
+        within ``mosExternalMetadata->mosPayload``), in seconds
         """
         return _get_story_duration(self.xml)
 
     @property
-    def offset(self):
+    def offset(self) -> Optional[float]:
         """
-        The time offset of the story in seconds (:class:`float` or ``None`` if
-        not available in the XML)
+        The time offset of the story in seconds (if available in the XML)
         """
         try:
             return self._story_offsets.get(self.id)
@@ -171,10 +262,9 @@ class Story(MosElement):
             return
 
     @property
-    def start_time(self):
+    def start_time(self) -> Optional[datetime]:
         """
-        The transmission start time of the story (:class:`datetime.datetime` or
-        ``None`` if not available in the XML)
+        The transmission start time of the story (if present in the XML)
         """
         try:
             metadata = self.xml.find('mosExternalMetadata')
@@ -191,10 +281,9 @@ class Story(MosElement):
         return self._prog_start_time + timedelta(seconds=self.offset)
 
     @property
-    def end_time(self):
+    def end_time(self) -> Optional[datetime]:
         """
-        The transmission end time of the story (:class:`datetime.datetime` or
-        ``None`` if not available in the XML)
+        The transmission end time of the story (if present in the XML)
         """
         try:
             metadata = self.xml.find('mosExternalMetadata')
@@ -204,14 +293,11 @@ class Story(MosElement):
         except AttributeError:
             pass
 
-        start_time = self.start_time
-        duration = self.duration
-        if start_time is None or duration is None:
-            return
-        return self.start_time + timedelta(seconds=self.duration)
+        if self.start_time is not None and self.duration is not None:
+            return self.start_time + timedelta(seconds=self.duration)
 
     @property
-    def script(self):
+    def script(self) -> List[str]:
         """
         A list of strings found in paragraph tags within the story body,
         excluding any empty paragraphs or technical notes in brackets.
@@ -223,78 +309,15 @@ class Story(MosElement):
         ]
 
     @property
-    def body(self):
+    def body(self) -> List[Union[Item, str]]:
         """
         A list of elements found in the story body. Each item in the list is
         either a string (representing a ``<p>`` tag) or an :class:`Item` object
         (representing an ``<item>`` tag). Unlike :attr:`script`, this does not
-        exclude empty paragraph tags.
+        exclude empty paragraph tags, which will be represented by empty strings.
         """
         return [
             Item(tag) if tag.tag == 'item' else _get_tag_text(tag)
             for tag in self.xml
             if tag.tag in ('item', 'p')
         ]
-
-
-class Item(MosElement):
-    """
-    This class represents an Item element within any
-    :class:`~mosromgr.mostypes.MosFile` object, providing data relating to an
-    item within a :class:`Story`. The Item ID and Item slug are exposed as
-    properties, and the XML element is provided for further introspection.
-    """
-    def __init__(self, xml, *, id=None, slug=None):
-        super().__init__(xml, id=id, slug=slug)
-        self._id_tag = 'itemID'
-        self._slug_tag = 'itemSlug'
-
-    @property
-    def id(self):
-        "The Item ID (:class:`str`)"
-        return super().id
-
-    @property
-    def slug(self):
-        "The Item slug (:class:`str` or ``None`` if not available in the XML)"
-        return super().slug
-
-    @property
-    def type(self):
-        """
-        The Item's object type (:class:`str` or ``None`` if not available in the
-        XML)
-        """
-        obj_type = self.xml.find('objType')
-        if obj_type is not None:
-            return obj_type.text
-
-    @property
-    def object_id(self):
-        """
-        The Item's Object ID (:class:`str` or ``None`` if not available in the
-        XML)
-        """
-        obj_id = self.xml.find('objID')
-        if obj_id is not None:
-            return obj_id.text
-
-    @property
-    def mos_id(self):
-        """
-        The Item's MOS ID (:class:`str` or ``None`` if not available in the XML)
-        """
-        mos_id = self.xml.find('mosID')
-        if mos_id is not None:
-            return mos_id.text
-
-    @property
-    def note(self):
-        "The item note text (:class:`str` or ``None`` if not found)"
-        try:
-            metadata = self.xml.find('mosExternalMetadata')
-            mos_payload = metadata.find('mosPayload')
-            note = mos_payload.find(".//studioCommand[@type='note']")
-            return note.find('text').text
-        except AttributeError:
-            return

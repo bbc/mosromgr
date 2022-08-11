@@ -14,18 +14,22 @@
           <MediaTime>2</MediaTime>
         </mosPayload>
       </mosExternalMetadata>
+      <p>This is story 1</p>
       <item>
         <itemID>ITEM1</itemID>
         <itemSlug>ITEM 1</itemSlug>
       </item>
+      <p>This is still story 1</p>
       <item>
         <itemID>ITEM2</itemID>
         <itemSlug>ITEM 2</itemSlug>
       </item>
+      <p>This is still still story 1</p>
       <item>
         <itemID>ITEM3</itemID>
         <itemSlug>ITEM 3</itemSlug>
       </item>
+      <p>That was story 1</p>
     </story>
     <story>
       <storyID>STORY2</storyID>

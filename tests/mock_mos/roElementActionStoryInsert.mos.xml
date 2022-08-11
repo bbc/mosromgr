@@ -8,12 +8,12 @@
     </element_target>
     <element_source>
       <story>
-        <storyID>STORYNEW</storyID>
-        <storySlug>STORY NEW</storySlug>
+        <storyID>STORY5</storyID>
+        <storySlug>STORY 5</storySlug>
         <storyNum></storyNum>
         <item>
-          <itemID>ITEMNEW</itemID>
-          <itemSlug>ITEM NEW</itemSlug>
+          <itemID>ITEM1</itemID>
+          <itemSlug>ITEM 1</itemSlug>
         </item>
       </story>
     </element_source>

@@ -2,18 +2,19 @@
 # Copyright 2021 BBC
 # SPDX-License-Identifier: Apache-2.0
 
+import warnings
+
 import pytest
 from mock import patch
-import warnings
 
 from mosromgr.moscollection import *
 from mosromgr.mostypes import *
 from mosromgr.exc import *
 
 
-def test_mos_collection_init_path(rocreate, rodelete):
+def test_mos_collection_init_from_files(rocreate, rodelete):
     """
-    GIVEN: A list containing a filepath to a roCreate and roDelete message
+    GIVEN: A list containing filepaths to a roCreate and roDelete message
     EXPECT: MosCollection object with 1 file
     """
     mos_files = [rocreate, rodelete]
@@ -22,6 +23,48 @@ def test_mos_collection_init_path(rocreate, rodelete):
     assert isinstance(mc.ro, RunningOrder)
     assert isinstance(mc.mos_readers, list)
     assert len(mc.mos_readers) == 1
+    assert 'roCreate' in str(mc)
+    assert mc.ro_id == 'RO ID'
+
+def test_mos_collection_init_from_strings(rocreate, rodelete):
+    """
+    GIVEN: A list containing roCreate and roDelete XML strings
+    EXPECT: MosCollection object with 1 file
+    """
+    mos_files = [rocreate.read_text(), rodelete.read_text()]
+    mc = MosCollection.from_strings(mos_files)
+    assert repr(mc) == "<MosCollection RO SLUG>"
+    assert isinstance(mc.ro, RunningOrder)
+    assert isinstance(mc.mos_readers, list)
+    assert len(mc.mos_readers) == 1
+    assert 'roCreate' in str(mc)
+    assert mc.ro_id == 'RO ID'
+
+def test_mos_collection_init_allow_incomplete(rocreate, rostorysend1):
+    """
+    GIVEN: A list containing filepaths to a roCreate and roStorySend message
+    WITH: allow_incomplete set True
+    EXPECT: MosCollection object with 1 file
+    """
+    mos_files = [rocreate, rostorysend1]
+    mc = MosCollection.from_files(mos_files, allow_incomplete=True)
+    assert repr(mc) == "<MosCollection RO SLUG>"
+    assert isinstance(mc.ro, RunningOrder)
+    assert isinstance(mc.mos_readers, list)
+    assert len(mc.mos_readers) == 1
+    assert 'roCreate' in str(mc)
+    assert mc.ro_id == 'RO ID'
+
+def test_mos_collection_init_no_allow_incomplete(rocreate, rostorysend1):
+    """
+    GIVEN: A list containing filepaths to a roCreate and roStorySend message
+    WITH: allow_incomplete set False
+    EXPECT: InvalidMosCollection exception
+    """
+    mos_files = [rocreate, rostorysend1]
+
+    with pytest.raises(InvalidMosCollection):
+        MosCollection.from_files(mos_files, allow_incomplete=False)
 
 def test_mos_collection_bad_init_params():
     "Test MosCollection cannot be created with bad input"
@@ -64,7 +107,7 @@ def test_mos_collection_bad_init_mixed_ids(rocreate, rodelete2):
     with pytest.raises(InvalidMosCollection):
         MosCollection.from_files(mos_files)
 
-def test_mos_collection_init_files_after_rodelete(rocreate, rodelete, rodelete2, rostorysend4):
+def test_mos_collection_init_files_after_rodelete(rocreate, rodelete, rostorysend4):
     """
     GIVEN: A list of MOS files with messages following roDelete
     EXPECT: MosCollection object with 2 files, plus warning on merge
@@ -81,24 +124,26 @@ def test_mos_collection_init_files_after_rodelete(rocreate, rodelete, rodelete2,
 @patch('mosromgr.utils.s3.boto3')
 @patch('mosromgr.utils.s3.get_file_contents')
 @patch('mosromgr.utils.s3.get_mos_files')
-def test_mos_collection_init_s3(get_mos_files, get_file_contents, boto3, rocreate, rodelete, ro_all):
+def test_mos_collection_init_from_s3(get_mos_files, get_file_contents, boto3, rocreate, rodelete):
     """
     GIVEN: A bucket name and prefix (mocked to contain two files)
     EXPECT: MosCollection object with 1 reader
     """
-    with open(rocreate) as f:
-        rocreate = f.read()
-    with open(rodelete) as f:
-        rodelete = f.read()
-
     get_mos_files.return_value = ['roCreate.mos.xml', 'roDelete.mos.xml']
-    get_file_contents.side_effect = [rocreate, rodelete, rocreate, rodelete]
+    get_file_contents.side_effect = [
+        rocreate.read_text(),
+        rodelete.read_text(),
+        rocreate.read_text(),
+        rodelete.read_text(),
+    ]
 
     mc = MosCollection.from_s3(bucket_name='bucket_name', prefix='newsnight')
     assert repr(mc) == "<MosCollection RO SLUG>"
     assert isinstance(mc.ro, RunningOrder)
     assert isinstance(mc.mos_readers, list)
     assert len(mc.mos_readers) == 1
+    assert 'roCreate' in str(mc)
+    assert mc.ro_id == 'RO ID'
 
 def test_mos_collection_init_multiple_files(ro_all):
     "Test collection can be created from multiple files"
@@ -128,12 +173,12 @@ def test_mos_collection_unsupported_mos_type(rocreate, roinvalid, rodelete):
     with pytest.raises(UnknownMosFileType):
         MosCollection.from_files(mos_files)
 
-def test_mos_collection_merge(rocreate, roelementactionstoryinsert, rodelete):
+def test_mos_collection_merge(rocreate, eastoryinsert, rodelete):
     """
     GIVEN: Running order and EAStoryInsert paths
     EXPECT: Running order summary, with story from EAStoryInsert added
     """
-    mos_files = [rocreate, roelementactionstoryinsert, rodelete]
+    mos_files = [rocreate, eastoryinsert, rodelete]
     mc = MosCollection.from_files(mos_files)
     assert len(mc.mos_readers) == 2
     d = mc.ro.dict
@@ -147,17 +192,14 @@ def test_mos_collection_merge(rocreate, roelementactionstoryinsert, rodelete):
 @patch('mosromgr.utils.s3.get_file_contents')
 @patch('mosromgr.utils.s3.get_mos_files')
 def test_mos_collection_s3_merge(get_mos_files, get_file_contents, boto3,
-    rocreate, roelementactionstoryinsert, rodelete):
+    rocreate, eastoryinsert, rodelete):
     """
     GIVEN: Bucket prefix matching a roCreate and ElementAction (StoryInsert)
     EXPECT: Running order summary, with story from EAStoryInsert added
     """
-    with open(rocreate) as f:
-        rc = f.read()
-    with open(roelementactionstoryinsert) as f:
-        ea = f.read()
-    with open(rodelete) as f:
-        rd = f.read()
+    rc = rocreate.read_text()
+    ea = eastoryinsert.read_text()
+    rd = rodelete.read_text()
 
     get_mos_files.return_value = [rc, ea, rd]
     get_file_contents.side_effect = [rc, ea, rd, rc, ea, rd]

@@ -6,12 +6,12 @@
     <storyID>STORY1</storyID>
     <itemID>ITEM2</itemID>
     <item>
-      <itemID>ITEMNEW1</itemID>
-      <itemSlug>ITEM NEW 1</itemSlug>
+      <itemID>ITEM4</itemID>
+      <itemSlug>ITEM 4</itemSlug>
     </item>
     <item>
-      <itemID>ITEMNEW2</itemID>
-      <itemSlug>ITEM NEW 2</itemSlug>
+      <itemID>ITEM5</itemID>
+      <itemSlug>ITEM 5</itemSlug>
     </item>
   </roItemInsert>
 </mos>

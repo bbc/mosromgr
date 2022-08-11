@@ -3,8 +3,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from xml.etree.ElementTree import Element
+from datetime import datetime
 
-from mosromgr.moselements import *
+from mosromgr.moselements import MosElement, Story, Item, _is_technical_note
 
 
 def test_mos_element_init():
@@ -17,7 +18,7 @@ def test_story_init(story_xml):
     story = Story(story_xml)
     assert repr(story) == "<Story STORY1>"
 
-def test_story_properties(story_xml):
+def test_story_properties(story_xml, story2_xml, story3_xml):
     "Test we can create a Story element and access its properties"
     story = Story(story_xml)
     assert type(story.xml) == Element
@@ -50,6 +51,15 @@ def test_story_properties(story_xml):
     body_part_3 = story.body[2]
     assert type(body_part_3) == Item
 
+    story2 = Story(story2_xml)
+    assert story2.duration is None
+    assert story2.start_time == datetime(2022, 11, 16, 12, 30)
+    assert story2.end_time == datetime(2022, 11, 16, 12, 40)
+
+    story3 = Story(story3_xml)
+    assert story3.start_time == datetime(2022, 11, 16, 12, 30)
+    assert story3.end_time == datetime(2022, 11, 16, 12, 32)
+
 def test_item_init(item_mosart_xml):
     "Test we can create a Item element and access its repr"
     item = Item(item_mosart_xml)
@@ -64,9 +74,9 @@ def test_item_properties(item_mosart_xml):
     assert item.note is None
     assert item.type == 'MOSART'
     assert item.mos_id == 'MOS ID'
-    assert item.object_id == 100
+    assert item.object_id == '100'
 
-def test_item_properties(item_note_xml):
+def test_item_note_properties(item_note_xml):
     "Test we can create a Item element and access its properties"
     item = Item(item_note_xml)
     assert type(item.xml) == Element
@@ -74,5 +84,21 @@ def test_item_properties(item_note_xml):
     assert item.slug == 'ITEM 2'
     assert item.note == 'THIS IS A NOTE'
     assert item.type is None
-    assert item.mos_id == 'MOS ID'
+    assert item.mos_id is None
     assert item.object_id is None
+
+def test_is_technical_note():
+    "Test we can determine what is and is not a technical note"
+    e = Element('p')
+    e.text = '(test)'
+    assert _is_technical_note(e)
+    e.text = '<test>'
+    assert _is_technical_note(e)
+    e.text = '(test'
+    assert not _is_technical_note(e)
+    e.text = 'test)'
+    assert not _is_technical_note(e)
+    e.text = 'test>'
+    assert not _is_technical_note(e)
+    e.text = 'test'
+    assert not _is_technical_note(e)

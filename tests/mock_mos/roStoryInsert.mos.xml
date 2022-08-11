@@ -5,8 +5,8 @@
     <roID>RO ID</roID>
     <storyID>STORY2</storyID>
     <story>
-      <storyID>STORYNEW1</storyID>
-      <storySlug>STORY NEW 1</storySlug>
+      <storyID>STORY4</storyID>
+      <storySlug>STORY 4</storySlug>
       <storyNum></storyNum>
       <mosExternalMetadata>
         <mosPayload>
@@ -15,13 +15,13 @@
         </mosPayload>
       </mosExternalMetadata>
       <item>
-        <itemID>ITEMNEW1</itemID>
-        <itemSlug>ITEM NEW 1</itemSlug>
+        <itemID>ITEM4</itemID>
+        <itemSlug>ITEM 4</itemSlug>
       </item>
     </story>
     <story>
-      <storyID>STORYNEW2</storyID>
-      <storySlug>STORY NEW 2</storySlug>
+      <storyID>STORY5</storyID>
+      <storySlug>STORY 5</storySlug>
       <storyNum></storyNum>
       <mosExternalMetadata>
         <mosPayload>
@@ -30,8 +30,8 @@
         </mosPayload>
       </mosExternalMetadata>
       <item>
-        <itemID>ITEMNEW21</itemID>
-        <itemSlug>ITEM NEW 21</itemSlug>
+        <itemID>ITEM5</itemID>
+        <itemSlug>ITEM 5</itemSlug>
       </item>
     </story>
   </roStoryInsert>
