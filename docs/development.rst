@@ -52,8 +52,7 @@ The test suite uses `pytest`_. Tests are organised mirroring the source code.
 Running the tests
 -----------------
 
-To run the linter, test suite and coverage analysis, activate the environment
-and run:
+To run the test suite and coverage analysis, activate the environment and run:
 
 .. code-block:: console
 
