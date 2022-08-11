@@ -117,7 +117,6 @@ class MosFile:
             'roReadyToAir': ReadyToAir,
             'roDelete': RunningOrderEnd,
             'roElementAction': ElementAction,
-            'roCtrl': RunningOrderControl,
         }
         for tag, subcls in tag_class_map.items():
             if xml.find(tag):
@@ -214,7 +213,7 @@ class RunningOrder(MosFile):
             ss = StorySend.from_file('roStorySend.mos.xml')
             ro += ss
         """
-        if self.xml.find('mosromgrmeta') is None or isinstance(other, RunningOrderControl):
+        if self.xml.find('mosromgrmeta') is None:
             return other.merge(self)
         raise MosCompletedMergeError("Cannot merge completed MOS file")
 
@@ -1217,8 +1216,7 @@ class RunningOrderEnd(MosFile):
     using the ``+`` operator. This behaviour is defined in the :meth:`merge`
     method in this class. Once a ``RunningOrderEnd`` object has been merged into
     a :class:`RunningOrder`, the running order is considered "completed" and no
-    further messages can be merged (with the exception of
-    :class:`RunningOrderControl`).
+    further messages can be merged.
 
     *Specification: Delete Running Order*
 
@@ -1977,59 +1975,3 @@ class EAItemMove(ElementAction):
         print("IN STORY:", self.story.id)
         for item in self.items:
             print("  MOVE ITEM:", item.id)
-
-
-class RunningOrderControl(MosFile):
-    """
-    A ``RunningOrderControl`` object is created from a ``roCtrl`` MOS file and
-    can be constructed using classmethods :meth:`from_file`, :meth:`from_string`
-    or :meth:`from_s3`.
-
-    *Specification: Running Order Control*
-    http://mosprotocol.com/wp-content/MOS-Protocol-Documents/MOSProtocolVersion40/index.html#calibre_link-47
-
-    TODO: generalise this class #20
-    """
-    @property
-    def base_tag_name(self) -> str:
-        """
-        The name of the base XML tag for this file type
-        """
-        return 'roCtrl'
-
-    @property
-    def story(self) -> Story:
-        """
-        The story to which this roCtrl message relates
-        """
-        return Story(xml=self.base_tag)
-
-    def merge(self, ro: RunningOrder) -> RunningOrder:
-        """
-        Merge into the :class:`RunningOrder` object provided.
-        """
-        if self.story.id is None:
-            msg = f"{self.__class__.__name__} error in {self.message_id} - story not given"
-            logger.warning(msg)
-            warnings.warn(msg, StoryNotFoundWarning)
-        story, story_index = find_child(parent=ro.base_tag, child_tag='story', id=self.story.id)
-        if story is None:
-            msg = f"{self.__class__.__name__} error in {self.message_id} - story not found"
-            logger.warning(msg)
-            warnings.warn(msg, StoryNotFoundWarning)
-        else:
-            ro_story_payload = story.find('mosExternalMetadata').find('mosPayload')
-            for new_tag in self.story.xml.find('mosExternalMetadata').find('mosPayload'):
-                if new_tag.text:
-                    old_tag, old_tag_index = find_child(parent=ro_story_payload, child_tag=new_tag.tag, id=None)
-                    if old_tag is None:
-                        append_node(parent=ro_story_payload, node=new_tag)
-                    else:
-                        replace_node(parent=ro_story_payload, old_node=old_tag, new_node=new_tag, index=old_tag_index)
-        return ro
-
-    def inspect(self):
-        """
-        Print an outline of the key file contents
-        """
-        print("RO CTRL FOR STORY:", self.story.id)

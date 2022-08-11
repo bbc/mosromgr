@@ -65,8 +65,7 @@ Release 0.7.0 (2021-01-08)
 - Ensured target story is found when merging
   :class:`~mosromgr.mostypes.StoryInsert` and
   :class:`~mosromgr.mostypes.StoryReplace`
-- Added :class:`~mosromgr.mostypes.RunningOrderControl` class (for ``roCtrl``
-  messages)
+- Added ``RunningOrderControl`` class (for ``roCtrl`` messages)
 - Changed ``tx_time`` to :attr:`~mosromgr.mostypes.RunningOrder.start_time`
 
 Release 0.6.0 (2020-12-01)
