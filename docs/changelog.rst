@@ -12,6 +12,15 @@ Changelog
     stable and may change. Once the library reaches v1.0, it will be considered
     stable. Please consider giving :doc:`feedback` to help stabilise the API.
 
+Release 0.10.0 (2022-08-25)
+===========================
+
+- Add type hints
+- Remove ``RunningOrderControl`` class
+- Add support for various edge cases in ``merge`` methods, fixing several bugs
+- Increase test coverage for :ref:`xml`, :doc:`api/moscollection`,
+  :doc:`api/moselements` and :doc:`api/mostypes` to 100%
+
 Release 0.9.1 (2021-09-02)
 ==========================
 

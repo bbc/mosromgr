@@ -34,6 +34,8 @@ get_file_contents
 
 .. autofunction:: mosromgr.utils.s3.get_file_contents
 
+.. _xml:
+
 XML
 ===
 

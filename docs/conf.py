@@ -39,7 +39,7 @@ autodoc_member_order = 'groupwise'
 # -- Intersphinx configuration --------------------------------------------
 
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/3.7', None),
+    'python': ('https://docs.python.org/3.9', None),
 }
 
 # -- Options for HTML output ----------------------------------------------
