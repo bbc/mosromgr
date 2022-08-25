@@ -47,9 +47,9 @@ GitHub owners:
 PyPI owners:
 
 - Ben Nuttall
-- Nik Rahmel
+- Rich Wareham
 
 ReadTheDocs owners:
 
 - Ben Nuttall
-- Nik Rahmel
+- Rich Wareham
